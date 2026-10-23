@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="t d">
+  <title id="t">claude-motion</title><desc id="d">Original illustrated stage with a flowing timeline, title card, and a camera path</desc>
+  <rect width="1200" height="340" rx="24" fill="#141a21"/>
+  <g opacity=".14" stroke="#c6d9d5"><path d="M80 0v340M160 0v340M240 0v340M320 0v340M400 0v340M480 0v340M560 0v340M640 0v340M720 0v340M800 0v340M880 0v340M960 0v340M1040 0v340M1120 0v340M0 85h1200M0 170h1200M0 255h1200"/></g>
+  <g transform="translate(50 55)">
+    <rect width="415" height="230" rx="14" fill="#232f38" stroke="#4d656a" stroke-width="2"/>
+    <rect x="26" y="24" width="363" height="182" rx="8" fill="#f2e9dc"/>
+    <path d="M78 141c54-71 100-71 157-5 47 54 77 37 117-43" fill="none" stroke="#c55d3a" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="234" cy="136" r="10" fill="#c55d3a" stroke="#f2e9dc" stroke-width="3"/>
+    <rect x="54" y="54" width="198" height="16" rx="8" fill="#2c464a"/>
+    <rect x="54" y="82" width="133" height="9" rx="4.5" fill="#a0b6b3"/>
+    <circle cx="337" cy="166" r="28" fill="none" stroke="#2c464a" stroke-width="3" stroke-dasharray="7 7"/>
+  </g>
+  <g transform="translate(530 90)">
+    <text x="0" y="65" font-size="68" font-weight="700" font-family="system-ui,sans-serif" fill="#f2e9dc" letter-spacing="-3">claude-motion</text>
+    <text x="2" y="108" font-size="21" font-family="system-ui,sans-serif" fill="#a4c5bc">Film craft, preserved. Execution, portable.</text>
+    <g transform="translate(2 154)">
+      <path d="M0 20h610" fill="none" stroke="#48615e" stroke-width="5" stroke-linecap="round"/>
+      <path d="M0 20h135" fill="none" stroke="#d87851" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="135" cy="20" r="11" fill="#d87851" stroke="#f2e9dc" stroke-width="3"/>
+      <rect x="185" y="4" width="92" height="32" rx="7" fill="#364d4d"/>
+      <rect x="291" y="4" width="92" height="32" rx="7" fill="#364d4d"/>
+      <rect x="397" y="4" width="92" height="32" rx="7" fill="#364d4d"/>
+      <rect x="503" y="4" width="107" height="32" rx="7" fill="#364d4d"/>
+    </g>
+  </g>
+</svg>

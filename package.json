@@ -1,0 +1,15 @@
+{
+  "name": "claude-motion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unofficial portable motion-film Agent Skill with verbatim source references",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/motion.test.mjs tests/fidelity-and-audio.test.mjs",
+    "parity": "node scripts/parity.mjs",
+    "check": "node scripts/sync-upstream.mjs --verify && node scripts/validate-film.mjs assets/vanilla-film/scenes.json && npm test"
+  }
+}
