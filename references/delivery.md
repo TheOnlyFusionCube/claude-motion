@@ -58,3 +58,15 @@ For GIF, export to MP4 first and use FFmpeg palette generation if a GIF is actua
 ## Event-based wordless soundtrack (bundled standalone film)
 
 The starter exports a `SCORE.events` sequence from the same `T` anchor object as its visuals. Generate the original WAV with `node /path/to/claude-motion/scripts/render-audio.mjs ./my-film --out ./my-film/score.wav --levels yes`; export it with `node /path/to/claude-motion/scripts/export.mjs ./my-film --out film.mp4 --audio ./my-film/score.wav`. The audio synth is a small portable illustration, **not** the original `S.*` Anthropic player synth. The HTML preview is silent unless you add an audio transport.
+
+## Mandatory final-video audit for promos and demos
+
+For finished MP4s, run the **export** through the QA script, not the source preview:
+
+```sh
+node /path/to/claude-motion/scripts/audit-video.mjs ./my-film.mp4 --mode showreel --strict --sheet ./qa-contact-sheet.png
+```
+
+The script flags low-resolution output and long almost-static mid-film intervals, and writes a 12-still contact sheet. Use the modes `showreel`, `product`, `walkthrough`, or `ambient` to match intent. Read `references/quality-gates.md` and `references/showreel.md` for the manual inspection criteria; passing a pixel-change score is **not** artistic validation. Deliberate opening/closing holds are exempted from the automated stagnation gate.
+
+**If the local Chromium/localhost preview is blocked by browser policy**, do not silently deliver a low-resolution or slideshow substitute. Export via the user's existing rendering stack or a deterministic local alternative (for example, SVG/Canvas frames composed by code and encoded with FFmpeg), then review decoded MP4 frames with this audit. Report the unavailable browser QA and any unverified features. The inability to run the original player is a tooling limitation, not a reason to discard the original filmmaking brief.
