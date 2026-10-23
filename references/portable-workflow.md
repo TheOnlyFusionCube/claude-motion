@@ -84,3 +84,9 @@ User requests override aesthetic defaults, not the need for truthful display. Fo
 Render and *visually inspect* first frame, all cut boundaries, UI click frames, typography at phone scale, and close. Capture contact sheet; verify forward-then-back seek equality; verify audio start/end and cue sync; verify last card holds >=3 seconds. Run the scene manifest validator, any unit tests, and export tooling. A successful ZIP build or test pass is **not** proof of visual parity; report unrun browser tests plainly. Mark `stage: final` only when actually deliverable.
 
 End with a link to project files and any requested video; say what is approximate or unverified. Preserve the exact upstream docs **unaltered** in `references/upstream/`; coding-agent compatibility belongs in this adapter and the active `SKILL.md`.
+
+## 8. A demo/showreel must meet the original film's visual promise
+
+Read `references/showreel.md` before making a skill/tool promo or any "demo video" brief, even when no real product UI is supplied. Write evidence shots (input/action/output, UI cause/effect, intentional camera or morph) before laying out static titles or brand cards. At least two different kinetic devices must be visible. A row of labeled coding-agent names is not evidence of cross-agent compatibility.
+
+After exporting, inspect the **actual encoded frames** and call `node scripts/audit-video.mjs <mp4> --mode showreel --strict --sheet <sheet.png>`. The audit catches prolonged mid-film stagnation and low pixel resolution. Inspect the sheet, sound and readable mobile sizing manually. An error requires revision before claiming a finished promo unless the user explicitly requested that static visual treatment. Never equate 100% verbatim documentation parity to 100% visual or product-quality parity.
