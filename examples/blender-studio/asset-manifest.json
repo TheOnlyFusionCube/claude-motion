@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "project": "Studio City Asset Kit",
+  "assets": [
+    {
+      "file": "assets/transit-hub.glb",
+      "role": "hero",
+      "license": "CC0-1.0",
+      "attribution": "Original claude-motion procedural asset",
+      "usage": "authored structural geometry, no external textures",
+      "notes": "1284 authored triangles before instancing"
+    },
+    {
+      "file": "assets/reservoir.glb",
+      "role": "support",
+      "license": "CC0-1.0",
+      "attribution": "Original claude-motion procedural asset",
+      "usage": "authored structural geometry, no external textures",
+      "notes": "1164 authored triangles before instancing"
+    },
+    {
+      "file": "assets/courtyard.glb",
+      "role": "environment",
+      "license": "CC0-1.0",
+      "attribution": "Original claude-motion procedural asset",
+      "usage": "authored structural geometry, no external textures",
+      "notes": "136 authored triangles before instancing"
+    }
+  ],
+  "visualTarget": "premium-stylized-architectural"
+}
