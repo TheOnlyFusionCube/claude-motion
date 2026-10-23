@@ -46,6 +46,35 @@ export const expoOut = p => { const x = clamp01(p); return x === 1 ? 1 : 1 - 2 *
 export const breathe = (t, amount = .012, period = 3.2) => 1 + amount * Math.sin(2 * Math.PI * t / period);
 export const boilVariant = (t, rate = 12, count = 3) => ((Math.floor(Math.max(0,t) * rate) % count) + count) % count;
 
+/** Source motion.md section 1: held image or composition never becomes a still.
+ * Monotonic eased Ken Burns pan/zoom for the entire hold, without reversing.
+ * Input: hold start/end in absolute seconds; return translation in pixels + scale.
+ */
+export function heldPlate(t, {start = 0, end = 3, panX = 18, panY = 0, zoomPct = .02} = {}) {
+  if (!(end > start) || ![start,end,panX,panY,zoomPct].every(Number.isFinite) || zoomPct <= -1)
+    throw new Error('heldPlate needs finite values, end > start, and zoomPct > -1.');
+  const p = inOut(segment(t, start, end));
+  return {x: panX * p, y: panY * p, scale: 1 + zoomPct * p};
+}
+
+/** Slow camera drift on held UI; rate is per second (original 0.3-2% zoom/s).
+ * This returns a transform; apply it to the plate, not to a cursor target separately.
+ */
+export function uiHoldDrift(t, {start = 0, end = 3, dxPerSecond = 2, dyPerSecond = 0, zoomPerSecond = .006} = {}) {
+  if (!(end > start) || ![start,end,dxPerSecond,dyPerSecond,zoomPerSecond].every(Number.isFinite))
+    throw new Error('uiHoldDrift needs finite values and end > start.');
+  const dt = clamp(t, start, end) - start;
+  return {x: dt * dxPerSecond, y: dt * dyPerSecond, scale: Math.exp(dt * zoomPerSecond)};
+}
+
+/** A title's light 2 px/s continuous creep during a hold. Not a loop or wobble. */
+export function titleCreep(t, {start = 0, end = 3, pxPerSecond = 2} = {}) {
+  if (!(end > start) || ![start,end,pxPerSecond].every(Number.isFinite))
+    throw new Error('titleCreep needs finite values and end > start.');
+  return pxPerSecond * (clamp(t, start, end) - start);
+}
+
+
 /** Pure camera keyframe evaluator (source `kit.Camera`-inspired, not API-identical).
  *  Keys: {t,cx,cy,z,hold?,from?,cut?,drift?: [dxPerSecond,dyPerSecond,dLogZoomPerSecond]}
  *  Interpolate zoom logarithmically; slow drifts continue during holds.

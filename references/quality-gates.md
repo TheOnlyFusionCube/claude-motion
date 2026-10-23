@@ -17,16 +17,17 @@ Read with `references/showreel.md` for promos/showreels or with `upstream/walkth
 1. Render the complete film with music and inspect **the resulting file**. Verify actual width, height, duration, frame rate, and audio stream using `ffprobe`; don't infer output size from your source canvas.
 2. Generate or capture evenly spaced stills AND extra stills 0.2s before/after every cut, cursor interaction and major camera move. Inspect at least 8 distinct timestamps for a 15–30s film, ideally a contact sheet. Check first frame, end-card hold, subject continuity, and offscreen elements.
 3. Check at two sizes: full rendered image and a 640px-wide/mobile-sized image. Critical UI copy should remain legible. As a practical 1080p target, information-bearing captions should generally appear ≥26px tall on the full frame after camera zoom; tiny top bars can be decorative only.
-4. Watch the **silent** film. Every major section needs either a true change of state or a purposeful action, not merely a title on an unchanged layout. In a showreel, an unchanging middle section lasting ≥3s is a serious issue; intentional intro and closing holds are different.
+4. Watch the **silent** film. Every major section needs either a true change of state or a purposeful action, not merely a title on an unchanged layout. An unchanging section lasting ~3s is a serious issue **even in a title, establishing shot or closing hold**: the original source insists on subtle movement throughout. A deliberate freeze requires explicit user intent; an end card can stay readable while creeping.
 5. Listen to the score and watch sync. Sync clicks/ticks to exact playhead times and differentiate intro / action / payoff / closing in dynamics. Simply having an AAC stream does not establish a good score.
 6. Seek backward and forward for deterministic output; catch animation state that depends on previously rendered frames.
 7. Run the automated check below. **Do not override a failure silently.** Revise or explicitly explain why the user requested that unusual aesthetic; only user preference should override the creative brief.
 
 ```sh
-node <skill-folder>/scripts/audit-video.mjs ./output.mp4 --mode showreel --strict --sheet ./qa-contact-sheet.png
+node <skill-folder>/scripts/validate-motion-plan.mjs ./motion-plan.json --strict
+node <skill-folder>/scripts/audit-video.mjs ./output.mp4 --mode showreel --continuous --strict --sheet ./qa-contact-sheet.png
 ```
 
-Flags: `<720`-pixel short-edge resolution, 3+ second almost-unchanged mid-film shot, near-solid frames around transitions, missing audio (advisory), and unusually low overall activity (advisory). Use `--mode product`, `walkthrough`, or `ambient` for less kinetic intent. This lightweight pixel test does **not** establish artistic value: subtle transforms can be powerful and busy but meaningless movement can score high. It exists only to surface likely failures for a human/agent to review.
+Flags: `<720`-pixel short-edge resolution, 3+ second almost-unchanged **anywhere** (including opening and end cards), near-solid frames around transitions, missing audio (advisory), and unusually low overall activity (a blocking problem in continuous mode). Use `--mode product`, `walkthrough`, or `ambient` for less kinetic intent. Read `references/perpetual-motion.md` for the original default of motion during all holds and for the distinction between quiet motion carriers and subject-driven visual storytelling. A motion plan alone is not enough: watch the exported movie from beginning to end. This lightweight pixel test does **not** establish artistic value: subtle transforms can be powerful and busy but meaningless movement can score high. It exists only to surface likely failures for a human/agent to review.
 
 ## Distinguish technical from creative tests
 

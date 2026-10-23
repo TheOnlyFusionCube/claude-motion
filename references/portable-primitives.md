@@ -9,6 +9,9 @@ The bundled `assets/vanilla-film/src/motion.mjs` exports **pure, local** functio
 | `typist(text,t0,cps,seed)` | Deterministic `times`, `count(t)`, `at(t)` for typing and aligned Foley (`kit.typist`) |
 | `wordEntrance(line,t,t0,opts)` | One-direction, staggered word opacity and dx (`kit.TextFx`) |
 | `cursorAt(keys,clicks,t)` | Time-indexed arced cursor plus precisely timed click progress (`kit.cursor`) |
+| `heldPlate(t,{start,end,panX,panY,zoomPct})` | Smooth monotonic push/pan during a held image (source 1-3% zoom or 10-30px pan over hold) |
+| `uiHoldDrift(t,{start,end,dxPerSecond,dyPerSecond,zoomPerSecond})` | Quiet UI-camera progression (source 0.3-2%/s) |
+| `titleCreep(t,{start,end,pxPerSecond})` | Readable title gently creeps at about 2px/s for a hold |
 | `breathe(t,amount,period)` | Subtle pure sinusoidal hold movement (`kit.breathe`) |
 | `boilVariant(t,rate,count)` | Frozen seeded hand-drawn jitter variants by absolute frame time (marks) |
 | `paperPolygon(seed,n,roughness)` + `morphPolygon(a,b,p)` | Cut-paper polygons and equal-vertex morphing (`kit.cutPaper`, `kit.polyLerp`) |

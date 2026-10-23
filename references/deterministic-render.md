@@ -69,3 +69,16 @@ For jittered type strokes or hand-drawn marks, precompute seeded variants and in
 - Inspect the first frame for a meaningful visible title/subject.
 - Confirm no `NaN`, layout clipping, missing fonts, stale styling, asset-loading races, or async errors.
 - For exports, verify codec, pixel dimensions, frame rate, and duration using `ffprobe` when available.
+
+## Continuous motion, independent of seek order
+
+`references/perpetual-motion.md` translates the original `motion.md` rule: even a held image, UI close-up, or end card continues subtly moving. Implement its drift as a pure analytic function of `t`, never as accumulated per-frame state:
+
+```js
+import {heldPlate, titleCreep, uiHoldDrift} from './motion.mjs';
+const held = heldPlate(t,{start:2,end:8,panX:20,panY:-6,zoomPct:.02});
+const ui = uiHoldDrift(t,{start:8,end:16,dxPerSecond:3,zoomPerSecond:.006});
+const labelOffset = titleCreep(t,{start:0,end:3,pxPerSecond:2});
+```
+
+Animate a foreground subject/action with its own beat times and hand off that subject to the next shot. A looping background drift alone does not turn narration slides into a film. Do not auto-scroll actual interactive UI away from the pointer target: the tracking camera, content and cursor must derive from a shared coordinate space and same absolute timestamp.

@@ -1,5 +1,7 @@
 # Motion craft and art direction
 
+Before this summary, read `references/upstream/motion.md` **and** `references/perpetual-motion.md`: the original first principle is continuous motion throughout holds, including the opening and ending. Do not use this short guide as a replacement.
+
 Use this guide to direct attention and improve short, code-authored films. Numbers are practical defaults for a 1080p output, not mandatory rules.
 
 ## Establish visual hierarchy

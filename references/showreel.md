@@ -1,6 +1,6 @@
 # Product and skill showreels: prove capability on screen
 
-Read for **"make a demo video," "promote this skill," "launch teaser," "show what this tool does,"** and any film whose subject is software, developer tooling, or motion design itself. Read the original `upstream/motion.md` and `upstream/sound.md` first; this is an additional commissioning brief, not a substitute.
+Read for **"make a demo video," "promote this skill," "launch teaser," "show what this tool does,"** and any film whose subject is software, developer tooling, or motion design itself. Read the original `upstream/motion.md`, `references/perpetual-motion.md` and `upstream/sound.md` first; this is an additional commissioning brief, not a substitute.
 
 ## The key distinction
 
@@ -26,7 +26,7 @@ A demo is not a title treatment, a slide deck, or a claims reel. In a *demo*, th
 | 5.9–9.6 | Human intent | A pointer arcs toward one control, settles 0.2–0.3s, types or drags. The actual source-preview changes visibly. The camera stays with the cursor target. | Distinct ticks / click at exact events. |
 | 9.6–13.4 | Proof of motion | A scrub changes an object, a text phrase, and a mark from the SAME `t`. Jump the playhead backward and forward, showing identical states. The viewer sees why determinism matters. | Music hit tied to the scrub landing. |
 | 13.4–17.4 | Payoff | The edited object exits the UI and fills the whole screen as a composed moving film. New scene scale and material, no static graph about "motion." | Musical lift + controlled whoosh. |
-| 17.4–end | Branded resolve | The outgoing movement becomes the brand mark or clear single-line CTA. Finish in a stable, legible 3+ second hold; sound resolves and fades. | Resolving chord and fade. |
+| 17.4–end | Branded resolve | The outgoing movement becomes the brand mark or clear single-line CTA. Finish in a legible 3+ second hold with continuous, very slow plate/mark drift; sound resolves and fades. Stable composition is not a frozen frame. | Resolving chord and fade. |
 
 Every few seconds the visual question should change: *What is it? What did the human do? What changed? What did that enable?* The words can be minimal because the picture proves the point.
 
@@ -36,10 +36,10 @@ Every few seconds the visual question should change: *What is it? What did the h
 
 1. At `t=0`, the first frame is already a compelling composition, not merely a dark technical template.
 2. For each beat, write two sentences: **"Before, the viewer sees ___." "After, the viewer sees ___ because ___."** If only the headline changed or a line filled, invent a real visual action and recompose.
-3. Mark the actual hero's coordinate and camera scale at each 0.5–1s interval. A title at exactly the same coordinate and scale for six consecutive seconds is a warning for a showreel.
+3. Mark the actual hero's coordinate and camera scale at each 0.5–1s interval. A title at exactly the same coordinate and scale for six consecutive seconds is a failure; even an opening/ending hold must retain quiet motion.
 4. Watch once with sound **off**: does the action make sense? Watch once looking only at compositional change, not the text. Watch again with sound on: do hits align with exactly visible events?
 5. Downscale to the actual delivered dimensions and a mobile 640px-wide preview. Remove text that cannot be read there, or zoom the camera.
-6. Inspect the final MP4, not merely the live HTML preview. Call `node scripts/audit-video.mjs output.mp4 --mode showreel --strict --sheet qa.png`. Treat every flagged mid-film stagnation as a request to review and either revise or give a deliberate reason for an intentional hold.
+6. Inspect the final MP4, not merely the live HTML preview. Call `node scripts/audit-video.mjs output.mp4 --mode showreel --continuous --strict --sheet qa.png`. Treat every flagged mid-film stagnation as a request to review and either revise or give a deliberate reason for an intentional hold.
 7. Do not submit a technically valid but artistically unreviewed MP4 as "finished."
 
 ## Anti-example: motion-themed slides
