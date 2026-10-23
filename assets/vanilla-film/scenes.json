@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "stage": "rough",
+  "look": "Calm flat geometry with big type, one warm accent and a measured camera",
+  "palettes": [["#142236", "#F9B45D", "#F5F2E9", "#ACC0CD"]],
+  "theirs": 0,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "background": "#142236",
+  "scenes": [
+    {"id":"idea", "name":"The idea", "dur":3.4, "desc":"An already readable title becomes the subject of the film."},
+    {"id":"work", "name":"Make the cut", "dur":6.2, "desc":"A cursor shows a cause-and-effect edit and timed result."},
+    {"id":"end", "name":"End card", "dur":4.4, "desc":"The result settles into a readable closing statement."}
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Claude Motion"
+  short_description: "Create deterministic motion graphics and product demo videos"
+  default_prompt: "Use claude-motion to create a polished, seekable animation from my brief, using my project's existing tools when practical."
