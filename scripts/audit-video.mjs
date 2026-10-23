@@ -89,10 +89,19 @@ export function auditMetrics({ width, height, duration, hasAudio, intervals, nea
   } else if (lowActivityFraction !== null && lowActivityFraction > .5 && mode !== 'ambient') {
     warnings.push(`${Math.round(lowActivityFraction * 100)}% of sampled intervals appear quiet; visually check title, held UI, and end-card camera/shape drift.`);
   }
+  // A long explainer can have lots of changing pixels at tiny local widgets while
+  // the camera/layout barely develops. This heuristic makes the user's annotated
+  // "moving infographic cards" regression visibly fail the continuous release gate.
+  // Keep this separate from the minimal freeze detector: it measures coverage,
+  // NOT semantic or aesthetic quality. A quiet, deliberately art-directed film
+  // may require an explicit visual exception from the producer.
+  const localizedFraction=usable.length ? usable.filter(r => r.strongChangeFraction < .03).length / usable.length : 0;
+  if(continuous && duration >= 30 && localizedFraction > .75)
+    problems.push(`${Math.round(localizedFraction*100)}% of intervals change fewer than 3% of pixels strongly: visually concentrated motion throughout a long film (likely static panel/camera compositions). Rebuild subject/camera choreography and review real-time playback.`);
   // Still-image diffs cannot see visual hierarchy, text legibility, motion purpose,
   // click alignment, actual UI fidelity, original music, or meaningful narration.
   warnings.push('Manual review required: verify hero action, changing focal scale, UI causality, type size, pacing, crop, branding, and sound sync.');
-  return { pass: problems.length === 0, problems, warnings, stagnantRuns: runs, lowActivityFraction };
+  return { pass: problems.length === 0, problems, warnings, stagnantRuns: runs, lowActivityFraction, localizedMotionFraction: localizedFraction };
 }
 
 function parseArguments(argv) {

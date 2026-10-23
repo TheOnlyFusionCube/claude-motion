@@ -90,3 +90,8 @@ End with a link to project files and any requested video; say what is approximat
 Read `references/showreel.md` before making a skill/tool promo or any "demo video" brief, even when no real product UI is supplied. Write evidence shots (input/action/output, UI cause/effect, intentional camera or morph) before laying out static titles or brand cards. At least two different kinetic devices must be visible. A row of labeled coding-agent names is not evidence of cross-agent compatibility.
 
 After exporting, inspect the **actual encoded frames** and call `node scripts/audit-video.mjs <mp4> --mode showreel --strict --sheet <sheet.png>`. The audit catches prolonged mid-film stagnation and low pixel resolution. Inspect the sheet, sound and readable mobile sizing manually. An error requires revision before claiming a finished promo unless the user explicitly requested that static visual treatment. Never equate 100% verbatim documentation parity to 100% visual or product-quality parity.
+
+
+### Runtime production update (v1.6)
+
+The default Canvas2D starter now has an executable persistent world and camera in `assets/vanilla-film/src/world.mjs`; chapter switches are narrative/camera beats, not separate static render branches. Use `references/retained-stage.md` for the actual camera/actor API and renderer-linked trace, `scripts/audit-stage.mjs` to inspect world-space choreography, and `scripts/review-film.mjs` to record factual output-frame approval. This is a *functional subset* of the original scene-aware runtime; do not claim the source's private `kit.*`, music engine, DOM player or production polish have been recreated.

@@ -69,8 +69,9 @@ export function evaluatePlan(plan, {strict = false, maxCarrierGap = .5, maxFocal
     if (typeof tr.why!=='string'||tr.why.trim().length<12) errors.push(`Track ${id}: describe its perceptual/story purpose, not just 'animation'.`);
   }
   if (errors.length) return {pass:false,errors,warnings};
-  const ambient=tracks.filter(x=>x.role==='carrier'||x.role==='focal');
-  const carrierGaps=uncoveredSpans(ambient,0,duration,maxCarrierGap);
+  const carriers=tracks.filter(x=>x.role==='carrier');
+  if(!carriers.length) errors.push('No actual carrier tracks were declared; focal actions do not replace continuous camera/plate movement.');
+  const carrierGaps=uncoveredSpans(carriers,0,duration,maxCarrierGap);
   for (const g of carrierGaps) errors.push(`Dead-air motion gap ${g.start}-${g.end}s (${g.seconds}s): the frame has no declared visible motion carrier. Holds and end cards also require a subtle moving actor.`);
   const focal=tracks.filter(x=>x.role==='focal');
   for(const shot of shots) if (!focal.some(t=>Math.min(t.end,shot.end)-Math.max(t.start,shot.start)>.2)) errors.push(`Shot ${shot.id} has no meaningful focal action, only ambient/plate movement; this is a slideshow risk.`);

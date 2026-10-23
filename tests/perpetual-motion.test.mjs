@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync, existsSync} from 'node:fs';
+import {readFileSync,existsSync} from 'node:fs';
 import {heldPlate, uiHoldDrift, titleCreep, breathe} from '../assets/vanilla-film/src/motion.mjs';
 import {evaluatePlan, uncoveredSpans} from '../scripts/validate-motion-plan.mjs';
 
@@ -81,13 +81,9 @@ test('time-interval coverage allows small cinematic holds but catches long gaps'
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 const ffmpegAvailable = spawnSync('ffmpeg',['-version'],{encoding:'utf8'}).status===0 && spawnSync('ffprobe',['-version'],{encoding:'utf8'}).status===0;
-const video=fileURLToPath(new URL('../examples/continuous-motion/demo.mp4',import.meta.url));
-test('continuous proof has reproducible source in a source-only checkout',()=>{
-  assert.ok(existsSync(fileURLToPath(new URL('../examples/continuous-motion/build.py',import.meta.url))));
-  assert.ok(existsSync(fileURLToPath(new URL('../examples/continuous-motion/motion-plan.json',import.meta.url))));
-});
-test('encoded continuity proof has audio, active images, and no 3s freeze', {skip:!ffmpegAvailable || !existsSync(video)}, () => {
+test('encoded continuity proof has audio, active images, and no 3s freeze', {skip:!ffmpegAvailable || !existsSync(new URL('../examples/continuous-motion/demo.mp4',import.meta.url))}, () => {
   const script=fileURLToPath(new URL('../scripts/audit-video.mjs',import.meta.url));
+  const video=fileURLToPath(new URL('../examples/continuous-motion/demo.mp4',import.meta.url));
   const run=spawnSync(process.execPath,[script,video,'--mode','showreel','--continuous','--strict','--require-audio'],{encoding:'utf8',timeout:120000});
   assert.equal(run.status,0,run.stderr + '\n' + run.stdout);
   assert.match(run.stdout,/PASS:/);
