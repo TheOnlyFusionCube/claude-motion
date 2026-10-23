@@ -1,0 +1,29 @@
+# Node and editors
+node_modules/
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated media and captures
+frames/
+dist/
+*.mp4
+!examples/showreel-proof/demo.mp4
+!examples/city-data-film/demo.mp4
+*.mov
+*.webm
+*.wav
+*.gif
+*.log
+
+# Python utility caches
+__pycache__/
+*.pyc
