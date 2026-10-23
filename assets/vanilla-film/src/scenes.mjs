@@ -1,4 +1,4 @@
-import { clamp, clamp01, segment, lerp, out, inOut, backOut, motion, roundRect, text, line } from './motion.mjs';
+import { clamp, clamp01, segment, lerp, out, inOut, backOut, motion, roundRect, text, line, titleCreep } from './motion.mjs';
 
 /** Replace film content and drawing below; keep drawFrame(ctx,t) pure in t. */
 export const FILM = Object.freeze({
@@ -178,9 +178,9 @@ function drawClose(g, t) {
   topLabel(g, '03   /   THE FINISHED CUT', 'CLAUDE MOTION');
   const enter = backOut(segment(t, T.close, T.close + 1.1), 0.8);
   const rise = 70 * (1 - enter);
-  const breathe = Math.sin((t - T.close) * 1.13) * 6;
+  const creep = titleCreep(t, {start:T.close, end:T.end, pxPerSecond:-2});
   g.save();
-  g.translate(0, rise + breathe);
+  g.translate(0, rise + creep);
   text(g, 'Every frame', 950, 492, 164, C.ink, 700, 'center');
   text(g, 'on purpose.', 950, 682, 164, C.ink, 700, 'center');
   g.restore();

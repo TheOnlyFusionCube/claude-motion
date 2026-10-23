@@ -21,7 +21,7 @@ Beyond kinetic typography, this release adds a **camera-driven 3D data-film rout
 
 Give your coding agent a brief, a product screen, or an existing animation. `claude-motion` teaches it to make a considered film, not a collection of generic UI effects:
 
-- **Direct attention** with disciplined pacing, camera moves, subject handoffs, and kinetic typography.
+- **Sustain uninterrupted, purposeful motion** with the original source's quiet hold pushes/drifts/breaths, tracked subjects, meaningful handoffs and kinetic typography; no frozen slideshow panels.
 - **Show real product behavior** using source-first UI reproduction, meaningful cursor movement, and readable close-ups.
 - **Build deterministic timelines** so a frame at time `t` looks the same no matter how the playhead got there.
 - **Synchronize an original score** and UI foley to exact visual events.
@@ -93,6 +93,22 @@ node scripts/export.mjs assets/vanilla-film --out ./demo.mp4 --audio ./score.wav
 ```
 
 Visual export depends on a locally available Chromium and FFmpeg. The browser preview is not a replacement for the private Motion player or its audio transport.
+
+## v1.5: continuous-motion first (fixes the animated-slideshow failure)
+
+The original Motion craft source's first principle is **"Everything is always in motion."** This update makes it operational for 15-120s explainers, launch films, product tutorials and end cards, not only short showreels. A held card needs a low-amplitude moving camera/plate or shape **and** a real foreground action per beat; sliding from one static panel to the next is not enough.
+
+- `references/perpetual-motion.md`: measured Ken Burns holds, UI drift, shape breathing, title creep, causal subject handoffs and a concrete redesign plan for the 90s PHP film.
+- `assets/vanilla-film/src/motion.mjs`: deterministic `heldPlate`, `uiHoldDrift`, `titleCreep` primitives; end-card example now creeps rather than reversing its title drift.
+- `scripts/validate-motion-plan.mjs`: tests **coverage of every shot**, including title/end holds, and demands real focal actions distinct from ambient motion. Example at `examples/continuous-motion/motion-plan.json` and [a runnable 18-second continuous-world demo](examples/continuous-motion/README.md).
+- `scripts/audit-video.mjs --continuous`: decodes actual MP4 frames at 2fps, including opening and ending; flags >=3s near-static runs **and** high overall stillness. Music and scene cuts do not excuse dead visual time.
+
+```bash
+node scripts/validate-motion-plan.mjs examples/continuous-motion/motion-plan.json --strict
+node scripts/audit-video.mjs ./your-film.mp4 --mode launch --continuous --strict --sheet ./qa.png
+```
+
+The example now includes an **18-second original continuously tracked 2D scene**, with `build.py` and a small demo MP4, as a concrete non-slideshow mechanism reference. It is not evidence of commercial-level art direction. A passing metadata plan, pixel audit, or test suite alone does not prove compelling visual choreography. Play and review the encoded film to verify meaningful ongoing action; a camera drifting across unchanged text for 90 seconds still fails the creative contract.
 
 ## New: optimized asset and studio-lighting pipeline (v1.4)
 

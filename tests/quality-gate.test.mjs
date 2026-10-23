@@ -11,18 +11,26 @@ test('areaDelta ignores small encoder shimmer but detects large visible movement
   assert.ok(delta.meanLumaDelta > 6);
 });
 
-test('stagnantRuns identifies prolonged static middle and exempts intentional opening and closing holds', () => {
-  const intervals = Array.from({ length: 23 }, (_, i) => ({ start: i, end: i + 1, strongChangeFraction: 0.18 }));
-  for (const i of [0, 1, 2, 10, 11, 12, 13, 14, 20, 21, 22]) intervals[i].strongChangeFraction = 0.002;
-  assert.deepEqual(stagnantRuns(intervals, { duration: 24, mode: 'showreel' }), [{ start: 10, end: 15, seconds: 5 }]);
-  assert.deepEqual(stagnantRuns(intervals, { duration: 24, mode: 'ambient' }), []);
+test('stagnantRuns checks the original source requirement even in opening and closing holds', () => {
+  const intervals = Array.from({ length: 23 }, (_, i) => ({ start: i, end: i + 1, strongChangeFraction: 0.18, meanLumaDelta: 2 }));
+  for (const i of [0, 1, 2, 10, 11, 12, 13, 14, 20, 21, 22]) {
+    intervals[i].strongChangeFraction = 0.002;
+    intervals[i].meanLumaDelta = 0.02;
+  }
+  assert.deepEqual(stagnantRuns(intervals, { duration: 23, mode: 'showreel' }), [
+    {start:0,end:3,seconds:3}, {start:10,end:15,seconds:5}, {start:20,end:23,seconds:3},
+  ]);
+  assert.deepEqual(stagnantRuns(intervals, { duration: 23, mode: 'ambient' }), []);
+  assert.deepEqual(stagnantRuns(intervals, { duration: 23, mode: 'ambient', continuous: true }), [
+    {start:0,end:3,seconds:3}, {start:10,end:15,seconds:5}, {start:20,end:23,seconds:3},
+  ]);
 });
 
 test('showreel audit rejects undersized MP4 and still middle despite an audio track', () => {
   const intervals = Array.from({ length: 23 }, (_, i) => ({ start: i, end: i + 1, strongChangeFraction: i >= 10 && i < 15 ? 0 : 0.16 }));
   const result = auditMetrics({ width: 910, height: 512, duration: 24, hasAudio: true, intervals });
   assert.equal(result.pass, false);
-  assert.equal(result.problems.length, 2);
+  assert.ok(result.problems.length >= 2);
   assert.match(result.problems.join(' '), /910×512/);
   assert.match(result.problems.join(' '), /10–15s/);
 });
@@ -50,4 +58,25 @@ test('empty transition frames are rejected even when the video shows motion else
     nearBlankFrames: [{ time: 3, lumaStddev: 0.1 }] });
   assert.equal(result.pass, false);
   assert.match(result.problems.join(' '), /Near-blank frame/);
+});
+
+test('quiet camera movement is not classified as a completely still card', () => {
+  const intervals = Array.from({length: 20},(_,i)=>({start:i*.5,end:(i+1)*.5,strongChangeFraction:0.001,meanLumaDelta:.32}));
+  assert.deepEqual(stagnantRuns(intervals,{duration:10,mode:'launch',continuous:true}),[]);
+  assert.equal(auditMetrics({width:1920,height:1080,duration:10,hasAudio:true,intervals,mode:'launch',continuous:true}).pass,true);
+});
+
+test('a static nine-second title fails continuous delivery despite a lively middle', () => {
+  const intervals = Array.from({length:60},(_,i)=>({start:i*.5,end:(i+1)*.5,strongChangeFraction:i<18||i>=50?0:.18,meanLumaDelta:i<18||i>=50?0:12}));
+  const r = auditMetrics({width:1920,height:1080,duration:30,hasAudio:true,intervals,mode:'launch',continuous:true});
+  assert.equal(r.pass,false);
+  assert.ok(r.stagnantRuns.some(x=>x.start===0&&x.seconds>=9));
+  assert.ok(r.stagnantRuns.some(x=>x.start>=25));
+});
+
+test('full-length static picture with music cannot pass a non-showreel continuous mode', () => {
+  const intervals = Array.from({length:180},(_,i)=>({start:i*.5,end:(i+1)*.5,strongChangeFraction:i%20<2?.2:0,meanLumaDelta:i%20<2?8:0}));
+  const r = auditMetrics({width:1280,height:720,duration:90,hasAudio:true,intervals,mode:'walkthrough',continuous:true});
+  assert.equal(r.pass,false);
+  assert.ok(r.problems.some(x=>x.includes('sampled half-second')));
 });

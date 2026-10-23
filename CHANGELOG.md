@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.0 - restore the original perpetual-motion contract
+
+- Read the original Motion source's very first principle ("Everything is always in motion") before authoring **any** finished film; opening/title/close holds stay quietly alive and foreground motion must have a causal job.
+- Add `references/perpetual-motion.md` with source-exact Ken Burns/held UI/shape breathing/type-creep measures, purpose-first motion layers, spatial handoffs, and a repair storyboard for the reported 90s PHP slideshow.
+- Add a zero-dependency `validate-motion-plan.mjs` and example contract enforcing source-visible motion coverage across all shots, meaningful focal actions, non-fade motion and scene continuity.
+- Upgrade encoded-video auditor to one 2fps decode and `--continuous` enforcement across the entire video; reject multi-second opening/end stills and films dominated by motionless frames. Existing explicit ambient mode remains supported; `--continuous` overrides its exemption.
+- Add pure-time `heldPlate`, `uiHoldDrift`, `titleCreep` helpers; change the included Canvas end-card title to monotonic slow creep. Add a genuinely rendered, source-backed 18s moving-camera/request-travel proof (`examples/continuous-motion/build.py` + `demo.mp4`) so the skill has a runnable alternative to static slide cards.
+- Add regression tests for opening/closing static holds, a barely moving frame, a freeze-heavy narrated film, and inaccurate motion plans. Preserve all 12 original source documents verbatim.
+
+# Changelog
+
 ## 1.4.0 — Asset-led production and optimized studio lighting
 
 - Added optional **Blender 4+ studio pipeline** in `examples/blender-studio/` with real authored GLB assets (arched transit hub, reservoir and courtyard), connected camera/lens/data state, area-light key/fill/rim rig, Eevee draft and Cycles final presets, instanced geometry and resumable PNG sequence workflow. This addresses the *lack of modeled assets and light direction* that hindered the earlier 3D demos.
