@@ -1,4 +1,4 @@
-import { FILM, drawFrame } from './scenes.mjs';
+import { FILM, drawFrame, storySample } from './scenes.mjs';
 import { clamp } from './motion.mjs';
 
 const canvas = document.getElementById('film');
@@ -63,6 +63,7 @@ window.__motion = Object.freeze({
   config: FILM,
   seek: go,
   render: go,
+  trace: storySample, // same world/camera functions used by pixel renderer
   play,
   pause,
   get time() { return currentTime; },

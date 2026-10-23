@@ -1,209 +1,168 @@
-import { clamp, clamp01, segment, lerp, out, inOut, backOut, motion, roundRect, text, line, titleCreep } from './motion.mjs';
+/** Production starter: one retained scene and a subject-led camera, not a slideshow.
+ * Film is a pure function of seconds t. Edit WORLD, props and chapter action timings.
+ * The three chapters are beats within the SAME spatial world, not full-screen slides.
+ */
+import {segment, lerp, inOut, out, clamp01, text, line, roundRect} from './motion.mjs';
+import {createWorld} from './world.mjs';
 
-/** Replace film content and drawing below; keep drawFrame(ctx,t) pure in t. */
-export const FILM = Object.freeze({
-  title: 'Make ideas move',
-  width: 1920,
-  height: 1080,
-  fps: 30,
-  duration: 14,
-  chapters: [
-    { t: 0, label: 'The idea' },
-    { t: 3.4, label: 'Make the cut' },
-    { t: 9.6, label: 'The end card' },
-  ],
-});
+export const FILM=Object.freeze({title:'Follow the signal',width:1920,height:1080,fps:30,duration:14,
+  chapters:[{id:'request',t:0,label:'THE REQUEST'},{id:'memory',t:3.4,label:'INSIDE THE PROCESS'},{id:'recovery',t:9.6,label:'THE FIX'}]});
 
-const C = Object.freeze({
-  bg: '#142236',
-  bgDeep: '#101a2b',
-  ink: '#f5f2e9',
-  muted: '#acc0cd',
-  accent: '#f9b45d',
-  accentPale: '#ffdb9e',
-  rule: '#3d5367',
-  ui: '#f3f1eb',
-  uiInk: '#21344b',
-  uiMuted: '#738295',
-});
-const T = Object.freeze({ intro: 0, work: 3.4, click: 6.25, result: 7.1, close: 9.6, end: 14 });
+const EVENTS=Object.freeze([
+  {id:'request-enters',start:0,end:3.4,kind:'transfer',actor:'signal'},
+  {id:'heap-overflow',start:3.4,end:6.7,kind:'state-change',actor:'signal'},
+  {id:'corruption-contained',start:6.7,end:9.6,kind:'repair',actor:'signal'},
+  {id:'verified',start:9.6,end:14,kind:'result',actor:'signal'},
+]);
+export const WORLD=createWorld({width:FILM.width,height:FILM.height,
+ actors:{signal:{ease:'linear',path:[{t:0,x:100,y:525},{t:3.4,x:1180,y:525},{t:6.7,x:2250,y:525},{t:9.6,x:3120,y:525},{t:14,x:3960,y:525}]}},
+ camera:{follow:'signal',keys:[{t:0,offsetX:350,offsetY:-30,zoom:1.03},{t:2.4,offsetX:220,offsetY:-50,zoom:1.17},{t:4.2,offsetX:175,offsetY:-70,zoom:1.54},{t:6.4,offsetX:135,offsetY:-40,zoom:1.76},{t:8.8,offsetX:230,offsetY:-55,zoom:1.22},{t:11.2,offsetX:245,offsetY:-35,zoom:1.47},{t:14,offsetX:270,offsetY:-40,zoom:1.07}]},
+ chapters:FILM.chapters,events:EVENTS});
 
-// Original wordless score; shared anchors keep notes, foley, and screen events in sync.
-// The audio renderer turns these absolute-time events into a deterministic WAV.
-const scoreEvents = [
-  {kind: 'note', t: 0, dur: 3.6, pitch: 'D3', instrument: 'pad', vel: .065},
-  {kind: 'note', t: 0, dur: 3.6, pitch: 'A3', instrument: 'pad', vel: .028},
-  {kind: 'note', t: 0.15, dur: .9, pitch: 'D5', instrument: 'mallet', vel: .074},
-  {kind: 'note', t: T.work, dur: 4.0, pitch: 'G3', instrument: 'pad', vel: .065},
-  {kind: 'note', t: T.work, dur: 1.5, pitch: 'D4', instrument: 'ep', vel: .075},
-  {kind: 'note', t: T.work, dur: 1.5, pitch: 'G4', instrument: 'ep', vel: .055},
-  {kind: 'note', t: T.work + 2, dur: 1.3, pitch: 'A3', instrument: 'bass', vel: .095},
-  {kind: 'fx', t: T.click, dur: .12, name: 'click', vel: .12},
-  {kind: 'fx', t: T.result, dur: .16, name: 'pop', vel: .10},
-  {kind: 'note', t: T.result, dur: 2.5, pitch: 'A3', instrument: 'pad', vel: .075},
-  {kind: 'note', t: T.result, dur: 1.6, pitch: 'C#5', instrument: 'ep', vel: .055},
-  {kind: 'note', t: T.close, dur: 3.6, pitch: 'D3', instrument: 'pad', vel: .065},
-  {kind: 'note', t: T.close, dur: 3.6, pitch: 'F#4', instrument: 'ep', vel: .055},
-  {kind: 'note', t: T.close, dur: 3.6, pitch: 'A4', instrument: 'ep', vel: .050},
-  {kind: 'fx', t: T.close, dur: .7, name: 'ding', vel: .065},
-];
-const notes = ['G5', 'A5', 'B5', 'D6', 'B5', 'A5'];
-for (let i = 0; i < 9; i++) {
-  const beatAt = T.work + .35 + i * .63;
-  if (beatAt < T.close) scoreEvents.push({kind: 'note', t: beatAt, dur: .38, pitch: notes[i % notes.length], instrument: 'mallet', vel: i % 4 === 0 ? .075 : .045});
+const C={bg:'#0A1423',floor:'#132439',floorAlt:'#0E1D30',ink:'#F9F4E8',muted:'#9AABBE',cyan:'#6DE1DF',orange:'#F9B777',red:'#FF7B81',green:'#8FF1B0',rule:'#34506A'};
+const ease=(t,a,b)=>inOut(segment(t,a,b));
+const wave=(x)=>Math.sin(x);
+const worldText=(g,s,x,y,size,color=C.ink,weight=600)=>text(g,s,x,y,size,color,weight);
+const pill=(g,s,x,y,accent=C.cyan)=>{g.save();g.strokeStyle=accent;g.lineWidth=2;g.strokeRect(x-14,y-41,Math.max(125,s.length*18+25),56);worldText(g,s,x,y,25,accent,700);g.restore();};
+
+function grid(g,t){
+  g.fillStyle=C.bg;g.fillRect(-1300,-1300,7600,3700);
+  g.lineWidth=1.3;g.strokeStyle='#23374C';
+  for(let x=-1000;x<6400;x+=145){g.beginPath();g.moveTo(x,110);g.lineTo(x,1020);g.stroke();}
+  for(let y=160;y<1000;y+=105){g.beginPath();g.moveTo(-1200,y);g.lineTo(6100,y);g.stroke();}
+  // A world anchored backbone—the *same route* throughout the journey.
+  g.strokeStyle='#355975';g.lineWidth=8;g.beginPath();g.moveTo(-500,525);g.lineTo(4700,525);g.stroke();
+  g.strokeStyle=C.cyan;g.lineWidth=2;
+  const front=t*340;
+  for(let k=-1;k<26;k++){
+    let x=(front+k*240)%5550;
+    if(x<0)x+=5550;
+    g.beginPath();g.moveTo(x-54,525);g.lineTo(x+35,525);g.stroke();
+  }
 }
-scoreEvents.push({kind: 'fx', t: T.close - .42, dur: .42, name: 'whoosh', vel: .085});
-export const SCORE = Object.freeze({title: 'Original warm mallet and electric piano score', events: Object.freeze(scoreEvents)});
-
-
-function backdrop(g, t) {
-  g.fillStyle = C.bg;
-  g.fillRect(0, 0, FILM.width, FILM.height);
-  // Calm geometric detail; derived from absolute time, not previous frames.
-  g.save();
-  g.translate(1600, 485);
-  g.rotate(Math.sin(t / 5) * 0.014);
-  for (let i = 0; i < 5; i++) {
-    g.strokeStyle = i === 3 ? '#436174' : '#2f465a';
-    g.lineWidth = 2;
-    g.beginPath();
-    g.arc(0, 0, 250 + i * 99 + Math.sin(t * 0.7) * 5, 0, 2 * Math.PI);
-    g.stroke();
+function facility(g,x,y,type,t){
+  g.save();g.translate(x,y);
+  const glow=type==='heap'?(t>=5.8&&t<8.8?C.red:C.orange):type==='patch'?C.green:C.cyan;
+  if(type==='browser'){
+    // A browser *portal*, drawn as staggered sheets of folded glass.
+    for(let j=2;j>=0;j--){
+      const xx=-140+j*28,yy=-180+j*16;
+      g.fillStyle=j===0?'#152D44':'#102137';
+      g.strokeStyle=j===0?C.cyan:'#2E5866';g.lineWidth=j===0?5:2;
+      g.beginPath();g.moveTo(xx,yy);g.lineTo(xx+260,yy);g.lineTo(xx+260,yy+340);g.lineTo(xx,yy+340);g.closePath();g.fill();g.stroke();
+      g.fillStyle='#315C66';g.fillRect(xx+20,yy+26,130,4);
+      g.fillStyle='#8ADBD3';for(let q=0;q<3;q++){g.beginPath();g.arc(xx+23+q*26,yy+15,5,0,6.284);g.fill();}
+    }
+    g.strokeStyle=C.cyan;g.lineWidth=8;g.beginPath();g.moveTo(-60,70);g.lineTo(10,70);g.lineTo(36,44);g.stroke();
+    g.beginPath();g.moveTo(10,42);g.lineTo(38,42);g.lineTo(38,70);g.stroke();
+  } else if(type==='engine'){
+    // Kinetic turbine: counter-rotating arcs and a real center that the signal traverses.
+    for(let i=5;i>=0;i--){const r=74+i*30;
+      arc(g,0,0,r,-2.8+t*.10+i*.42,1.3+t*.10+i*.42,i%2?C.cyan:'#42758C',i%2?8:4);
+      arc(g,0,0,r,2.0-t*.15+i*.22,3.5-t*.15+i*.22,'#A6D6E0',i%2?2:5);
+    }
+    g.fillStyle='#12293E';g.beginPath();g.arc(0,0,100,0,Math.PI*2);g.fill();
+    g.strokeStyle=C.cyan;g.lineWidth=8;g.beginPath();g.arc(0,0,100,0,Math.PI*2);g.stroke();
+    for(let j=0;j<8;j++){const a=j*Math.PI/4+t*.25;g.fillStyle=j%2?C.orange:C.cyan;g.fillRect(Math.cos(a)*74-5,Math.sin(a)*74-5,10,10);}
+  } else if(type==='heap'){
+    // Layered physical memory columns. Failure travels through *those same cells*.
+    for(let i=0;i<14;i++){
+      const c=i<9?'#31576B':(t>=6.1&&t<9.7?C.red:C.orange);
+      const yy=(i%3)*13;
+      g.fillStyle='#142A3D';g.strokeStyle=c;g.lineWidth=3;
+      g.fillRect(-215+i*31,-200+yy,23,348-yy);
+      g.strokeRect(-215+i*31,-200+yy,23,348-yy);
+      g.fillStyle=c;g.fillRect(-212+i*31,-196+yy,17,10+Math.max(0,Math.sin(t*2+i))*.5*100);
+    }
+    g.strokeStyle=C.red;g.lineWidth=7;
+    const p=segment(t,6.2,8.2);
+    if(p>0&&p<1){g.beginPath();g.moveTo(-108,-242);g.lineTo(-108+p*250,-242);g.lineTo(-108+p*250,-170);g.stroke();}
+    g.fillStyle=t>9.7?C.green:C.orange;g.fillRect(-228,182,470,8);
+  } else if(type==='patch'){
+    // Not another panel: a wide concentric verifier and convergence aperture.
+    for(let i=0;i<4;i++){
+      const r=98+i*45;g.strokeStyle=i===0?C.green:'#3C806E';g.lineWidth=12-i*2;
+      arc(g,0,0,r,-Math.PI*.79+i*.11,Math.PI*.8+i*.13,g.strokeStyle,g.lineWidth);
+    }
+    g.fillStyle='#12352D';g.beginPath();g.arc(0,0,92,0,Math.PI*2);g.fill();
+    g.strokeStyle=C.green;g.lineWidth=15;g.beginPath();g.moveTo(-52,-4);g.lineTo(-15,36);g.lineTo(67,-45);g.stroke();
+    const p=segment(t,11.1,13.9);
+    for(let i=0;i<9;i++){let a=i*6.28/9;const x=Math.cos(a)*(160+65*p),yy=Math.sin(a)*(160+65*p);g.fillStyle=C.green;g.globalAlpha=.18+.5*p;g.fillRect(x-4,yy-4,8,8);}g.globalAlpha=1;
   }
   g.restore();
+  const titles={browser:['01 / SEND','BROWSER → NETWORK'],engine:['02 / EXECUTE','PHP WORKER / RUNTIME'],heap:['03 / TRACE','ADDRESS SPACE / HEAP'],patch:['04 / RECOVER','PATCH + VERIFY']};
+  const [headline,detail]=titles[type];
+  worldText(g,headline,x-166,y-298,37,C.ink,700);
+  g.strokeStyle=glow;g.lineWidth=4;g.beginPath();g.moveTo(x-164,y-275);g.lineTo(x+150,y-275);g.stroke();
+  worldText(g,detail,x-164,y+327,25,C.muted,500);
 }
-
-function topLabel(g, title, right = 'A FILM FROM CODE') {
-  text(g, title, 126, 112, 25, C.muted, 700);
-  text(g, right, 1790, 112, 23, C.muted, 500, 'right');
-  line(g, 126, 141, 1794, 141, C.rule, 2);
-}
-
-function drawIntro(g, t) {
-  topLabel(g, 'CLAUDE MOTION   /   001');
-  const drift = Math.sin(t / 3.2) * 13;
-  const a = motion(t, -0.65, 0.42);
-  g.save();
-  g.globalAlpha = 0.64 + 0.36 * a;
-  g.translate(-20 * (1 - a), drift);
-  text(g, 'Make ideas', 122, 515, 169, C.ink, 700);
-  text(g, 'move.', 122, 696, 169, C.ink, 700);
-  g.restore();
-  const lineP = out(segment(t, 0.2, 1.45));
-  roundRect(g, 130, 738, Math.max(4, 540 * lineP), 12, 6, C.accent);
-  text(g, 'ANIMATION   /   DESIGN   /   CODE', 130, 843 + Math.sin(t / 3) * 5, 31, C.muted, 500);
-  // A moving punctuation mark gently leads the viewer toward the next composition.
-  const cx = 1470 + Math.sin(t * 0.67) * 17;
-  const cy = 420 + Math.cos(t * 0.67) * 17;
-  g.beginPath(); g.arc(cx, cy, 88, 0, 2 * Math.PI); g.fillStyle = C.accent; g.fill();
-  g.fillStyle = C.bg; g.beginPath(); g.arc(cx, cy, 20, 0, 2 * Math.PI); g.fill();
-  const outP = segment(t, 2.95, T.work);
-  if (outP > 0) { g.fillStyle = C.bgDeep; g.globalAlpha = outP; g.fillRect(0, 0, 1920, 1080); g.globalAlpha = 1; }
-}
-
-function drawPointer(g, x, y, click) {
-  g.save(); g.translate(x, y);
-  g.fillStyle = '#132033'; g.strokeStyle = '#fff'; g.lineJoin = 'round'; g.lineWidth = 4;
-  g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 49); g.lineTo(13, 37); g.lineTo(24, 67); g.lineTo(37, 60); g.lineTo(24, 31); g.lineTo(45, 29); g.closePath(); g.fill(); g.stroke();
-  if (click > 0 && click < 1) { g.strokeStyle = `rgba(249,180,93,${1 - click})`; g.lineWidth = 6; g.beginPath(); g.arc(4, 6, 22 + 33 * click, 0, Math.PI * 2); g.stroke(); }
-  g.restore();
-}
-
-function drawWorkbench(g, t) {
-  topLabel(g, '02   /   COMPOSE WITH TIME', 'THE TIMELINE IS THE SOURCE OF TRUTH');
-  const entered = backOut(segment(t, T.work, T.work + 0.84), 0.95);
-  const scale = 0.93 + entered * 0.07;
-  const subtlePush = inOut(segment(t, T.work + 1.3, T.work + 5.2)) * 0.018;
-  const x = 218, y = 184, w = 1484, h = 738;
-  g.save();
-  g.translate(x + w / 2, y + h / 2);
-  g.scale(scale + subtlePush, scale + subtlePush);
-  g.translate(-w / 2, -h / 2);
-  roundRect(g, 5, 12, w, h, 35, '#0c1827');
-  roundRect(g, 0, 0, w, h, 30, C.ui);
-  roundRect(g, 0, 0, w, 96, [30, 30, 0, 0], '#e5e9e7');
-  for (let i = 0; i < 3; i++) { g.fillStyle = ['#dfa7a0', '#e9bd82', '#95bba5'][i]; g.beginPath(); g.arc(43 + i * 37, 49, 11, 0, 2 * Math.PI); g.fill(); }
-  text(g, 'Untitled motion', 160, 60, 27, C.uiInk, 700);
-  text(g, 'LOCAL PREVIEW', 1404, 59, 18, C.uiMuted, 600, 'right');
-  line(g, 0, 96, w, 96, '#cdd7d4', 2);
-  // A preview pane, explicitly drawn with absolute time.
-  roundRect(g, 59, 149, 875, 385, 22, C.bg);
-  text(g, 'A better way to', 107, 303, 70, C.ink, 700);
-  text(g, 'show the story.', 107, 386, 70, C.ink, 700);
-  const underline = motion(t, 4.1, 5.3);
-  roundRect(g, 110, 420, 500 * underline, 8, 4, C.accent);
-  text(g, 'FRAME  /  TIME', 74, 613, 18, C.uiMuted, 700);
-  line(g, 74, 633, 1418, 633, '#cfd6d6', 2);
-  const blockLabels = ['Open', 'Action', 'Payoff', 'Close'];
-  const xPos = [74, 420, 768, 1116];
-  for (let i = 0; i < 4; i++) {
-    const highlight = t >= (T.result + 0.2) && i === 2;
-    roundRect(g, xPos[i], 662, 300, 58, 12, highlight ? C.accent : '#dce4e1');
-    text(g, blockLabels[i], xPos[i] + 20, 701, 24, C.uiInk, 700);
+function flowNodes(g,t){
+  // Object relationships are spatial. The camera flies through them, never cuts to a new panel.
+  facility(g,420,550,'browser',t);
+  facility(g,1530,550,'engine',t);
+  facility(g,2560,550,'heap',t);
+  facility(g,3700,550,'patch',t);
+  for (const [x,label,color] of [[930,'INPUT BUFFER',C.cyan],[2050,'ADDRESS SPACE',C.orange],[3150,'PATCH BOUNDARY',C.green]]){
+    g.strokeStyle='#49677B';g.lineWidth=2;g.beginPath();g.moveTo(x,430);g.lineTo(x,195);g.stroke();
+    g.fillStyle=color;g.fillRect(x-10,185,20,20);worldText(g,label,x+28,201,25,C.muted,500);
   }
-  // Editor panel and deterministic typewriter.
-  text(g, 'EDIT THE SHOT', 1030, 186, 24, C.uiInk, 700);
-  line(g, 1030, 210, 1414, 210, '#d1d9d8', 2);
-  text(g, 'On-screen copy', 1030, 266, 23, C.uiMuted, 500);
-  roundRect(g, 1026, 288, 396, 93, 12, '#ffffff');
-  const sentence = 'Every frame is intentional.';
-  const count = Math.min(sentence.length, Math.max(0, Math.floor((t - 4.45) * 23)));
-  text(g, sentence.slice(0, count), 1044, 341, 25, C.uiInk, 600);
-  if (t < 4.45 + sentence.length / 23 + 0.3 && (Math.floor(t / 0.5) % 2 === 0)) {
-    g.save(); g.font = '600 25px Arial, Helvetica, sans-serif';
-    const contentWidth = g.measureText(sentence.slice(0, count)).width; g.restore();
-    roundRect(g, 1044 + contentWidth + 2, 313, 3, 37, 0, C.uiInk);
+  // Memory cells: an *actual* altered state (one becomes compromised and is repaired).
+  const reveal=segment(t,4.0,5.1),alert=segment(t,6.1,7.4),restore=segment(t,9.6,11.0);
+  for(let i=0;i<17;i++){
+    const x=2320+i*28,y=910+Math.sin(i*.4)*15;
+    if(t<3.5||x>4000)continue;
+    let col='#355872';
+    if(i<=Math.floor(16*reveal))col=i<9?C.cyan:C.orange;
+    if(i>=9&&i<=12&&alert>.45&&restore<.8)col=C.red;
+    if(restore>.8)col=C.green;
+    g.fillStyle=col;g.fillRect(x,y,18,65+(i%4)*20);
   }
-  roundRect(g, 1030, 425, 385, 61, 12, t >= T.click ? '#e9ad60' : C.accent);
-  text(g, 'Render the moment', 1221, 465, 25, C.uiInk, 700, 'center');
-  if (t > T.result) {
-    const p = motion(t, T.result, T.result + 0.52);
-    g.globalAlpha = p;
-    roundRect(g, 1030, 527 + 16 * (1-p), 390, 72, 11, '#e4f0ed');
-    text(g, 'READY  /  30 FPS', 1053, 574 + 16 * (1-p), 22, '#317766', 700);
-    g.globalAlpha = 1;
-  }
-  g.restore();
-  // The mouse is above the window, and deliberately reads as a separate pointer.
-  const approach = inOut(segment(t, 5.28, T.click));
-  const px = lerp(1108, 1450, approach);
-  const py = lerp(485, 668, approach) - 58 * Math.sin(approach * Math.PI);
-  const clickPulse = segment(t, T.click, T.click + 0.23);
-  if (t >= 5.1 && t <= 8.3) drawPointer(g, px, py, clickPulse);
-  const fade = segment(t, T.close - 0.33, T.close);
-  if (fade > 0) { g.fillStyle = C.bgDeep; g.globalAlpha = fade; g.fillRect(0, 0, 1920, 1080); g.globalAlpha = 1; }
 }
-
-function drawClose(g, t) {
-  topLabel(g, '03   /   THE FINISHED CUT', 'CLAUDE MOTION');
-  const enter = backOut(segment(t, T.close, T.close + 1.1), 0.8);
-  const rise = 70 * (1 - enter);
-  const creep = titleCreep(t, {start:T.close, end:T.end, pxPerSecond:-2});
-  g.save();
-  g.translate(0, rise + creep);
-  text(g, 'Every frame', 950, 492, 164, C.ink, 700, 'center');
-  text(g, 'on purpose.', 950, 682, 164, C.ink, 700, 'center');
+function arc(g,x,y,r,start,end,color,width=3){g.strokeStyle=color;g.lineWidth=width;g.beginPath();g.arc(x,y,r,start,end);g.stroke();}
+function subject(g,t){
+  const p=WORLD.actorAt('signal',t),scale=1+.08*Math.sin(t*4.7);
+  const alert=segment(t,5.7,6.6)*(1-segment(t,9.35,10.2));
+  const glow=alert>.6?C.red:t>11?C.green:C.cyan;
+  g.save();g.translate(p.x,p.y);g.scale(scale,scale);
+  g.shadowColor=glow;g.shadowBlur=65;g.fillStyle=glow;
+  g.beginPath();g.arc(0,0,33,0,Math.PI*2);g.fill();g.shadowBlur=0;
+  g.strokeStyle=C.bg;g.lineWidth=7;g.beginPath();g.arc(0,0,15,-2.5,1.8);g.stroke();
+  g.strokeStyle=glow;
+  for(let i=0;i<3;i++)arc(g,0,0,50+i*20,Math.PI*segment(t*2.1+i,0,2),Math.PI*(segment(t*2.1+i,0,2)+.4),glow,3);
   g.restore();
-  const rule = out(segment(t, T.close + 0.25, T.close + 1.4));
-  roundRect(g, 637, 745, 614 * rule, 12, 6, C.accent);
-  text(g, 'MAKE   /   PLAY   /   REFINE', 960, 848, 31, C.muted, 500, 'center');
-  const a = motion(t, T.close + 0.25, T.close + 1.1);
-  g.save(); g.globalAlpha = a;
-  g.beginPath(); g.arc(960, 267, 27 + 8 * Math.sin(t - T.close), 0, Math.PI * 2); g.fillStyle = C.accent; g.fill();
-  g.restore();
+  // The kinetic subject is the meaning; the caption follows its real world anchor.
+  const label=t<3.4?'REQUEST':t<5.8?'EXECUTING':t<9.6?'TRACE':t<11.5?'PATCHING':'VERIFIED';
+  worldText(g,label,p.x+62,p.y-46,24,glow,700);
 }
-
-/** Draw a complete frame from scratch. No state carried from the previous frame. */
-export function drawFrame(g, rawTime) {
-  const t = clamp(rawTime, 0, FILM.duration);
-  const { width: W, height: H } = FILM;
-  g.setTransform(1, 0, 0, 1, 0, 0);
-  g.globalAlpha = 1;
-  g.globalCompositeOperation = 'source-over';
-  g.clearRect(0, 0, W, H);
-  backdrop(g, t);
-  if (t < T.work) drawIntro(g, t);
-  else if (t < T.close) drawWorkbench(g, t);
-  else drawClose(g, t);
-  g.globalAlpha = 1;
+function drawNarrativeHUD(g,t){
+  const chapter=FILM.chapters.filter(x=>x.t<=t).at(-1);
+  g.fillStyle='#091421';g.fillRect(0,0,1920,106);g.fillRect(0,990,1920,90);
+  text(g,'SIGNAL  /  A MOTION STUDY',110,69,28,C.ink,700);
+  text(g,'ONE REQUEST. ONE CONTINUOUS WORLD.',1808,69,22,C.muted,600,'right');
+  line(g,110,92,1810,92,C.rule,2);
+  const name=t<3.4?'THE REQUEST':t<9.6?'INSIDE THE PROCESS':'THE RECOVERY';
+  text(g,chapter.id.toUpperCase()+'  /  '+name,110,1046,28,C.ink,600);
+  text(g,'CHAPTER '+String(FILM.chapters.indexOf(chapter)+1).padStart(2,'0')+'   •   '+t.toFixed(1)+'s',1810,1046,23,C.muted,600,'right');
+  g.fillStyle=C.cyan;g.fillRect(0,1076,1920*clamp01(t/FILM.duration),4);
+}
+export function storySample(t){return WORLD.trace(t);}
+const scoreEvents=[
+  {kind:'note',t:0,dur:6,pitch:'D3',instrument:'pad',vel:.07},
+  {kind:'note',t:3.4,dur:5,pitch:'A3',instrument:'pad',vel:.06},
+  {kind:'note',t:9.6,dur:4.4,pitch:'G3',instrument:'pad',vel:.07},
+  {kind:'fx',t:3.4,dur:.18,name:'whoosh',vel:.11},
+  {kind:'fx',t:6.25,dur:.16,name:'click',vel:.13},
+  {kind:'fx',t:9.6,dur:.18,name:'pop',vel:.13},
+  {kind:'fx',t:13.5,dur:.6,name:'ding',vel:.07},
+ ];
+const notes=['D5','F5','A5','G5','E5','D5','C5'];
+for(let i=0;i<16;i++)scoreEvents.push({kind:'note',t:.42+i*.81,dur:.38,pitch:notes[i%notes.length],instrument:'mallet',vel:i%4===0?.08:.044});
+export const SCORE=Object.freeze({title:'Original soft cinematic pulse',events:Object.freeze(scoreEvents)});
+export function drawFrame(g,t){
+  const s=Math.max(0,Math.min(FILM.duration,t));
+  g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.globalCompositeOperation='source-over';
+  g.clearRect(0,0,FILM.width,FILM.height);
+  // A single persistent world survives the whole timeline. No scene switching.
+  WORLD.withCamera(g,s,ctx=>{grid(ctx,s);flowNodes(ctx,s);subject(ctx,s);});
+  drawNarrativeHUD(g,s);
 }

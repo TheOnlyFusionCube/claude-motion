@@ -25,7 +25,7 @@ test('seeded noise is deterministic and bounded', () => {
 
 function fakeCanvas() {
   const operations = [];
-  const methods = ['setTransform', 'clearRect', 'fillRect', 'beginPath', 'arc', 'fill', 'stroke', 'translate', 'scale', 'rotate', 'moveTo', 'lineTo', 'roundRect', 'fillText', 'save', 'restore', 'closePath'];
+  const methods = ['setTransform', 'clearRect', 'fillRect', 'beginPath', 'arc', 'fill', 'stroke', 'translate', 'scale', 'rotate', 'moveTo', 'lineTo', 'roundRect', 'fillText', 'strokeRect', 'save', 'restore', 'closePath'];
   const receiver = Object.fromEntries(methods.map(m => [m, (...values) => operations.push([m, ...values])]));
   receiver.measureText = v => ({ width: v.length * 14 });
   const context = new Proxy(receiver, {

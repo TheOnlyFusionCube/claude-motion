@@ -1,16 +1,38 @@
 {
   "v": 1,
   "stage": "rough",
-  "look": "Calm flat geometry with big type, one warm accent and a measured camera",
-  "palettes": [["#142236", "#F9B45D", "#F5F2E9", "#ACC0CD"]],
+  "look": "Cinematic one-world signal trace; subject-driven camera tracking instead of full-screen cards",
+  "palettes": [
+    [
+      "#0A1423",
+      "#6DE1DF",
+      "#F9F4E8",
+      "#F9B777"
+    ]
+  ],
   "theirs": 0,
   "width": 1920,
   "height": 1080,
   "fps": 30,
-  "background": "#142236",
+  "background": "#0A1423",
   "scenes": [
-    {"id":"idea", "name":"The idea", "dur":3.4, "desc":"An already readable title becomes the subject of the film."},
-    {"id":"work", "name":"Make the cut", "dur":6.2, "desc":"A cursor shows a cause-and-effect edit and timed result."},
-    {"id":"end", "name":"End card", "dur":4.4, "desc":"The result settles into a readable closing statement."}
+    {
+      "id": "request",
+      "name": "The request",
+      "dur": 3.4,
+      "desc": "A persistent request token enters the first physical portal as the camera follows it."
+    },
+    {
+      "id": "memory",
+      "name": "Inside the process",
+      "dur": 6.2,
+      "desc": "The same token continues through execution and corrupted memory while the camera scales toward active state."
+    },
+    {
+      "id": "recovery",
+      "name": "Recover and verify",
+      "dur": 4.4,
+      "desc": "The original token passes through verification and the moving camera resolves the causal journey."
+    }
   ]
 }

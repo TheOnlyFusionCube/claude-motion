@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0 — Restore executable film-making machinery
+
+- Replaced the original standalone starter's intro/workbench/close `if(t<cut)` cards with one world-space Canvas2D environment in `assets/vanilla-film/src/world.mjs` and `scenes.mjs`. Named persistent subject, camera follow/lens keys, time-coded scene events and world anchors are computed from the **same absolute time** and exposed through `storySample(t)` / `window.__motion.trace(t)`. Physical browser, engine, memory and recovery elements have distinct silhouettes. This is a functional technical demo, not professional art-direction certification.
+- New `scripts/audit-stage.mjs`: validates renderer-linked camera and subject travel, lens range, actor continuity, named semantic events and teleport limits. A fake camera claim or tiny moving border cannot pass this structural gate.
+- Fixed the v1.5 plan false positive: only `carrier` tracks count as continuous carriers, not `focal` tracks.
+- The long-film `--continuous` video audit now flags excessive visually localized motion; the user-provided 124s PHP video that passed v1.5 fails v1.6. The private video is **not** bundled or shared.
+- Added Chromium-independent `scripts/render-stage.mjs`, which rasterizes a documented supported Canvas2D subset from the same renderer using Sharp/SVG. Actual 14s HD MP4 proof with synchronized original score was rendered and audited.
+- New `scripts/review-film.mjs` enforces evidence of real-time watching, timestamped visual review and distinct shot scales; no automated metric is represented as a quality verdict. New `references/retained-stage.md` details source-space cinematography, hard-shot approval before long movies and sound/QA trace requirements.
+- Expanded regression tests and preserved all twelve original Motion references byte-for-byte.
+
+
 ## 1.5.0 - restore the original perpetual-motion contract
 
 - Read the original Motion source's very first principle ("Everything is always in motion") before authoring **any** finished film; opening/title/close holds stay quietly alive and foreground motion must have a causal job.
@@ -10,6 +21,17 @@
 - Add regression tests for opening/closing static holds, a barely moving frame, a freeze-heavy narrated film, and inaccurate motion plans. Preserve all 12 original source documents verbatim.
 
 # Changelog
+
+## 1.6.0 — Restore executable film-making machinery
+
+- Replaced the original standalone starter's intro/workbench/close `if(t<cut)` cards with one world-space Canvas2D environment in `assets/vanilla-film/src/world.mjs` and `scenes.mjs`. Named persistent subject, camera follow/lens keys, time-coded scene events and world anchors are computed from the **same absolute time** and exposed through `storySample(t)` / `window.__motion.trace(t)`. Physical browser, engine, memory and recovery elements have distinct silhouettes. This is a functional technical demo, not professional art-direction certification.
+- New `scripts/audit-stage.mjs`: validates renderer-linked camera and subject travel, lens range, actor continuity, named semantic events and teleport limits. A fake camera claim or tiny moving border cannot pass this structural gate.
+- Fixed the v1.5 plan false positive: only `carrier` tracks count as continuous carriers, not `focal` tracks.
+- The long-film `--continuous` video audit now flags excessive visually localized motion; the user-provided 124s PHP video that passed v1.5 fails v1.6. The private video is **not** bundled or shared.
+- Added Chromium-independent `scripts/render-stage.mjs`, which rasterizes a documented supported Canvas2D subset from the same renderer using Sharp/SVG. Actual 14s HD MP4 proof with synchronized original score was rendered and audited.
+- New `scripts/review-film.mjs` enforces evidence of real-time watching, timestamped visual review and distinct shot scales; no automated metric is represented as a quality verdict. New `references/retained-stage.md` details source-space cinematography, hard-shot approval before long movies and sound/QA trace requirements.
+- Expanded regression tests and preserved all twelve original Motion references byte-for-byte.
+
 
 ## 1.4.0 — Asset-led production and optimized studio lighting
 

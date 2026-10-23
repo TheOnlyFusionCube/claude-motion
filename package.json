@@ -1,6 +1,6 @@
 {
   "name": "claude-motion",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "description": "Unofficial portable 2D/3D motion-film skill with verbatim source references",
   "type": "module",
@@ -10,11 +10,13 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "parity": "node scripts/parity.mjs",
-    "check": "node scripts/sync-upstream.mjs --verify && node scripts/validate-film.mjs assets/vanilla-film/scenes.json && python3 scripts/3d-preflight.py examples/blender-studio/asset-manifest.json --budget web --strict && node scripts/validate-motion-plan.mjs examples/continuous-motion/motion-plan.json --strict && npm test",
+    "check": "node scripts/sync-upstream.mjs --verify && node scripts/validate-film.mjs assets/vanilla-film/scenes.json && python3 scripts/3d-preflight.py examples/blender-studio/asset-manifest.json --budget web --strict && node scripts/validate-motion-plan.mjs examples/continuous-motion/motion-plan.json --strict && node scripts/audit-stage.mjs assets/vanilla-film/src/scenes.mjs --strict && npm test",
     "preflight:3d": "python3 scripts/3d-preflight.py examples/blender-studio/asset-manifest.json --budget web --strict",
     "audit": "node scripts/audit-video.mjs",
     "audit:continuous": "node scripts/audit-video.mjs examples/continuous-motion/demo.mp4 --mode showreel --continuous --strict",
     "audit:example": "node scripts/audit-video.mjs examples/showreel-proof/demo.mp4 --mode showreel --strict",
-    "audit:city": "node scripts/audit-video.mjs examples/city-data-film/demo.mp4 --mode data-story --strict"
+    "audit:city": "node scripts/audit-video.mjs examples/city-data-film/demo.mp4 --mode data-story --strict",
+    "audit:stage": "node scripts/audit-stage.mjs assets/vanilla-film/src/scenes.mjs --strict",
+    "render:offline": "node scripts/render-stage.mjs --out stage.mp4 --scale .667 --fps 24"
   }
 }

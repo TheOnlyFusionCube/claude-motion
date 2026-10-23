@@ -52,3 +52,20 @@ If the reference has a 3D city/data segment or live narrated walkthrough, read *
 ## Cinematic 3D appearance gate — added after failed user review
 
 A valid 3D camera and consistent data-linked labels are necessary but **nowhere near sufficient**. The previous Pillow-projected city had all of these and still looked basic. Read `references/cinematic-3d.md`. A *premium* 3D deliverable is rejected unless a reviewer can identify distinct geometry families and a hero silhouette, coherent set dressing (roads/plaza/landmarks, not regular blocks alone), visible surface/material and lighting/shadow depth, foreground/midground/background separation, and at least one legible macro shot with real physical action. Inspect source render frames before postprocessing; adding gradients, glow, or more small text cannot repair poor geometry. Look at the *actual* reference for craft standards and never claim parity based on a technical benchmark. If modeling assets or a renderer are unavailable, deliver an honest look-dev storyboard instead of a fake premium movie.
+
+## v1.6 film-mechanism acceptance (mandatory for video deliverables)
+
+Before encoding any long-form film, open the **real retained-stage source** and inspect `storySample(t)` at real shot boundaries. If using this starter, run:
+
+```bash
+node scripts/audit-stage.mjs assets/vanilla-film/src/scenes.mjs --strict
+node scripts/validate-motion-plan.mjs motion-plan.json --strict
+node scripts/audit-video.mjs output.mp4 --mode launch --continuous --strict --sheet qa.png
+node scripts/review-film.mjs review.json --strict
+```
+
+The first script checks *rendered* actor/camera keyframes, subject continuity, actual world movement, meaningful timed events, and lens variation. The second script checks declared carrier vs focal tracks separately. The MP4 check now detects **long films with highly localized moving-pixel coverage**: the previously supplied 124s PHP explainer is an explicit negative case; it must not pass continuous mode merely because tiny ornaments animate. These tests can reject some poor films but **cannot** positively certify a great one.
+
+Review the encoded film **at real playback speed**, with specific timestamps, composition and transition notes, one audited frame per shot beat, and a genuine approved close/wide. Use `scripts/review-film.mjs` to reject missing review evidence. If the agent cannot actually watch the full film, it must say so and cannot assert editorial approval. For films >30s, make and inspect the most demanding 10-15s visual mechanism before expanding to the full timeline.
+
+The default world-space example is a code/instrumentation proof, NOT an established, polished art direction. Reuse its mechanisms without copying its dark-grid visual language.

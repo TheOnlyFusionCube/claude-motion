@@ -73,7 +73,7 @@ Ask your coding agent:
 
 > Review this animation against the original Motion craft rules: pacing, camera, readability, cursor path, first frame, and closing hold.
 
-The skill prioritizes the stack your project already uses (for example, Canvas, SVG/DOM, Motion, GSAP, Remotion, or FFmpeg). It also ships an **original, dependency-free browser-film example** for projects without an animation stack.
+The skill prioritizes the stack your project already uses (for example, Canvas, SVG/DOM, Motion, GSAP, Remotion, or FFmpeg). It also ships an **original, dependency-free retained-world browser-film example** for projects without an animation stack.
 
 ## Try the included demo
 
@@ -93,6 +93,27 @@ node scripts/export.mjs assets/vanilla-film --out ./demo.mp4 --audio ./score.wav
 ```
 
 Visual export depends on a locally available Chromium and FFmpeg. The browser preview is not a replacement for the private Motion player or its audio transport.
+
+## v1.6: working retained-world stage, not another slideshow validator
+
+The previous v1.5 uploader produced a **124-second explainer that still passed the "continuous" pixel test**, despite having an almost-static infographic layout throughout. This version fixes the core abstraction **and** the false-positive check:
+
+- `assets/vanilla-film/src/world.mjs` holds persistent named subjects in world coordinates, follows them with a real camera, provides world-space attached props/labels, and exposes deterministic camera/actor event snapshots. The default `scenes.mjs` now renders **one connected journey**, not three mutually exclusive slide functions.
+- `scripts/audit-stage.mjs` reads **the renderer's own `storySample(t)`** and checks actual subject/camera travel, lens range, uninterrupted ID continuity, time-linked state events and teleport failures.
+- `scripts/validate-motion-plan.mjs` now checks carrier tracks **separately** from focal ones; a plan with zero carriers fails strict validation.
+- `scripts/audit-video.mjs --continuous` now flags an additional long-film anti-panel heuristic. The supplied 124s PHP video is a **negative regression fixture**: 82.6% of its half-second intervals change less than 3% of pixels strongly and the v1.6 auditor rejects it (the original private user video is NOT committed). This is a diagnostic only; art direction still requires inspection.
+- `scripts/render-stage.mjs` renders the exact Canvas2D starter's supported primitives through an SVG recorder + Sharp for environments where browser localhost access is blocked. Requires FFmpeg for MP4. This does not replace browsers for arbitrary apps.
+- `scripts/review-film.mjs` checks evidence of human/agent normal-speed playback, timestamped frame inspection, lens variety and actionable notes. It cannot automate creative judgment.
+
+```bash
+node scripts/audit-stage.mjs assets/vanilla-film/src/scenes.mjs --strict
+node scripts/render-stage.mjs --out ./still.png --still 6.5 --scale .667
+node scripts/render-audio.mjs assets/vanilla-film --out ./score.wav
+node scripts/render-stage.mjs --out ./world.mp4 --scale .667 --fps 24 --audio ./score.wav
+node scripts/audit-video.mjs ./world.mp4 --mode showreel --continuous --strict --sheet ./contact.png
+```
+
+The **14-second included source demo** is a functional camera/subject continuity proof, not commercial-grade art. Read [`references/retained-stage.md`](references/retained-stage.md) before working on any long-form explainer. **Before rendering 90-120 seconds, create and critique a real 10-15s hardest-shot preview.**
 
 ## v1.5: continuous-motion first (fixes the animated-slideshow failure)
 
