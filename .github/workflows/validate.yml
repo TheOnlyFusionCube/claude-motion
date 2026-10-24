@@ -29,5 +29,8 @@ jobs:
         run: |
           node scripts/check.mjs templates/starter
           node scripts/check.mjs examples/styles
+          node scripts/check.mjs examples/journey
       - name: Draft export
-        run: node scripts/export.mjs templates/starter --draft --out /tmp/starter.mp4
+        run: |
+          node scripts/export.mjs templates/starter --draft --out /tmp/starter.mp4
+          node scripts/review.mjs /tmp/starter.mp4

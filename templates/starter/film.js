@@ -43,7 +43,7 @@ export default {
     cam.set([
       { t: 0, cx: 960, cy: 540, z: 1.0, drift: [0, -2, .004] },
       { t: TT.card + 0.9, from: TT.card, cx: 960, cy: 560, z: 1.25, drift: [0, 0, .006] },
-      { t: TT.push + 0.8, from: TT.push, cx: 900, cy: 520, z: 1.7, drift: [3, -1, .01] },
+      { t: TT.push + 0.8, from: TT.push, cx: 960, cy: 612, z: 2.0, drift: [4, -1, .008] },   // close-up: the bars fill the frame
       { t: TT.out + 0.5, from: TT.out - 0.2, cx: 960, cy: 540, z: 1.0, ease: eio },
     ]);
     title = kit.h('<div class="title">Weekly signups</div>'); kit.stage.append(title);
