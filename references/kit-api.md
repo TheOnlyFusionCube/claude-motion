@@ -91,8 +91,8 @@ Optional `r` (degrees) rolls the camera.
 
 ## Type
 
-`TextFx` splits an element's text into word spans once, then sets each word from t. Keep a line as ONE
-element with ONE string.
+`TextFx` splits an element's text into word spans once, keeping inline markup (`<em>`, `<b>`, `<br>`) in place,
+then sets each word from t. Keep a line as ONE element.
 
 - `TextFx.in(el, t, t0, {from: 'right'|'left'|'bottom'|'top', d = 28, stagger = .11, dur = .5, ease = eo, blur = 0, scale = 1, mode: 'words'|'chars'})` → end time
 - `TextFx.rise(el, t, t0, opts)` (from bottom, 34 px), `TextFx.fadeFromRight(el, t, t0, {stagger, dur, dx})`
@@ -130,6 +130,11 @@ marks.add({ kind: 'circle', x, y, w, h, t0: 6.2, dur: .45, color: '#e5484d', wid
 
 `kit.cutPaper(seed, n = 7, irregularity)` → unit polygon; `kit.rectPoly(n, w, h)`; `kit.polyLerp(A, B, p)`
 (morph, point for point); `kit.polyStr(pts, cx, cy, sx, sy, rot)` → SVG `points`.
+
+## Style presets
+
+`import { useStyle } from 'motion/styles/index.js'` → `await useStyle(kit, 'editorial', { palette, values, root })`.
+Six looks (sketch, bubbles, editorial, bold, midnight, showcase) sharing one set of classes. See `references/styles.md`.
 
 ## Scenes (optional)
 
@@ -169,6 +174,7 @@ Unknown names are silent and reported by `score.mjs`. `--levels` prints RMS per 
 | `node scripts/frames.mjs <dir> --at 0,2.5,c2+0.5,50%,end --sheet` | exact stills + contact sheet (also `--every 1`, `--count 16`) |
 | `node scripts/check.mjs <dir>` | errors, determinism, blank first frame, frozen spans, slideshow smell, tiny text |
 | `node scripts/score.mjs <dir> [--levels]` | render `score.wav` |
+| `node scripts/palette.mjs "#g,#m,#i,#a" …` | check palettes (ink ≥ 4.5:1 on ground, no mid-tone grounds) |
 | `node scripts/export.mjs <dir> --out film.mp4 [--fps 60] [--gif x.gif]` | frame-exact MP4 with the score; parallel workers |
 
 Requirements: Node ≥ 22, Playwright with Chromium (`npm i -D playwright && npx playwright install chromium`,

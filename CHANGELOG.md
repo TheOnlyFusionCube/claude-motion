@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.0: opening questions and style presets
+
+- **Intake** (`references/intake.md`): for a new film the agent asks Style, Colours and Length once,
+  together, before the beat sheet, using the host's question tool (`AskUserQuestion`) or one plain
+  message. Ported from the original Motion intake: looks invented for the film, the brand palette first
+  (found in the codebase if possible), palette rules, and what each answer means.
+- **Style presets** (`kit/styles/`, `references/styles.md`): sketch, bubbles, editorial, bold, midnight
+  and showcase, ported from the original built-in styles. Each has named palettes, values, an animated
+  backdrop and an emphasis animation, all on one shared class vocabulary. `examples/styles/` is a
+  gallery film.
+- `scripts/palette.mjs`: contrast check for palettes before they are offered.
+- `TextFx` keeps inline markup (`<em>`, `<b>`, `<br>`) when splitting words.
+- Bundled Shantell Sans (hand-drawn, OFL) for the sketch preset.
+
 ## 2.0.0: a runtime, an example and a method, instead of more rules
 
 1.x produced animated slideshows even when every validator passed. 2.0 is a rebuild.

@@ -82,7 +82,7 @@ api.ready = (async () => {
   }
   // Load every bundled face that the film's CSS might use before measuring anything.
   await document.fonts.ready;
-  const faces = ['Inter', 'Inter Tight', 'Fraunces', 'Instrument Serif', 'Space Grotesk', 'Manrope', 'Bricolage Grotesque', 'JetBrains Mono', 'DM Mono'];
+  const faces = ['Inter', 'Inter Tight', 'Fraunces', 'Instrument Serif', 'Space Grotesk', 'Manrope', 'Bricolage Grotesque', 'JetBrains Mono', 'DM Mono', 'Shantell Sans'];
   await Promise.all(faces.flatMap(f => [`400 20px "${f}"`, `700 20px "${f}"`, `italic 400 20px "${f}"`]).map(s => document.fonts.load(s).catch(() => {})));
   if (CUT.init) await CUT.init(kit);
   const fx = document.createElement('canvas'); fx.width = W; fx.height = H; fx.className = 'kit-fx'; stage.append(fx);

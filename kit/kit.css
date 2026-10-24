@@ -11,6 +11,7 @@
 @font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-wght-normal.woff2) format("woff2"); font-weight: 200 800; }
 @font-face { font-family: "Bricolage Grotesque"; src: url(fonts/bricolage-grotesque-latin-wght-normal.woff2) format("woff2"); font-weight: 200 800; }
 @font-face { font-family: "JetBrains Mono"; src: url(fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); font-weight: 100 800; }
+@font-face { font-family: "Shantell Sans"; src: url(fonts/shantell-sans-latin-wght-normal.woff2) format("woff2"); font-weight: 300 800; }
 @font-face { font-family: "DM Mono"; src: url(fonts/dm-mono-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
 @font-face { font-family: "DM Mono"; src: url(fonts/dm-mono-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
 

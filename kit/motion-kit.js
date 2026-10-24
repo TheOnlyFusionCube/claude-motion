@@ -168,18 +168,27 @@
 
   // ───────────────────────── Type in motion ─────────────────────────
   // Splits once into word spans (or chars), then sets per-unit opacity/offset/blur from t.
+  // Splits once into word (or char) spans, keeping inline markup (<em>, <b>, <br>, spans) in place.
   const split = (el, mode = 'words') => {
-    if (el._kitSplit && el._kitSplit.mode === mode && el._kitSplit.src === el.textContent) return el._kitSplit.units;
-    const text = el.textContent;
-    el.textContent = '';
-    const parts = mode === 'chars' ? [...text] : text.split(/(\s+)/).filter(Boolean);
-    const units = [];
-    for (const p of parts) {
-      if (/^\s+$/.test(p)) { el.append(document.createTextNode(p)); continue; }
-      const s = kit.el('span', { class: 'kit-word', text: p }); el.append(s); units.push(s);
-    }
-    el._kitSplit = { mode, src: text, units };
-    // textContent of el now equals text again; keep src for re-splits.
+    const k = el._kitSplit;
+    if (k && k.mode === mode && k.src === el.textContent) return k.units;
+    if (k && k.src === el.textContent) el.innerHTML = k.html;          // another mode: start from the original markup
+    const html = el.innerHTML, src = el.textContent, units = [];
+    const walk = node => {
+      for (const n of [...node.childNodes]) {
+        if (n.nodeType === 3) {
+          const parts = mode === 'chars' ? [...n.textContent] : n.textContent.split(/(\s+)/).filter(Boolean);
+          const frag = document.createDocumentFragment();
+          for (const p of parts) {
+            if (/^\s+$/.test(p)) { frag.append(document.createTextNode(p)); continue; }
+            const sp = kit.el('span', { class: 'kit-word', text: p }); frag.append(sp); units.push(sp);
+          }
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.tagName !== 'BR' && !n.classList.contains('kit-word')) walk(n);
+      }
+    };
+    walk(el);
+    el._kitSplit = { mode, src, html, units };
     return units;
   };
   const DIRS = { right: [1, 0], left: [-1, 0], bottom: [0, 1], top: [0, -1], up: [0, 1], down: [0, -1] };
@@ -385,5 +394,5 @@
     };
   };
 
-  kit.version = '2.0.0';
+  kit.version = '2.1.0';
 })();

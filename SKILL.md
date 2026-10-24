@@ -1,6 +1,6 @@
 ---
 name: claude-motion
-description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, kinetic type, data stories, 3D scenes) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
+description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, kinetic type, data stories, 3D scenes) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Asks style, colours and length up front; offers six style presets. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
 ---
 
 # Claude Motion
@@ -27,7 +27,8 @@ It can have perfect type and still fail. This skill exists to prevent that.
 2. `examples/launch/film.js` + `film.css`: a complete 34 s launch film (title → app → question →
    chart → push into a 3D city → comment → replay with the fix → end card, with score). It's the
    reference for structure and finish. **Copy its techniques, never its look, story or words.**
-3. `references/recipes.md` for the specific moves you'll use, and `references/kit-api.md` for the API.
+3. `references/intake.md` (the opening questions), `references/recipes.md` (the specific moves you'll use),
+   `references/kit-api.md` (the API) and, if a preset is picked, `references/styles.md`.
 
 ## Workflow
 
@@ -38,20 +39,35 @@ fails, install: `npm i -D playwright && npx playwright install chromium` (or set
 plus FFmpeg (`FFMPEG_PATH`). Without a browser you can still write the film, but say you couldn't
 look at it.
 
-### 1. Decide: subject, audience, length, look
+### 1. Ask the three questions: style, colours, length
 
 Take the story, product, copy and facts from the request and the user's material. Never invent claims
-about a real product. If the subject is missing, ask once and stop. Otherwise decide, and say what you
-chose in a line:
+about a real product. If the subject is missing, ask for it and stop.
 
-- **Length:** 15–30 s by default, ~35–60 s for a launch film. Typing and reading are the time sinks.
-- **Look:** a ground, an ink, a muted grey and **one accent doing one job** (a second colour only if
-  data needs it). Use their brand if they have one. Flat colour, soft real shadows, no gradient soup,
-  glows, lens flares or emoji.
+Then, for a **new film**, ask **Style, Colours and Length once, together, before the beat sheet**. These
+are the choices people most regret leaving vague. Follow `references/intake.md`:
+
+- **Use the host's question tool** (`AskUserQuestion` in Claude Code), all three in one call, your pick first
+  in each row. Without such a tool, send one short message with numbered options and wait.
+- **Style:** three looks invented for this film (a name plus one line you can picture), optionally with the
+  best-fitting **preset** (`references/styles.md`: sketch, bubbles, editorial, bold, midnight, showcase) as the
+  last option.
+- **Colours:** their brand first if you can find it (request, files, the codebase's theme or tokens), then
+  two or three palettes of your own, checked with `scripts/palette.mjs`.
+- **Length:** three that suit the film.
+- **Skip any row the request already answers.** Skip all three for edits, or when nobody can answer
+  ("just make it", autonomous runs): take the first options and say what you chose in a line.
+
+Whatever look you end up with:
+
+- **Colour:** a ground, an ink, a muted grey and **one accent doing one job** (a second colour only if data
+  needs it). Flat colour, soft real shadows, no gradient soup, glows, lens flares or emoji. A preset
+  brings its own treatment.
 - **Faces:** pick for this film rather than by habit. Bundled (no network needed): `Inter`, `Inter Tight`,
   `Fraunces` (+italic), `Instrument Serif` (+italic), `Space Grotesk`, `Manrope`, `Bricolage Grotesque`,
-  `JetBrains Mono`, `DM Mono`. Usually a display face over a text face that differs in kind. Their own
-  font files go in `assets/` with an `@font-face`.
+  `Shantell Sans` (hand-drawn), `JetBrains Mono`, `DM Mono`. Usually a display face over a text face that
+  differs in kind. Their own font files go in `assets/` with an `@font-face`.
+- **A preset is a look, not a film.** It still needs the beat sheet, the camera, actions and transitions.
 
 ### 2. Write the beat sheet before any code
 
@@ -175,6 +191,7 @@ they ask for a redesign. If you think a bigger change would help, do what they a
 
 `kit/` runtime (`motion-kit.js`, `player.html`, `kit.css`, bundled fonts, Three.js) · `scripts/`
 (`new`, `preview`, `frames`, `check`, `score`, `export`) · `templates/starter/` · `examples/launch/` ·
-`references/kit-api.md`, `references/recipes.md` · `references/upstream/` (the original Motion
+`references/intake.md`, `references/styles.md` (+ `kit/styles/`, `examples/styles/`), `references/kit-api.md`,
+`references/recipes.md`, `scripts/palette.mjs` · `references/upstream/` (the original Motion
 reference set, verbatim and read-only; its private-player commands don't exist here. Use this kit's
 equivalents in `kit-api.md`).

@@ -14,3 +14,4 @@ SIL Open Font License 1.1 (https://openfontlicense.org): free to use, embed and 
 | bricolage-grotesque-latin-wght-normal.woff2 | Bricolage Grotesque (variable) | The Bricolage Grotesque Project Authors (Mathieu Triay) |
 | jetbrains-mono-latin-wght-normal.woff2 | JetBrains Mono (variable) | The JetBrains Mono Project Authors |
 | dm-mono-latin-*-normal.woff2 | DM Mono 400/500 | The DM Mono Project Authors (Colophon Foundry) |
+| shantell-sans-latin-wght-normal.woff2 | Shantell Sans (variable, hand-drawn) | The Shantell Sans Project Authors (Shantell Martin, Arrow Type) |
