@@ -28,26 +28,19 @@ All original files are **included offline**, unmodified, and checked against the
 | `walkthrough.md` | `artifact-type/reference/walkthrough.md` | 4,653 | `6499048be0e2ed73c8de6d35a69c13d3b8f95e23` |
 | **Total** | **12 original documents** | **159,065** | **12 verified Git blobs** |
 
-Verify 100% exactly, using only bundled bytes and Node built-ins:
+Verify with Node built-ins only:
 
 ```sh
-node scripts/parity.mjs                 # 12/12, 159,065/159,065: 100.0%
-node scripts/parity.mjs --json          # machine-readable per-file report
-node scripts/sync-upstream.mjs --verify # also fails nonzero for missing/mismatched originals
+node scripts/sync-upstream.mjs --verify   # fails nonzero for a missing or changed original
 ```
 
-`node scripts/sync-upstream.mjs --all` is an **optional** network repair command pinned to the same revision and original hashes. It is never required to activate the skill. It refuses mismatched data or local edits except with an explicit `--force`. Avoid editing originals; implement adaptations elsewhere.
+`node scripts/sync-upstream.mjs --all` re-fetches the originals at the pinned revision (optional, needs network).
 
-## Coding-agent compatibility: what is adapted
+## How the skill uses them
 
-The active `SKILL.md`, `references/portable-workflow.md`, `references/compatibility-map.md`, and all scripts/assets are **new adapter code**, not copies of a proprietary Motion runtime. Source-specific directives such as Artifact creation, ArtifactData `batch`/`set`, `kit.stage`/`kit.scenes()`/`S.program`, `show_widget`, `_blob` URLs and the player-only Export UI cannot run unmodified on Claude Code, Codex, OpenCode or Pi. They are documented historically verbatim in `references/upstream/` and **mapped**, never silently rewritten, to local project files, time-indexed drawing, host-supported questions, original WAV generation and browser/FFmpeg export.
-
-A local `scenes.json` manifest follows the original scene data conventions; `scripts/validate-film.mjs` checks basic invariants, stable IDs, palette contrast, dimensions and durations without private tools. Scene rendering and the soundtrack in `assets/vanilla-film/` are original standalone demonstrations. Agents should prefer an existing user video/animation stack when available.
-
-## What 100% does and does not mean
-
-**Document-level retention parity = 100%:** Exact pinned upstream Markdown bytes are bundled and verified.
-
-**Original API/runtime parity = not claimed:** This package does not include the source player's custom scene engine, built-in style system, editor, database, score synthesizer, or Export UI. The portable template provides substitute behavior with different implementation and rendering characteristics.
-
-**Visual/audio quality parity = not measured:** Equal creative instructions are not proof of equal output quality. Testing representative compositions and comparing frame captures, text fidelity, camera movement, exact sounds, and exports against original Motion artifacts would be required for a defensible percentage. Our generic tests verify deterministic code, manifests and source integrity, not human visual equivalence.
+`SKILL.md`, `kit/`, `scripts/`, `templates/` and `examples/` are new code written for this project. The runtime
+re-implements the *documented* `kit` API (`film-api.md`) as an ordinary browser script, so the craft rules and
+code fragments in the originals apply to films made here. It is not the original player, and neither its
+pixels nor its sound are claimed to match. The originals' private-product commands (Artifact, ArtifactData,
+`kit.module`, `frames.ts`/`check.ts`, the Export button) do not exist here; `references/kit-api.md` lists the
+local equivalents.

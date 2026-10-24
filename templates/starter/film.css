@@ -1,0 +1,19 @@
+/* Starter look — replace. Colours as variables; one accent doing one job. */
+#stage { --ground: #f2f0eb; --ink: #1c1f24; --muted: #6a707a; --line: #e2ded5; --accent: #e2553d; color: var(--ink); font-family: "Inter", system-ui, sans-serif; }
+.title { position: absolute; left: 0; top: 0; white-space: nowrap; font: 600 120px/1 "Inter Tight", sans-serif; letter-spacing: -0.035em; transform-origin: 0 0; }
+.card { position: absolute; left: 510px; top: 240px; width: 900px; height: 600px; background: #fff; border-radius: 22px; box-sizing: border-box; padding: 44px 56px;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 30px 70px -24px rgba(28,31,36,.28), 0 0 0 1px rgba(28,31,36,.05); transform-origin: 50% 50%; }
+.card .head { font: 600 40px/1 "Inter Tight", sans-serif; letter-spacing: -0.035em; }
+.bars { position: absolute; left: 56px; right: 56px; top: 130px; height: 300px; display: flex; gap: 22px; align-items: flex-end; border-bottom: 2px solid var(--line); }
+.bar { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.bar i { display: block; width: 100%; height: 100%; background: var(--ink); border-radius: 10px 10px 2px 2px; transform-origin: 50% 100%; }
+.bar:last-child i { background: var(--accent); }
+.foot { position: absolute; left: 56px; right: 56px; bottom: 44px; display: flex; align-items: center; justify-content: space-between; }
+.total { font: 600 44px/1 "Inter Tight", sans-serif; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.btn { height: 60px; padding: 0 30px; border-radius: 14px; border: 1.5px solid var(--line); display: flex; align-items: center; font: 600 22px/1 "Inter", sans-serif; }
+.btn.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.endc { position: absolute; inset: 0; }
+.endc .words { position: absolute; left: 0; right: 0; top: 452px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.endc .word { font: 600 150px/1 "Inter Tight", sans-serif; letter-spacing: -0.045em; }
+.endc .line { font: 400 42px/1.2 "Inter", sans-serif; color: var(--muted); }
+.dot { position: absolute; left: -16px; top: -16px; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); }

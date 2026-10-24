@@ -1,60 +1,72 @@
 #!/usr/bin/env node
-/** Export frame-seekable local browser films via PNG pipe and FFmpeg. */
-import fs from 'node:fs/promises';
+// Export a film to MP4 (H.264 + AAC), frame-exact, in parallel browser workers.
+//   node scripts/export.mjs <film-dir> [--out film.mp4] [--fps 30] [--from 0] [--to end]
+//        [--jobs 4] [--audio score.wav | --no-audio] [--crf 16] [--gif out.gif]
+//        [--scale 0.5] [--draft]   (--draft = half size, 24 fps, quick encode: for checking timing, not delivery)
+// The score is rendered first (scripts/score.mjs) unless --no-audio or --audio is given.
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
-import { once } from 'node:events';
-import { openFilm, parseOptions } from './browser.mjs';
+import { spawnSync } from 'node:child_process';
+import { args, launch, openFilm, snap, ffmpegPath } from './lib/browser.mjs';
+import { renderFilmScore } from './score.mjs';
 
-const HELP = `Usage: node export.mjs <film-directory> --out film.mp4 [--fps 30] [--scale 1] [--start 0] [--end 14] [--audio authorized.wav]\nNeeds Node >=22, Chromium (or CHROMIUM_PATH), and ffmpeg on PATH. Output MP4/H.264 is opaque.`;
+const a = args();
+if (a.draft) { a.scale ??= 0.5; a.fps ??= 24; a.crf ??= 23; a.preset ??= 'veryfast'; }
+const scale = +(a.scale || 1);
+const film = a._[0];
+if (!film) { console.log('usage: node scripts/export.mjs <film-dir> [--out film.mp4] [--fps n] [--from s] [--to s] [--jobs n] [--audio wav | --no-audio]'); process.exit(1); }
+const filmDir = path.resolve(film);
+const out = path.resolve(a.out || path.join(filmDir, 'film.mp4'));
+const ffmpeg = ffmpegPath();
+const browser = await launch();
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'export-'));
+try {
+  const first = await openFilm(browser, filmDir, { scale });
+  const info = first.info; await first.ctx.close();
+  const fps = +(a.fps || info.fps);
+  const from = +(a.from || 0), to = a.to && a.to !== 'end' ? +a.to : info.duration;
+  const N = Math.round((to - from) * fps);
+  const jobs = Math.max(1, Math.min(+(a.jobs || Math.min(6, os.cpus().length)), N));
+  console.log(`${info.title}: ${Math.round(info.width * scale)}×${Math.round(info.height * scale)} @ ${fps}fps, ${(to - from).toFixed(2)}s = ${N} frames, ${jobs} workers`);
+  const started = Date.now(); let done = 0;
+  const worker = async (w) => {
+    const logs = [];
+    const { page, ctx } = await openFilm(browser, filmDir, { logs, scale });
+    const lo = Math.floor((w * N) / jobs), hi = Math.floor(((w + 1) * N) / jobs);
+    for (let i = lo; i < hi; i++) {
+      const buf = await snap(page, from + i / fps, 'jpeg', 94);
+      fs.writeFileSync(path.join(tmp, `f${String(i).padStart(6, '0')}.jpg`), buf);
+      if (++done % 30 === 0 || done === N) process.stdout.write(`\r  frames ${done}/${N}  ${((Date.now() - started) / 1000).toFixed(0)}s`);
+    }
+    const errs = await page.evaluate(() => __film.errors);
+    await ctx.close();
+    return [...errs, ...logs];
+  };
+  const errs = (await Promise.all(Array.from({ length: jobs }, (_, w) => worker(w)))).flat();
+  process.stdout.write('\n');
+  if (errs.length) console.warn('Console errors during export:\n  ' + [...new Set(errs)].join('\n  '));
 
-async function main() {
-  if (process.argv.includes('--help') || process.argv.includes('-h')) { console.log(HELP); return; }
-  const args = parseOptions(process.argv.slice(2), ['--out', '--fps', '--scale', '--start', '--end', '--audio']);
-  if (args._.length !== 1 || !args.out) throw new Error(HELP);
-  if (!args.out.toLowerCase().endsWith('.mp4')) throw new Error('Exporter writes H.264 MP4. Use an .mp4 output filename.');
-  const film = await openFilm(args._[0]);
-  let encoder = null;
-  try {
-    const fps = Number(args.fps ?? film.config.fps);
-    const scale = Number(args.scale ?? 1);
-    const start = Number(args.start ?? 0);
-    const end = Number(args.end ?? film.config.duration);
-    if (!Number.isInteger(fps) || fps < 1 || fps > 120) throw new Error('--fps must be 1..120');
-    if (!Number.isFinite(scale) || scale <= 0 || scale > 2) throw new Error('--scale must be >0 and <=2');
-    if (!(start >= 0 && end > start && end <= film.config.duration)) throw new Error('--start/--end must define a valid film interval');
-    const total = Math.round((end - start) * fps);
-    if (total < 1) throw new Error('Requested interval contains zero frames');
-    const output = path.resolve(args.out);
-    await fs.mkdir(path.dirname(output), { recursive: true });
-    const ffArgs = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-vcodec', 'png', '-i', 'pipe:0'];
-    if (args.audio) {
-      await fs.access(args.audio);
-      if (start > 0) ffArgs.push('-ss', String(start));
-      ffArgs.push('-i', path.resolve(args.audio), '-map', '0:v:0', '-map', '1:a:0', '-shortest', '-c:a', 'aac', '-b:a', '160k');
-    }
-    ffArgs.push('-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '19', '-preset', 'medium', '-movflags', '+faststart', '-frames:v', String(total), output);
-    encoder = spawn('ffmpeg', ffArgs, { stdio: ['pipe', 'ignore', 'pipe'] });
-    let ffErrors = '';
-    encoder.stderr.on('data', chunk => { ffErrors += String(chunk); });
-    encoder.on('error', error => { ffErrors += String(error); });
-    for (let i = 0; i < total; i++) {
-      const t = start + i / fps;
-      const png = await film.frame(t, scale);
-      if (!encoder.stdin.write(png)) await once(encoder.stdin, 'drain');
-      if (i === 0 || (i + 1) % Math.max(1, Math.floor(fps * 2)) === 0 || i === total - 1) {
-        console.log(`Encoded input frame ${i + 1}/${total} at t=${t.toFixed(3)}s`);
-      }
-    }
-    encoder.stdin.end();
-    const [code] = await once(encoder, 'close');
-    if (code !== 0) throw new Error(`FFmpeg exited ${code}: ${ffErrors}`);
-    if (film.errors.length) throw new Error('Browser reported errors: ' + film.errors.join('; '));
-    const stat = await fs.stat(output);
-    console.log(`Wrote ${output} (${stat.size} bytes, ${total} frames, ${fps} fps)`);
-  } finally {
-    if (encoder && encoder.exitCode === null) encoder.kill('SIGTERM');
-    await film.close();
+  let audio = a.audio ? path.resolve(a.audio) : null;
+  if (!audio && !a['no-audio']) {
+    const wav = path.join(filmDir, 'score.wav');
+    const r = await renderFilmScore(filmDir, wav, { browser, quiet: true });
+    if (r && r.events > 0) audio = wav;
   }
+  const ff = ['-y', '-loglevel', 'error', '-framerate', String(fps), '-i', path.join(tmp, 'f%06d.jpg')];
+  if (audio) ff.push('-ss', String(from), '-t', String(to - from), '-i', audio);
+  ff.push('-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', a.preset || 'slow', '-crf', String(a.crf || 16), '-pix_fmt', 'yuv420p', '-tune', 'animation', '-movflags', '+faststart');
+  if (audio) ff.push('-c:a', 'aac', '-b:a', '192k', '-shortest');
+  ff.push(out);
+  const r = spawnSync(ffmpeg, ff, { stdio: 'inherit' });
+  if (r.status !== 0) throw new Error('ffmpeg failed');
+  if (a.gif) {
+    const gif = path.resolve(a.gif);
+    spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', out, '-vf', `fps=${Math.min(fps, 24)},scale=${Math.min(960, info.width)}:-1:flags=lanczos,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=sierra2_4a`, gif], { stdio: 'inherit' });
+    console.log('→ ' + gif);
+  }
+  console.log(`→ ${out}  (${(fs.statSync(out).size / 1e6).toFixed(1)} MB${audio ? ', with audio' : ', silent'}, ${((Date.now() - started) / 1000).toFixed(0)}s)`);
+} finally {
+  await browser.close();
+  fs.rmSync(tmp, { recursive: true, force: true });
 }
-main().catch(err => { console.error('Export failed:', err.message); process.exitCode = 1; });
