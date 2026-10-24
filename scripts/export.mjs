@@ -2,13 +2,14 @@
 // Export a film to MP4 (H.264 + AAC), frame-exact, in parallel browser workers.
 //   node scripts/export.mjs <film-dir> [--out film.mp4] [--fps 30] [--from 0] [--to end]
 //        [--jobs 4] [--audio score.wav | --no-audio] [--crf 16] [--gif out.gif]
-//        [--scale 0.5] [--draft]   (--draft = half size, 24 fps, quick encode: for checking timing, not delivery)
+//        [--scale 0.5] [--draft]   (--draft = half size, 24 fps, quick encode, no motion blur: for checking timing, not delivery)
+//        [--blur n | --no-blur]    (motion blur: defaults to the film's `motionBlur`; n sub-frames per frame)
 // The score is rendered first (scripts/score.mjs) unless --no-audio or --audio is given.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { args, launch, openFilm, snap, ffmpegPath } from './lib/browser.mjs';
+import { args, launch, openFilm, snapFrame, ffmpegPath, blurSetting, makeBlender } from './lib/browser.mjs';
 import { renderFilmScore } from './score.mjs';
 
 const a = args();
@@ -28,14 +29,16 @@ try {
   const from = +(a.from || 0), to = a.to && a.to !== 'end' ? +a.to : info.duration;
   const N = Math.round((to - from) * fps);
   const jobs = Math.max(1, Math.min(+(a.jobs || Math.min(6, os.cpus().length)), N));
-  console.log(`${info.title}: ${Math.round(info.width * scale)}×${Math.round(info.height * scale)} @ ${fps}fps, ${(to - from).toFixed(2)}s = ${N} frames, ${jobs} workers`);
+  const mb = blurSetting(info, a['no-blur'] ? false : (a.draft && a.blur == null ? false : a.blur));
+  console.log(`${info.title}: ${Math.round(info.width * scale)}×${Math.round(info.height * scale)} @ ${fps}fps, ${(to - from).toFixed(2)}s = ${N} frames, ${jobs} workers${mb ? `, motion blur ×${mb.samples}${mb.fast.length ? ' (more on fast spans)' : ''}` : info.motionBlur ? ' (motion blur off)' : ''}`);
   const started = Date.now(); let done = 0;
   const worker = async (w) => {
     const logs = [];
     const { page, ctx } = await openFilm(browser, filmDir, { logs, scale });
+    const blender = mb ? await makeBlender(browser) : null;
     const lo = Math.floor((w * N) / jobs), hi = Math.floor(((w + 1) * N) / jobs);
     for (let i = lo; i < hi; i++) {
-      const buf = await snap(page, from + i / fps, 'jpeg', 94);
+      const buf = await snapFrame(page, from + i / fps, { ...info, fps }, mb, blender, 'jpeg', 94);
       fs.writeFileSync(path.join(tmp, `f${String(i).padStart(6, '0')}.jpg`), buf);
       if (++done % 30 === 0 || done === N) process.stdout.write(`\r  frames ${done}/${N}  ${((Date.now() - started) / 1000).toFixed(0)}s`);
     }

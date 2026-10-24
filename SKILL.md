@@ -1,6 +1,6 @@
 ---
 name: claude-motion
-description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, kinetic type, data stories, 3D scenes) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Asks style, colours and length up front; offers six style presets. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
+description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, motion-design reels and sizzles, kinetic type, data stories, 3D scenes) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Asks style, colours and length up front; offers six style presets. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
 ---
 
 # Claude Motion
@@ -30,6 +30,9 @@ It can have perfect type and still fail. This skill exists to prevent that.
    - `examples/journey/`: a 22 s **abstract story** (how a message crosses the world) told with one
      physical subject, a camera that goes from finger scale to map scale and back, and almost no words.
      Read it for any brief that's an idea rather than a product.
+   - `examples/reel/`: a 13 s **motion-design reel** (3D letters → the O becomes a ball → squash and stretch →
+     pull back into an editor → the ball becomes a toggle → a colour flood → whip pans over a grid → a rolling
+     count), with motion blur. Read it for a sizzle, showreel, brand sting or anything that should feel fast and crafted.
    Each has a `BEATS.md`: read the sheet, then the code.
 3. `references/intake.md` (the opening questions), `references/recipes.md` (the specific moves you'll use),
    `references/kit-api.md` (the API) and, if a preset is picked, `references/styles.md`.
@@ -58,6 +61,28 @@ moving. `scripts/review.mjs` measures the deck signals on any MP4, so use it on 
 For an abstract story (an idea, a process, "what it's like to be…"), the same rules apply. Turn the
 idea into one physical subject in one world, the way `examples/journey/` turns a message into an
 object that travels. Then let the camera follow it. Don't turn each idea into a titled panel.
+
+## Reels and sizzles
+
+A motion-design reel (a sizzle, a showreel, a brand sting, a "what this can do" opener) is a different
+genre from a launch film: there's no story to follow, and the pleasure is the **craft of the moves** and how
+each one **turns into the next**. The deck trap still applies, so a reel is never a run of titled cards.
+Its own rules (all used in `examples/reel/`):
+
+- **Every move hands off.** No cut between ideas without a carry. A letter becomes a ball, the ball becomes a
+  knob, the knob's click floods the frame, the flood is one tile of the next world. Write the "carries into
+  next by" column first. Use **match cuts** (same shape, same place, new thing) and **morphs** (`kit.morph`).
+- **Pace is ~1–1.5 s per idea**, with a breath (a held, drifting second) every 4–5 s. Fast camera is allowed
+  from the start, but every whip lands on something.
+- **Weight and physics everywhere:** squash and stretch on anything that lands (`kit.bouncer`), overshoot on
+  arrivals, springs on UI, letters that fly in from depth with rotation (`kit.letters` + `kit.extrude`).
+- **Real motion blur.** Set `motionBlur: { samples: 8, shutter: 0.5 }` on the film, and list whip pans and smash
+  moves in `fast` (16–32 samples) so they smear instead of ghosting. Stills and exports both include it.
+- **Texture is allowed here:** a soft glow under the subject, depth of field (`kit.focus`), grain
+  (`kit.grain`), a gradient studio ground. Still one accent colour.
+- **Words: one at a time, one or two words** ("Weight.", "Timing."). Numbers roll (`kit.odometer`).
+- **Sound is cut to the picture:** a hit on every landing (`thud`, `pop`), a `swipe` under every whip, a `riser`
+  into a flood or smash, an `impact` on the cut it lands, a groove under the fastest section.
 
 ## Workflow
 
@@ -91,7 +116,7 @@ Whatever look you end up with:
 
 - **Colour:** a ground, an ink, a muted grey and **one accent doing one job** (a second colour only if data
   needs it). Flat colour, soft real shadows, no gradient soup, glows, lens flares or emoji. A preset
-  brings its own treatment.
+  brings its own treatment, and a reel may use one soft glow, grain and a studio gradient (see "Reels and sizzles").
 - **Faces:** pick for this film rather than by habit. Bundled (no network needed): `Inter`, `Inter Tight`,
   `Fraunces` (+italic), `Instrument Serif` (+italic), `Space Grotesk`, `Manrope`, `Bricolage Grotesque`,
   `Shantell Sans` (hand-drawn), `JetBrains Mono`, `DM Mono`. Usually a display face over a text face that
@@ -208,7 +233,8 @@ below about −30 dB.
 
 `node <skill>/scripts/export.mjs <film-dir> --out <film-dir>/film.mp4` (renders the score, encodes
 H.264 + AAC; `--fps 60` for the smoothest UI, `--gif` too if asked; `--draft` makes a quick half-size cut for
-checking timing). DOM frames take ~0.05 s each; 3D frames
+checking timing, without motion blur). Motion blur multiplies render time by its sample count, so check
+timing with `--draft` first. DOM frames take ~0.05 s each; 3D frames
 ~1–2 s each without a GPU, so a 34 s film with 18 s of 3D takes about 15 minutes. Run it in the background. Then pull a few stills from the MP4
 itself (`ffmpeg -ss 12 -i film.mp4 -frames:v 1 x.png`) and look. Report truthfully: what you made, its
 length and size, the look you chose, and anything you couldn't do.
@@ -224,7 +250,7 @@ they ask for a redesign. If you think a bigger change would help, do what they a
 - Static panels that fade in and out with a title each: the slideshow.
 - Motion as garnish: particles, a wiggling underline or a pulsing glow around a still layout.
 - Wide shots of whole UIs with unreadable text, or long holds on a finished result. Cut in while it builds.
-- Fast camera in the first five seconds. Multiple entrance directions in one line. Bouncy product UI.
+- Fast camera in the first five seconds (reels aside). Multiple entrance directions in one line. Bouncy product UI.
 - Everything entering at once. Stagger 200–400 ms and sequence the eye.
 - Generic AI look: purple gradients, glassmorphism, emoji, a rounded card with a coloured left border, grey default 3D cubes.
 - Claiming a file, sound or check exists that you didn't produce and look at.
@@ -232,7 +258,8 @@ they ask for a redesign. If you think a bigger change would help, do what they a
 ## Files
 
 `kit/` runtime (`motion-kit.js`, `player.html`, `kit.css`, bundled fonts, Three.js) · `scripts/`
-(`new`, `preview`, `frames`, `check`, `score`, `export`) · `templates/starter/` · `examples/launch/` ·
+(`doctor`, `new`, `preview`, `frames`, `check`, `review`, `score`, `export`) · `templates/starter/` ·
+`examples/launch/`, `examples/journey/`, `examples/reel/` ·
 `references/intake.md`, `references/styles.md` (+ `kit/styles/`, `examples/styles/`), `references/kit-api.md`,
 `references/recipes.md`, `scripts/palette.mjs` · `references/upstream/` (the original Motion
 reference set, verbatim and read-only; its private-player commands don't exist here. Use this kit's

@@ -30,6 +30,8 @@ jobs:
           node scripts/check.mjs templates/starter
           node scripts/check.mjs examples/styles
           node scripts/check.mjs examples/journey
+          node scripts/check.mjs examples/reel
+          node scripts/frames.mjs examples/reel --at 8.55 --scale 0.5 --out /tmp/reel-blur
       - name: Draft export
         run: |
           node scripts/export.mjs templates/starter --draft --out /tmp/starter.mp4

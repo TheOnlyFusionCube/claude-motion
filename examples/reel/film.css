@@ -1,0 +1,62 @@
+/* "Everything moves": a motion-design reel. Warm grey studio, one electric blue, cream type. */
+#stage { --blue: #2f54ff; --cream: #f4f1ea; --ink: #16171a; --grey: #d8d3cb; --paper: #ece8e1; --muted: #8b867e;
+  font-family: "Inter", system-ui, sans-serif; color: var(--ink); }
+
+/* ── Studio (the first world: title, bounce, editor, toggle) ── */
+.studio .backdrop { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
+  background: radial-gradient(1200px 760px at 50% 38%, #dcd7cf 0%, #b9b4ac 52%, #7d7973 100%); }
+.studio .glow { position: absolute; left: 260px; top: 760px; width: 1400px; height: 520px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(47,84,255,.55), rgba(47,84,255,.18) 55%, rgba(47,84,255,0)); filter: blur(30px); }
+.studio .window { position: absolute; left: -260px; top: -170px; width: 2440px; height: 1830px; border-radius: 34px; background: #24252a;
+  box-shadow: 0 60px 160px rgba(0,0,0,.55), 0 0 0 2px #34363c; }
+.studio .window .bar { position: absolute; left: 0; right: 0; top: 0; height: 150px; display: flex; align-items: center; gap: 22px; padding: 0 48px; }
+.studio .window .bar i { width: 26px; height: 26px; border-radius: 50%; background: #45474e; display: block; }
+.studio .window .bar span { margin-left: 30px; font: 500 46px/1 "JetBrains Mono", monospace; color: #8d9099; }
+.studio .window .bar b { margin-left: auto; font: 600 44px/1 "Inter", sans-serif; color: #fff; background: var(--blue); padding: 18px 34px; border-radius: 14px; }
+.studio .panel { position: absolute; left: 0; top: 1130px; width: 1920px; height: 450px; border-radius: 22px; background: #1b1c20; box-shadow: inset 0 0 0 2px #2f3137; }
+.studio .panel .lab { position: absolute; left: 44px; top: 34px; font: 500 44px/1 "JetBrains Mono", monospace; color: #8d9099; }
+.studio .panel .val { position: absolute; right: 44px; top: 34px; font: 500 44px/1 "JetBrains Mono", monospace; color: var(--cream); }
+.studio .panel .val em { font-style: normal; color: #7f9bff; }
+.studio .view-edge { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border-radius: 4px; box-shadow: 0 0 0 3px rgba(47,84,255,0); pointer-events: none; }
+
+.title3d { position: absolute; left: 0; top: 300px; width: 1920px; display: flex; justify-content: center; perspective: 1500px; perspective-origin: 50% 40%; }
+.title3d .word { display: flex; transform-style: preserve-3d; font: 800 290px/1 "Bricolage Grotesque", sans-serif; letter-spacing: -0.02em; color: var(--cream); }
+.title3d .kit-letter { margin: 0 0.01em; }
+
+.ground { position: absolute; left: 0; top: 0; overflow: visible; }
+.ball { position: absolute; left: 0; top: 0; width: 120px; height: 120px; border-radius: 60px; background: var(--blue); transform-origin: 50% 100%;
+  box-shadow: inset -14px -18px 30px rgba(0,0,40,.35), inset 12px 14px 24px rgba(255,255,255,.35); }
+.ball.knob { box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+.track { position: absolute; border-radius: 80px; background: #cfcac2; box-shadow: inset 0 3px 8px rgba(0,0,0,.18); }
+.shadow { position: absolute; left: 0; top: 0; width: 160px; height: 26px; border-radius: 50%; background: rgba(20,20,40,.35); filter: blur(8px); }
+.caption { position: absolute; left: 0; width: 1920px; top: 930px; text-align: center; font: 600 64px/1 "Inter Tight", sans-serif; letter-spacing: -0.02em; color: var(--cream); }
+.caption em { font-style: normal; color: var(--blue); }
+
+/* ── Flood ── */
+.flood { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: var(--blue); }
+
+/* ── Grid (the second world) ── */
+.gridw .floor { position: absolute; left: -2000px; top: -2000px; width: 6000px; height: 5000px; background: var(--paper); }
+.tile { position: absolute; width: 520px; height: 330px; border-radius: 30px; background: #f8f6f1; overflow: hidden; box-shadow: 0 2px 0 rgba(0,0,0,.05), 0 20px 50px -24px rgba(40,30,20,.35); }
+.tile .lab { position: absolute; left: 28px; top: 24px; font: 500 22px/1 "DM Mono", monospace; color: var(--muted); }
+.tile.blue { background: var(--blue); }
+.tile.blue .lab { color: rgba(255,255,255,.7); }
+.tile .typew { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font: 400 170px/1 "Inter", sans-serif; letter-spacing: -0.04em; color: var(--ink); }
+.tile .dot3 { position: absolute; width: 64px; height: 64px; border-radius: 50%; background: #fff; }
+.tile .cube { position: absolute; left: 190px; top: 95px; width: 140px; height: 140px; transform-style: preserve-3d; }
+.tile .cube i { position: absolute; width: 140px; height: 140px; background: var(--cream); box-shadow: inset 0 0 0 4px var(--ink); }
+.tile .cube i.top { background: var(--blue); }
+.tile .scene3d { position: absolute; inset: 0; perspective: 900px; }
+.tile .stripes { position: absolute; left: -200px; top: -200px; width: 1000px; height: 800px; }
+.tile .bars { position: absolute; left: 60px; right: 60px; bottom: 50px; height: 200px; display: flex; align-items: flex-end; gap: 14px; }
+.tile .bars i { flex: 1; background: var(--ink); border-radius: 6px 6px 0 0; display: block; }
+.tile .bars i.hi { background: var(--blue); }
+
+/* ── End: the count ── */
+.endc { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+.endc .row { position: absolute; left: 0; right: 0; top: 380px; display: flex; justify-content: center; align-items: flex-start; gap: 44px; }
+.endc .num { font: 800 300px/1 "Inter Tight", sans-serif; letter-spacing: -0.05em; color: var(--ink); }
+.endc .num .kit-odo-col:last-child { color: var(--blue); }
+.endc .side { padding-top: 40px; display: flex; flex-direction: column; gap: 20px; }
+.endc .w1 { font: 700 96px/1 "Inter Tight", sans-serif; letter-spacing: -0.03em; }
+.endc .w2 { font: 500 48px/1 "Inter", sans-serif; color: var(--muted); }
