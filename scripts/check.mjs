@@ -5,6 +5,7 @@
 // a readable first frame, dead-air spans where nothing moves, tiny on-screen text, end-card hold.
 // It cannot judge taste. Passing this is the floor, not the bar — see SKILL.md "Look at it".
 import { args, launch, openFilm, snap } from './lib/browser.mjs';
+import { analyze, findings } from './lib/analyze.mjs';
 
 const a = args();
 const film = a._[0];
@@ -54,6 +55,10 @@ try {
   if (frozen / D > 0.25) warns.push(`${Math.round(frozen / D * 100)}% of the film is frozen — this measures like a slideshow. Every beat needs an action and every hold a drift (SKILL.md §2).`);
   const moving = d.filter(v => v > 0.004).length / d.length;
   notes.push(`motion: ${(moving * 100).toFixed(0)}% of ${step}s steps change >0.4% of the frame; biggest change ${(Math.max(...d) * 100).toFixed(0)}% at ${samples[d.indexOf(Math.max(...d)) + 1].t}s`);
+  // the animated-deck smell: one layout, small centred blocks, no big pictures
+  { const r = findings(analyze(samples, step)); for (const w of r.warn) if (/animated deck/.test(w)) warns.push(w); for (const n of r.note) if (/^composition/.test(n)) notes.push(n); }
+  const sc = await page.evaluate(() => __film.score());
+  if (!sc.events.length) warns.push('silent: no score(S, kit). Sound is half the film unless silence was asked for (SKILL.md §5)');
   // end card hold: last 2.5s should be calm but not frozen
   const tail = d.slice(-Math.round(2.5 / step));
   if (tail.length && tail.every(v => v < 0.0005)) warns.push('the last 2.5s are frozen — let the end card creep/breathe (≈2 px/s) rather than stop dead');
@@ -80,9 +85,15 @@ try {
       }
       return out;
     }, info.height);
-    for (const [txt, px] of found) { const s = small.get(txt) || { px, from: t, to: t }; s.to = t; s.px = Math.min(s.px, px); small.set(txt, s); }
+    // continuous stretches only; text under ~7px is scenery seen from afar (a phone on a map), not copy meant to be read
+    for (const [txt, px] of found) {
+      if (px < 7) continue;
+      const s = small.get(txt);
+      if (s && t - s.to <= 0.51) { s.to = t; s.px = Math.min(s.px, px); if (s.to - s.from > s.best) { s.best = s.to - s.from; s.bf = s.from; s.bt = s.to; s.bpx = s.px; } }
+      else small.set(txt, { px, from: t, to: t, best: 0, bf: t, bt: t, bpx: px });
+    }
   }
-  const longSmall = [...small.entries()].filter(([, s]) => s.to - s.from >= 1);
+  const longSmall = [...small.entries()].filter(([, s]) => s.best >= 1).map(([k, s]) => [k, { px: s.bpx, from: s.bf, to: s.bt }]);
   if (longSmall.length) warns.push(`text under ~20px on screen for ≥1s (unreadable on a phone; zoom the camera in or set it larger):\n      ` + longSmall.slice(0, 8).map(([t, s]) => `"${t}" ~${s.px}px, ${s.from.toFixed(1)}–${s.to.toFixed(1)}s`).join('\n      ') + (longSmall.length > 8 ? `\n      …and ${longSmall.length - 8} more` : ''));
 
   const errs = [...(await page.evaluate(() => __film.errors)), ...logs];

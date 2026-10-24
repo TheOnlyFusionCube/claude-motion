@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.3.0: beyond the animated deck
+
+Tested with another model on "tell a story about being an LLM". Its films moved continuously and had a
+recurring subject, but they read as presentations: a label, a headline in the same place, and a
+centred diagram per beat, with header bars and counters on every frame, a camera that never changed
+scale, and no sound.
+
+- **SKILL.md "The deck trap":** names those signals and the fix. The beat sheet gains **framing** and
+  **words on screen** columns, a word budget (one line at a time, ~40 words per 30 s), "cover the
+  words: can you still follow it?", and framing that changes between neighbouring beats.
+- **`scripts/review.mjs`:** reviews any video or film folder for sound and loudness, frozen time, and the
+  animated-deck signals (how much the picture changes over 2 s, whether its weight ever leaves the
+  centre line, repeated layouts), with a contact sheet. `check.mjs` runs the same deck and silence
+  checks. Calibrated on films that read as films (14–30% change over 2 s) vs. animated decks (9–12%).
+- **`examples/journey/`:** a 22 s abstract story told without slides. One message is typed, split into
+  words, carried across an ocean (one word takes the long way) and reassembled; the camera goes from
+  finger scale to map scale and back.
+- Silent exports are called out (`export.mjs` warns; SKILL.md treats a film without a score as unfinished).
+- The tiny-text check counts continuous stretches and ignores scenery-sized text; the starter's close-up
+  now fills the frame.
+
 ## 2.2.0: finishing touches
 
 - **Claude Code plugin:** `/plugin install motion-films --marketplace TheOnlyFusionCube/claude-motion`
