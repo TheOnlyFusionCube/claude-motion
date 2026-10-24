@@ -1,0 +1,35 @@
+/* claude-motion kit: bundled faces (all SIL OFL 1.1, from Fontsource) and stage base.
+   Use them by family name. Variable faces take any weight in their range. */
+@font-face { font-family: "Inter"; src: url(fonts/inter-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-style: normal; }
+@font-face { font-family: "Inter"; src: url(fonts/inter-latin-wght-italic.woff2) format("woff2"); font-weight: 100 900; font-style: italic; }
+@font-face { font-family: "Inter Tight"; src: url(fonts/inter-tight-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; }
+@font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; font-style: normal; }
+@font-face { font-family: "Fraunces"; src: url(fonts/fraunces-latin-wght-italic.woff2) format("woff2"); font-weight: 100 900; font-style: italic; }
+@font-face { font-family: "Instrument Serif"; src: url(fonts/instrument-serif-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "Instrument Serif"; src: url(fonts/instrument-serif-latin-400-italic.woff2) format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Space Grotesk"; src: url(fonts/space-grotesk-latin-wght-normal.woff2) format("woff2"); font-weight: 300 700; }
+@font-face { font-family: "Manrope"; src: url(fonts/manrope-latin-wght-normal.woff2) format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "Bricolage Grotesque"; src: url(fonts/bricolage-grotesque-latin-wght-normal.woff2) format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "JetBrains Mono"; src: url(fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); font-weight: 100 800; }
+@font-face { font-family: "Shantell Sans"; src: url(fonts/shantell-sans-latin-wght-normal.woff2) format("woff2"); font-weight: 300 800; }
+@font-face { font-family: "DM Mono"; src: url(fonts/dm-mono-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+@font-face { font-family: "DM Mono"; src: url(fonts/dm-mono-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+
+#stage {
+  position: absolute; left: 0; top: 0; overflow: hidden;
+  transform-origin: 0 0; contain: strict;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision;
+  font-kerning: normal; font-feature-settings: "kern";
+}
+/* Everything is a pure function of t: the runtime owns all motion. */
+#stage *, #stage *::before, #stage *::after { transition: none !important; animation: none !important; }
+#stage .layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#stage .fill { position: absolute; inset: 0; }
+#stage svg.kit-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+#stage canvas.kit-fx { position: absolute; left: 0; top: 0; pointer-events: none; }
+#stage .kit-word { display: inline-block; white-space: pre; will-change: auto; }
+#stage .kit-cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 9000; }
+#stage .kit-cursor .kit-cursor-gfx { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#stage .kit-cursor .kit-ring { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%; box-sizing: border-box; border: 3px solid currentColor; opacity: 0; }
+#stage .kit-chip { position: absolute; left: 0; top: 0; padding: 14px 22px; border-radius: 999px; background: #fff; color: #1d1f22; font: 500 26px/1.1 "Inter", system-ui, sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,.14), 0 1px 0 rgba(0,0,0,.06); white-space: nowrap; }

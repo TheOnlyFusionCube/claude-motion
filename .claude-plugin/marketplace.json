@@ -1,0 +1,14 @@
+{
+  "name": "motion-films",
+  "owner": { "name": "TheOnlyFusionCube", "url": "https://github.com/TheOnlyFusionCube" },
+  "description": "Claude Motion: launch-quality motion films in code for Claude Code.",
+  "plugins": [
+    {
+      "name": "motion-films",
+      "source": "./",
+      "description": "Launch-quality motion films in code, with intake questions, style presets, a 3D-capable film runtime and MP4 export.",
+      "category": "design",
+      "tags": ["video", "animation", "motion-design"]
+    }
+  ]
+}

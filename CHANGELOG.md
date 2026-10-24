@@ -1,77 +1,56 @@
 # Changelog
 
-## 1.6.0 — Restore executable film-making machinery
+## 2.2.0: finishing touches
 
-- Replaced the original standalone starter's intro/workbench/close `if(t<cut)` cards with one world-space Canvas2D environment in `assets/vanilla-film/src/world.mjs` and `scenes.mjs`. Named persistent subject, camera follow/lens keys, time-coded scene events and world anchors are computed from the **same absolute time** and exposed through `storySample(t)` / `window.__motion.trace(t)`. Physical browser, engine, memory and recovery elements have distinct silhouettes. This is a functional technical demo, not professional art-direction certification.
-- New `scripts/audit-stage.mjs`: validates renderer-linked camera and subject travel, lens range, actor continuity, named semantic events and teleport limits. A fake camera claim or tiny moving border cannot pass this structural gate.
-- Fixed the v1.5 plan false positive: only `carrier` tracks count as continuous carriers, not `focal` tracks.
-- The long-film `--continuous` video audit now flags excessive visually localized motion; the user-provided 124s PHP video that passed v1.5 fails v1.6. The private video is **not** bundled or shared.
-- Added Chromium-independent `scripts/render-stage.mjs`, which rasterizes a documented supported Canvas2D subset from the same renderer using Sharp/SVG. Actual 14s HD MP4 proof with synchronized original score was rendered and audited.
-- New `scripts/review-film.mjs` enforces evidence of real-time watching, timestamped visual review and distinct shot scales; no automated metric is represented as a quality verdict. New `references/retained-stage.md` details source-space cinematography, hard-shot approval before long movies and sound/QA trace requirements.
-- Expanded regression tests and preserved all twelve original Motion references byte-for-byte.
+- **Claude Code plugin:** `/plugin install motion-films --marketplace TheOnlyFusionCube/claude-motion`
+  (`.claude-plugin/plugin.json`, `marketplace.json` and icon; passes `claude plugin validate`).
+- **`scripts/doctor.mjs`:** checks Node, Playwright, Chromium, WebGL and FFmpeg, and prints the exact fix
+  for each problem (`--json` for agents).
+- **`new.mjs --style <preset> [--palette <id>]`:** scaffolds a film on a style preset (`templates/preset`).
+- **`export.mjs --draft` / `--scale`:** quick half-size cuts for checking timing.
+- `preview.mjs` falls back to a free port when the default one is taken; the player shows keyboard hints.
+- **In-browser tests** (`tests/render.test.mjs`): determinism, markup-preserving word splits, every preset, and
+  score recording. They skip cleanly where no browser is installed.
+- **README** rebuilt with an animated hero clip from the example film, install paths, a pipeline diagram,
+  the preset gallery and a FAQ.
 
+## 2.1.0: opening questions and style presets
 
-## 1.5.0 - restore the original perpetual-motion contract
+- **Intake** (`references/intake.md`): for a new film the agent asks Style, Colours and Length once,
+  together, before the beat sheet, using the host's question tool (`AskUserQuestion`) or one plain
+  message. Ported from the original Motion intake: looks invented for the film, the brand palette first
+  (found in the codebase if possible), palette rules, and what each answer means.
+- **Style presets** (`kit/styles/`, `references/styles.md`): sketch, bubbles, editorial, bold, midnight
+  and showcase, ported from the original built-in styles. Each has named palettes, values, an animated
+  backdrop and an emphasis animation, all on one shared class vocabulary. `examples/styles/` is a
+  gallery film.
+- `scripts/palette.mjs`: contrast check for palettes before they are offered.
+- `TextFx` keeps inline markup (`<em>`, `<b>`, `<br>`) when splitting words.
+- Bundled Shantell Sans (hand-drawn, OFL) for the sketch preset.
 
-- Read the original Motion source's very first principle ("Everything is always in motion") before authoring **any** finished film; opening/title/close holds stay quietly alive and foreground motion must have a causal job.
-- Add `references/perpetual-motion.md` with source-exact Ken Burns/held UI/shape breathing/type-creep measures, purpose-first motion layers, spatial handoffs, and a repair storyboard for the reported 90s PHP slideshow.
-- Add a zero-dependency `validate-motion-plan.mjs` and example contract enforcing source-visible motion coverage across all shots, meaningful focal actions, non-fade motion and scene continuity.
-- Upgrade encoded-video auditor to one 2fps decode and `--continuous` enforcement across the entire video; reject multi-second opening/end stills and films dominated by motionless frames. Existing explicit ambient mode remains supported; `--continuous` overrides its exemption.
-- Add pure-time `heldPlate`, `uiHoldDrift`, `titleCreep` helpers; change the included Canvas end-card title to monotonic slow creep. Add a genuinely rendered, source-backed 18s moving-camera/request-travel proof (`examples/continuous-motion/build.py` + `demo.mp4`) so the skill has a runnable alternative to static slide cards.
-- Add regression tests for opening/closing static holds, a barely moving frame, a freeze-heavy narrated film, and inaccurate motion plans. Preserve all 12 original source documents verbatim.
+## 2.0.0: a runtime, an example and a method, instead of more rules
 
-# Changelog
+1.x produced animated slideshows even when every validator passed. 2.0 is a rebuild.
 
-## 1.6.0 — Restore executable film-making machinery
+**Added**
+- `kit/`: a deterministic film runtime mirroring the original Motion `kit` API. It has a DOM stage, a
+  Camera (keys, drift, log-zoom, cuts, `toStage`), cursor (arcs, clicks, holds, shapes), typist,
+  streamed text, TextFx (in/out/rise/mask/swap/count), hand-drawn boiling Marks, keyframes, springs,
+  shapes, clips and optional scenes. Three.js 0.180 and addons are bundled behind an import map, along
+  with nine OFL font families. The player has scrubbing, frame stepping, chapters and score playback.
+- `scripts/`: `new` (scaffold), `preview`, `frames` (exact stills + contact sheet), `check`
+  (determinism, blank first frame, frozen spans, frozen share of the film, tiny text), `score` (offline
+  synth: 8 patches, 13 drums, 13 foley, reverb, limiter) and `export` (parallel frame-exact MP4 + AAC, GIF).
+- `examples/launch/`: a 34 s launch film (app UI → chart → push-through into a 3D city → comment →
+  replay → end card) with a beat sheet and score.
+- `templates/starter/`: a 14 s film showing the grammar.
+- `references/kit-api.md`, `references/recipes.md`.
 
-- Replaced the original standalone starter's intro/workbench/close `if(t<cut)` cards with one world-space Canvas2D environment in `assets/vanilla-film/src/world.mjs` and `scenes.mjs`. Named persistent subject, camera follow/lens keys, time-coded scene events and world anchors are computed from the **same absolute time** and exposed through `storySample(t)` / `window.__motion.trace(t)`. Physical browser, engine, memory and recovery elements have distinct silhouettes. This is a functional technical demo, not professional art-direction certification.
-- New `scripts/audit-stage.mjs`: validates renderer-linked camera and subject travel, lens range, actor continuity, named semantic events and teleport limits. A fake camera claim or tiny moving border cannot pass this structural gate.
-- Fixed the v1.5 plan false positive: only `carrier` tracks count as continuous carriers, not `focal` tracks.
-- The long-film `--continuous` video audit now flags excessive visually localized motion; the user-provided 124s PHP video that passed v1.5 fails v1.6. The private video is **not** bundled or shared.
-- Added Chromium-independent `scripts/render-stage.mjs`, which rasterizes a documented supported Canvas2D subset from the same renderer using Sharp/SVG. Actual 14s HD MP4 proof with synchronized original score was rendered and audited.
-- New `scripts/review-film.mjs` enforces evidence of real-time watching, timestamped visual review and distinct shot scales; no automated metric is represented as a quality verdict. New `references/retained-stage.md` details source-space cinematography, hard-shot approval before long movies and sound/QA trace requirements.
-- Expanded regression tests and preserved all twelve original Motion references byte-for-byte.
+**Changed**
+- `SKILL.md` was rewritten from ~33 KB of stacked warnings into a short, ordered method: decide, beat
+  sheet, build, look and fix (at least twice), sound, export.
 
-
-## 1.4.0 — Asset-led production and optimized studio lighting
-
-- Added optional **Blender 4+ studio pipeline** in `examples/blender-studio/` with real authored GLB assets (arched transit hub, reservoir and courtyard), connected camera/lens/data state, area-light key/fill/rim rig, Eevee draft and Cycles final presets, instanced geometry and resumable PNG sequence workflow. This addresses the *lack of modeled assets and light direction* that hindered the earlier 3D demos.
-- New `references/3d-asset-lighting.md`: hero-first shot review, material/lighting principles, curated districts, LOD/instancing, renderer and texture budgets, reference-friendly composition, and staged review to avoid expensive renders of poor-looking work.
-- New **standard-library-only** `scripts/3d-preflight.py` scans GLB/glTF for geometry/material/draw-call/texture estimates, local path safety, source attribution and decoder requirements. A small generated GLB kit (about 63 KiB, 2,584 unique triangles and 6,172 instanced visible triangles) passes the strict web preset.
-- New conservative `scripts/3d-optimize.py` wrapper for optional `gltfpack`, with explicit Meshopt/KTX2 compatibility warnings, protected original assets and background-only simplification.
-- Tests added for package budget, source safety, generator, optimizer command and imported 3D asset. Original twelve upstream reference files remain byte-for-byte unchanged.
-- **Honest verification limit:** GLB generation, preflight and real VTK GLB import passed; Blender is not installed in this authoring environment, so Cycles/Eevee visual output is not independently verified. The included asset kit is a faster and richer production foundation, not certified launch-film aesthetic parity.
-
-
-## 1.2.0 — 3D data films and narrated launch workflows
-
-The user-supplied reference was the Oct 2026 **82-second Claude Dashboards/Motion launch film**, which blends presenter/screen footage and a camera-driven 3D neighborhood data animation. The previous 2D showreel demonstration did not cover this demanding class of scene.
-
-- New required `references/3d-data-films.md`: world coordinate systems, real 3D camera, data-state animation, object occlusion, status callouts, meaningful movement, independent seek and verification; Three.js/Blender routes and offline fallback.
-- New required `references/launch-film.md`: time-coded analysis of the official hybrid launch video; narration, authentic product recordings, action/cause/effect, voice, score, captions and post-production editing.
-- New runnable `examples/city-data-film/`: original 26s synthetic city network projected using a real 3D camera, world-anchored data hubs, animated supply depletion and replenishment, original audio and a 1080p/30fps MP4. No browser, WebGL service, video model, or upstream player required.
-- New `scripts/assemble-film.mjs`: normalized-resolution multi-clip editor with optional mixed narration + instrumental score. Actual audio/video FFmpeg integration tested.
-- Expanded `scripts/audit-video.mjs`: data-story and narrated-launch mode, optional strict audio requirement. Production acceptance still requires creative human review.
-- Added `tests/data-film.test.mjs` for source consistency, camera/clock/quantity mapping, out-of-order frame determinism, assembly and QA regression.
-- Preserved all 12 upstream source documents byte-for-byte, without claiming runtime/product/creative parity based on document hashes alone.
-
-
-## 1.1.0 — Film-quality hardening
-
-The source-first adaptation retained all original instruction bytes but did not sufficiently prevent slide-like outputs from passing as finished Motion films. This revision adds **product/skill showreel commissioning rules**, **visual acceptance gates**, and an executable **MP4 audit**. No original reference content was changed.
-
-- New `references/showreel.md`: requires on-screen causal demonstration, distinct shot scales, actual interactions, object handoffs, and visible result rather than claims on static cards.
-- New `references/quality-gates.md`: actual MP4/frame/audio review, phone-readable type, regression checks and candid limitations.
-- New `scripts/audit-video.mjs`: Node + FFmpeg, detects sub-HD exports and >3s of nearly unchanged *mid-film* imagery; contact sheet and `--strict` mode. The check flags problems for creative review; it is not an aesthetic judge.
-- Six regression tests added; a 24-second 910×512, mostly static promo scenario is expected to fail video QA. The user-provided MP4 is **not** bundled. A separate **original 20s/1080p concept example** is included as a hand-authored target, not a promise of automatically generated quality.
-- Updated README and workflow references; fallback for browser-restricted environments.
-
-The original 12 upstream documents remain byte-identical. Successful unit tests and source-hash parity **do not** by themselves establish equivalent image, timing, music or creative quality to Anthropic's private runtime.
-
-## 1.3.0 — 3D art-direction correction
-
-- Responded to repeated feedback that the technical city demo looked visually rudimentary.
-- Demoted the Pillow polygon projection to a **legacy technical check**; it is not an acceptable default for premium 3D briefs.
-- Added **`references/cinematic-3d.md`**, requiring material/shadow depth, model hierarchy, deliberate environment design, reference-matched shot scales and real output-still inspection.
-- Added an optional, offline VTK EGL/OpenGL real-geometry `examples/studio-city-film/` production exercise with instanced solids, studio lighting, physical depot geometry, source-driven values, authored camera and original score.
-- Preserved all 12 original upstream Markdown documents byte for byte. This release **does not claim studio aesthetic parity**: independent reference-level visual QA remains necessary.
+**Removed**
+- The Canvas2D "retained world" starter, the motion-plan / stage / video auditors, review-JSON
+  validators, the VTK, Blender, Pillow and continuous-motion examples, the GLB kit, and ~20 adapter
+  reference docs. The verbatim upstream references stay in `references/upstream/`.

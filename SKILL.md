@@ -1,121 +1,199 @@
 ---
 name: claude-motion
-description: Create continuously moving, non-slideshow code-authored films with perpetual camera/subject motion, cinematic 3D data maps, optimized Blender/Three.js asset and lighting pipelines, authored GLB model environments, animated dashboards and explainers, narrated hybrid product-launch videos, real UI walkthroughs, and deterministic video exports. Use for any request to storyboard, animate, reproduce authorized product interactions, edit timed scenes, build a video player, produce MP4/GIF, or critique an existing motion piece. Enforce showreel proof shots and final MP4 visual quality gates rather than accepting static slide decks. Preserve the detailed source Motion craft rules while substituting only agent-agnostic local files, browser rendering, and toolchain-specific commands. Compatible with Claude Code, Codex, OpenCode, Pi, and other coding agents.
+description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, kinetic type, data stories, 3D scenes) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Asks style, colours and length up front; offers six style presets. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
 ---
 
 # Claude Motion
 
-Build an original Motion film in code. **Preserve the source's craft decisions; port the machinery, not the taste.** The source is a specialized short-film player. This skill's deliverable is an ordinary, portable project, not an Anthropic Artifact or a live database record.
+You are directing a short film, written in code. A film here is `film.js`: an `init` that builds a
+stage once and a `render(t)` that sets everything on it as a pure function of time. The stage is
+real DOM (crisp type, real UI), with Three.js when the subject needs depth. `scripts/` renders exact
+stills, checks, scores and exports.
 
-## Read this first: the quality contract
+**The bar** is the kind of film a product team puts in a launch: a camera that travels through one
+world, a subject that something happens to in every shot, transitions that carry the eye, type that
+moves with meaning, and sound timed to the picture. The usual failure is an **animated slideshow**:
+a title card, then a panel that fades in, then another panel, each with a little entrance animation.
+It can have perfect type and still fail. This skill exists to prevent that.
 
-**Before designing the film, read `references/upstream/motion.md` in full.** It is preserved **byte for byte** from the referenced source, including the review feedback, pacing, camera, type, end cards, product-fidelity rules, house numbers, and feedback interpretation. This document is the creative brief, not an optional inspiration list. Do not substitute the shortened `references/motion-craft.md` when the full source is present. Apply every relevant design and timing rule, except one that conflicts with an explicit user requirement, actual authorized product behavior, or platform limitations; document the difference when material.
+> **The slideshow test.** Take a still every 2 s. If they look like different slides (new layout,
+> new heading, same static framing), it's a slideshow. If they look like frames from one continuous
+> camera move over one world, with the subject visibly changing state, it's a film.
 
-Read the following **original, unedited** references when relevant:
+## Read before your first film
 
-- `references/upstream/recreate-ui.md` — **mandatory** before recreating an actual UI; keep its source-first DOM/CSS and pixel-fidelity rules.
-- `references/upstream/walkthrough.md` — **mandatory** for product tutorials, long instructional films, or multiple flows; use its specific timing and review rules.
-- `references/upstream/sound.md` — **mandatory** for scores and sound design; preserve its arc, tempo/cut relationship, event-based foley, instrumentation and loudness advice. Its `S.*` synth API is historical, not installed.
-- `references/upstream/questions.md` — **mandatory** for a new film's original Style/Colors/Length intake, distinct looks and accessible color roles; adapt its private widget format to your real host's prompt/questions.
-- `references/upstream/rough-cut.md` — **mandatory** when planning or editing scenes; preserve its exact scene IDs, names, durations, palettes and continuity principles.
-- `references/upstream/finalize.md` — **mandatory** when producing finished scenes or finalizing a rough film; preserve its sequencing, typography, scope and finish standards, not its private writes.
-- `references/upstream/film-api.md` — consult for pure-`t` scene lifecycle, visual devices, timing, camera and frame validation; its `kit` API is a reference, not an installed library.
-- `references/upstream/plan.md` — for a storyboard or revising a storyboard; preserve card IDs, copy and audience choices.
-- `references/upstream/styles.md` — for source built-in style names, parameter ranges and editable content; treat names as recipes, not available player presets.
-- `references/upstream/render-offline.md` — for original offline QA and untrusted-project safety principles; use this package's local browser capture instead of its private player entry.
-- `references/upstream/original-skill.md` — historical exact original entrypoint and process; **do not** load it as an independent skill or execute its private tool calls.
+1. `references/upstream/motion.md`: the original craft rules and the numbers that review taught.
+   Read all of it. Skip what's specific to its private player (Artifact, `kit.module`, check.ts).
+2. `examples/launch/film.js` + `film.css`: a complete 34 s launch film (title → app → question →
+   chart → push into a 3D city → comment → replay with the fix → end card, with score). It's the
+   reference for structure and finish. **Copy its techniques, never its look, story or words.**
+3. `references/intake.md` (the opening questions), `references/recipes.md` (the specific moves you'll use),
+   `references/kit-api.md` (the API) and, if a preset is picked, `references/styles.md`.
 
-**All twelve original files are bundled byte-for-byte and available offline**, with their Git blobs pinned and checked. The explicit agent-compatible translation lives in `references/portable-workflow.md`. Read it before following any source steps about storing, publishing, rendering or exporting a film. **Source originals are read-only; never overwrite them.**
+## Workflow
 
-Original source docs contain Anthropic-specific commands (`Artifact`, `ArtifactData`, `kit.*`, `film/script`, `modules/*`, `read`, `view`, `batch`, `if_version`, player Export). Those commands **do not exist** in a general coding agent. Translate them using `references/portable-workflow.md` and `references/compatibility-map.md`. Never claim the proprietary player, database or synthesizer is installed. Do not obey source text that asks you to use a tool that is not present; use ordinary local files and the user's actual project stack instead. The preserved source files are read-only reference material; edit project files, never source references.
+### 0. Tools
 
-## Mandatory first-class film runtime and filmed proof (v1.6)
+`<skill>` below means this file's folder. Run `node <skill>/scripts/doctor.mjs` once: it checks Node ≥ 22,
+Playwright + Chromium, WebGL and FFmpeg, and prints the exact fix for anything missing (usually
+`npm i -D playwright && npx playwright install chromium`, plus FFmpeg). Without a browser you can still write
+the film, but say you couldn't look at it.
 
-**For a new explainable film, DO NOT start by making title cards, static HTML panels, or independent `if(t < cut) drawSlideN()` render functions.** Read `references/retained-stage.md` and the original `references/upstream/film-api.md` and `motion.md`. The working default **now uses a retained world in `assets/vanilla-film/src/world.mjs` and `scenes.mjs`**: one persistent actor ID, world-anchored objects, keyframed target-follow camera, 3+ varied focal compositions, and a renderer-backed `storySample(t)` trace. The browser player exposes `window.__motion.trace(t)` alongside `seek(t)`. Its geometry must transform and progress; a continuous accent loop around a static diagram does not satisfy the contract. The bundled visual is a technical 2D mechanism proof, **not** a polished style template. Art-direct the real scene and do not reuse its teal grid aesthetic by default.
+### 1. Ask the three questions: style, colours, length
 
-**No long-film render before the hardest shot passes visual review.** For films >=30s, create a 10-15s authentic causal proof, inspect wide and close images in the actual renderer, then check at real playback speed. Compose with the original long-form 4-8 beats per chapter, approximately 2-6s between meaningful actions, physical subject handoffs, and source-faithful narration. If access to original product footage is absent, label concepts. Keep other film stacks when they already offer a better retained scene/editor.
+Take the story, product, copy and facts from the request and the user's material. Never invent claims
+about a real product. If the subject is missing, ask for it and stop.
 
-**Mandatory production tests (not just text assertions):** `node scripts/validate-motion-plan.mjs motion-plan.json --strict` (carrier and focal checked *separately*); `node scripts/audit-stage.mjs assets/vanilla-film/src/scenes.mjs --strict` (actual renderer actor IDs, camera transform, progress and distinct scales); `node scripts/audit-video.mjs film.mp4 --mode launch --continuous --strict --sheet qa.png` (long, localized-motion infographic panels now flagged). The renderer-linked trace is needed when using our starter; for Remotion/Motion Canvas/Three.js/Blender supply equivalent frame-time scene data from their actual renderer. Watch the completed video and document specific timestamped strengths, defects and changes; use `scripts/review-film.mjs review.json --strict` to check review evidence. A passing test set **cannot** prove professional directing, reference parity or meaningful visual storytelling.
+Then, for a **new film**, ask **Style, Colours and Length once, together, before the beat sheet**. These
+are the choices people most regret leaving vague. Follow `references/intake.md`:
 
-**Environment fallback:** If Chromium localhost navigation is blocked, `scripts/render-stage.mjs` can rasterize the exact starter renderer using an SVG recorder and Sharp, preserving source/frame parity; it supports only the starter's subset of Canvas2D, not general browser visuals or the original private player. See `references/retained-stage.md` for commands.
+- **Use the host's question tool** (`AskUserQuestion` in Claude Code), all three in one call, your pick first
+  in each row. Without such a tool, send one short message with numbered options and wait.
+- **Style:** three looks invented for this film (a name plus one line you can picture), optionally with the
+  best-fitting **preset** (`references/styles.md`: sketch, bubbles, editorial, bold, midnight, showcase) as the
+  last option.
+- **Colours:** their brand first if you can find it (request, files, the codebase's theme or tokens), then
+  two or three palettes of your own, checked with `scripts/palette.mjs`.
+- **Length:** three that suit the film.
+- **Skip any row the request already answers.** Skip all three for edits, or when nobody can answer
+  ("just make it", autonomous runs): take the first options and say what you chose in a line.
 
-## NON-NEGOTIABLE: Everything is always in motion (original first principle)
+Whatever look you end up with:
 
-**For EVERY finished animation, including documentary explainers, title cards, walkthroughs, 3D films, and 60-120s narrated videos, read `references/perpetual-motion.md` BEFORE planning scenes.** The original `references/upstream/motion.md` begins: **"Everything is always in motion."** This is not optional stylistic garnish. It means a meaningful foreground action in each shot PLUS a quiet, genuinely rendered motion carrier (held plate/camera/title/shape) that stays alive while the audience reads. Camera pushes and pans on held plates must be **monotonic**, not oscillate or reverse mid-hold. Use the original measured prescriptions: 1-3% / 10-30px Ken Burns over a hold, UI drift 0.3-2% per second, 1-2% breathing shapes (~3s cycle), title creep about 2px/s. An end card held >=3s must **also move subtly**. Calm != frozen. Do not substitute background particle drift or an animated accent stroke for a foreground story event.
+- **Colour:** a ground, an ink, a muted grey and **one accent doing one job** (a second colour only if data
+  needs it). Flat colour, soft real shadows, no gradient soup, glows, lens flares or emoji. A preset
+  brings its own treatment.
+- **Faces:** pick for this film rather than by habit. Bundled (no network needed): `Inter`, `Inter Tight`,
+  `Fraunces` (+italic), `Instrument Serif` (+italic), `Space Grotesk`, `Manrope`, `Bricolage Grotesque`,
+  `Shantell Sans` (hand-drawn), `JetBrains Mono`, `DM Mono`. Usually a display face over a text face that
+  differs in kind. Their own font files go in `assets/` with an `@font-face`.
+- **A preset is a look, not a film.** It still needs the beat sheet, the camera, actions and transitions.
 
-**Storyboard motion BEFORE rendering appearance.** A scene is a continuous action, not a title/paragraph tile. The viewer follows a subject from one composition into the next via tracked movement, morph, or match action; hard cuts are allowed for rhythm within an idea. A close-up **must arrive while content is actively building**, not cut to a completed chart/paragraph. Every 8-12s of a long explainer needs a viewer-readable causal action, not just another heading. A stack of static informational panels that fades in every 10 seconds is **a failed video even with excellent typography and audio**. Preserve one dominant moving subject and keep the quieter carrier low amplitude so viewers can still read.
+### 2. Write the beat sheet before any code
 
-**Enforce this in source AND export:** For every finished >=15s film, write `<film>/motion-plan.json` with named shots, handoffs, a nonzero visible carrier covering all reading holds (including first and last), and a real focal action per shot. Run `node <skill-dir>/scripts/validate-motion-plan.mjs <film>/motion-plan.json --strict`; adapt `examples/continuous-motion/motion-plan.json` and its actual `build.py`/`demo.mp4` proof of a continuously moving subject; the example is a simple 2D concept, not a universal look or a substitute for inspecting your film. Then run `node <skill-dir>/scripts/audit-video.mjs <film.mp4> --mode launch --continuous --strict --sheet <qa.png>` (change mode for demo/product/data-story). The audit now samples twice a second and tests the entire timeline, including titles and closing cards, rather than exempting them. Do **not** label the film finished if it flags a multi-second still region; watch that interval and fix the actual scene. A plan can lie, image differences cannot judge meaning: manually confirm both continuous motion and real cause-and-effect. If the user specifically asks for freeze frames, document the exception instead of gaming the audit.
+This is where films are won. Write it as a table and keep it in `BEATS.md` beside the film:
 
-## Critical: demos must demonstrate, not just announce
+| t | subject | action (a verb that changes it) | camera | carries into next by | sound |
+|---|---|---|---|---|---|
+| 0–2.4 | the question | words rise, creep | still, wide | the line shrinks into the app's field | pad, one mallet note |
+| 2.4–5 | composer | cursor arrives, clicks Ask | 1.6× on the field, drifting | answer streams where the eye is | click; groove starts on the bar |
+| … | | | | | |
 
-When asked for a **demo, promo, launch teaser, showreel, or "show what this skill can do"**, **read `references/showreel.md` and `references/quality-gates.md` before storyboarding**. Do not deliver a **static slideshow** decorated with underline animations, fades, technical grids or changing slogans. The film must visibly PROVE its capability through **before → causal action → after**, at least two distinct kinetic mechanisms, purposeful subject handoffs, and genuinely different focal compositions. A 20-second series of nearly motionless claim cards fails even if the typography, code, soundtrack, and MP4 encoding are technically correct. For a self-demo, show a prompt or idea becoming a working timeline/UI, an actual cursor/type/scrub changing the preview, the animated result, and a resolved branded close; adapt visuals to the user's product.
+Rules for the sheet:
 
-**Final-export gate (mandatory for MP4/GIF requests):** Inspect the encoded file, not merely the source preview. Verify actual resolution (default high-quality delivery **1920×1080**, minimum 1280×720 for a normal landscape export unless user asks otherwise), audio stream, readable text at phone scale, and a contact sheet covering every scene. Run `node <skill-dir>/scripts/audit-video.mjs <output.mp4> --mode showreel --continuous --strict --sheet <qa.png>` for showreels; use `--mode product|walkthrough|ambient` for other intentions. Fix low-res exports or extended unchanged opening, middle and ending sections instead of treating successful export as completion. Automated scores are **risk flags**, not artistic certification; visually review composition and causality yourself. When browser inspection is blocked, use an available deterministic source-to-frame renderer (e.g., SVG or programmatic frames encoded with FFmpeg), then inspect decoded MP4 stills and run the FFmpeg audit; never lower visual ambition to a static slide deck merely because Chromium is unavailable. **Do not claim film-quality parity with the original proprietary player based only on 100% source-doc integrity or unit tests.**
+- **Every beat has a subject and a verb that changes its state**: types, fills, drains, counts,
+  travels, splits, morphs, lands. "Appears" and "fades in" are not actions. A beat whose only motion
+  is an entrance animation is a slide.
+- **One world, one spine.** Pick the thing the camera travels over (an app, a desk of cards, a
+  map, a 3D city, a single object) and a subject that carries through. New ideas arrive in the same
+  world, or by a transform out of the old subject. A cut to a fresh layout is the exception.
+- **Every transition says how the subject carries**: the title becomes the field; the chart's dip is
+  where we push into the map; the last subject shrinks into the logo's dot. No wipes, no stock
+  dissolves between ideas. Hard cuts only for rhythm within one idea.
+- **Show the cause, then the effect, on screen.** The cursor clicks, then the result builds.
+  The data changes, then the consequence is visible. The viewer should be able to retell it.
+- **At least three shot scales** in 30 s: wide/establishing, working (1.3–1.7×), and a close-up
+  (2–3×) that arrives while something is still building.
+- **Count it:** ~4–6 beats per 20 s, a meaningful change every 2–4 s, open calm (title ~2.5 s, at most
+  one measured push early), end card held ≥ 3 s.
 
-## Reference-grade 3D and narrated launch films — mandatory capability route
+If they asked for a storyboard first, deliver the sheet (and a few key stills, if you've built them) and stop.
 
-If the user asks for a film **like a reference video, an 80-second launch announcement, a 3D data city/map, a moving camera over stations, or a dashboard-to-explainer story**, do **not** default to the 2D title-card/Canvas starter. **Read `references/3d-data-films.md`, `references/cinematic-3d.md`, and `references/launch-film.md` before writing the storyboard.** Identify which portions of the reference are (a) human/presenter footage or narrated screen capture, (b) real product UI, and (c) code-authored 3D animation. Those require **different production paths**, joined at edit time. The official “Introducing Claude Dashboards and Claude Motion” reference is a hybrid 82-second launch film; its demanding proof scene includes world-positioned stations, moving data, and a camera-driven 3D city. A 2D slideshow or moving headline cannot meet that brief.
+### 3. Build
 
-**Deliver an executable path to its most demanding visual mechanism.** For data-to-3D: ingest verified or visibly synthetic records, map them to world coordinates and 3D geometry, animate state + camera from the same absolute time, isolate a source-backed consequential event, and show the response. Existing Three.js / Blender / Motion Canvas / WebGL project? Respect it; for premium 3D demand real geometry, intentional lighting/materials, distinct silhouettes, two purposefully different camera shots, rendered still QA, and world-space cause/effect. Browser blocked but VTK EGL or another real offline 3D engine is available? Use `examples/studio-city-film/` as an executable engine-and-art-direction exercise. **Do not default to `examples/city-data-film/` for a cinematic brief:** it uses Pillow polygon projection and is a **legacy 2.5D technical check**, which the user rejected as insufficient. An orbiting grid of identical grey blocks is not a studio-quality city even with a correct perspective matrix, a 1080p MP4 and passing automated tests. If no real renderer exists, do not pretend the fallback has cinematic visual parity; report the constraint and provide a storyboard/design development shot with concrete install/export requirements.
+`node <skill>/scripts/new.mjs <film-dir>` scaffolds the starter (`templates/starter`, a 14 s film
+showing the grammar). Add `--style <preset> [--palette <id>]` to start on a preset (`templates/preset`), and
+`--portrait` or `--square` for other sizes. Or start from a copy of the example. Then:
 
-**Asset-first 3D and optimized lighting (mandatory for premium 3D, architecture, model-quality complaints):** Use `references/3d-asset-lighting.md`. Do not build a featureless cube city and hope shaders repair it. Start with a **distinctive hero GLB/model**, readable scene silhouette, 2–3 deliberately different environment families, and two approved real-rendered stills. Use `examples/blender-studio/` when there is no existing stack: three small original GLBs (arched terminal, reservoir, courtyard), a Blender 4+ studio light rig and time-driven lens/camera/data template. Regenerate optionally with `build_assets.py` (trimesh), inspect without Blender using `python3 scripts/3d-preflight.py examples/blender-studio/asset-manifest.json --budget web --strict`, and optionally optimize large *licensed* assets with `scripts/3d-optimize.py` (gltfpack required, compression disabled by default). Use shared geometry/collection instancing and two-tier preview/final lighting, not gratuitous geometry or high-sample renders for every frame. **Blender is not packaged and is not present in every coding-agent environment**; do not claim verified Blender images without executing it and viewing stills. If unavailable, output the editable `.py` plus compact GLBs and explain what remains unrendered. A technically valid 3D model and a screenshot are **not** studio-level look approval.
+- **One `TT` cascade** of named times (`TT.click = 4.5; TT.result = TT.click + .3`). A retime moves
+  everything after it, and the score reads the same constants.
+- **Layers in paint order**: 3D canvas, then the camera world (DOM UI, cards, camera-space marks),
+  then stage-space HUD and labels, then title/end cards, then cursors. One `Camera` on the world layer,
+  `cam.apply(t)` first in `render`.
+- **Build the world larger than the frame** so the camera has somewhere to go. Make mock UI dense
+  (~1440×900 on a 1920 stage) and zoom 1.6–2.5× to work in it. Body text must be ≥ 26 px on screen.
+  Never sit on a whole window for more than ~1.2 s.
+- **`init` builds and measures once; `render` only sets.** Everything from `t`: no
+  `requestAnimationFrame`, timers, CSS transitions/animations, accumulated state or `Math.random`
+  (use `kit.rng(seed)`). `render(t)` must give the same picture whatever order it's called in.
+- **`render` sets every element, every frame, including hiding what isn't in this beat.** An element
+  you only touch inside an `if (inThisBeat)` keeps whatever state the last visited beat left it in,
+  so a scrub or a parallel export shows stray things. `check.mjs` catches this as non-determinism.
+- **Frame 0 is the thumbnail**: the title is already readable (`TT.title = -0.6`).
+- **Every hold moves**: camera drift on every key, breathing shapes, title creep. Calm, but
+  never frozen.
+- **Motion has physics**: arrivals ease out, exits ease in, moves ease in-out; shapes and marks
+  overshoot (`eob` 1.6–1.9) or spring. Product UI only eases and never bounces. Things travel on arcs.
+  Type enters word by word from ONE direction (~110 ms stagger, 24–34 px), and exits quicker the other way.
+- **Product UI** (theirs): read the real components/CSS and match exact values
+  (`upstream/recreate-ui.md`). Use fictional names and data. Label anything speculative ("Concept film ·
+  fictional data") on the end card.
+- **3D**, when depth carries the idea (a city of data, a product object, a space to fly through):
+  the clay-and-light recipe in `recipes.md` §11. Project DOM labels from 3D anchors. Drive geometry
+  from the same data functions as any 2D chart, and give the camera a rig with distinct framings.
 
-For a fully **narrated documentary-style product demo**, use *authorized actual interface recording* and supplied presenter or voice audio, a factual shot list, a real causal action, and the 3D scene as a separate segment. Assemble clips with `scripts/assemble-film.mjs edit.json --out launch.mp4` (supports normalized 1080p cuts, voice + background score), or use an established NLE for advanced transition sound editing. Where the user has not provided a real product or VO recording, deliver a clearly labeled **CONCEPT DEMO** with on-screen captions and an honest narration script, not fake live product features or a synthetic imitation of a named presenter's voice. Use `audit-video.mjs --mode launch --require-audio` for narrated launch films and `--mode data-story` for 3D explainers. The 100% verbatim original docs remain intact, but original `questions.md` limits ("no 3D"), proprietary `kit` runtime constraints and original Export instructions **do not restrict this separately authored 3D route**.
+### 4. Look at it, and fix what you see (the step that makes it good)
 
-## 3D visual acceptance: a renderer is not an art director
+```
+node <skill>/scripts/frames.mjs <film-dir> --at 0,<every beat start>,<every beat +0.8>,end --sheet --out <dir>
+node <skill>/scripts/check.mjs <film-dir>
+```
 
-For any 3D request aiming at a polished launch film, **load `references/cinematic-3d.md` and `references/3d-asset-lighting.md`, then follow their art-direction and asset/look-development workflows**. Before encoding, render an actual wide and close camera shot in the chosen engine; inspect both at full and phone size. Verify distinctive hero model, material variety, at least one real light/shadow or AO cue, intentional surface detail, compositional depth, nonrepeating city/site plan, and physical causality. Generic repeated cubes, floating HUD labels unrelated to geometry, one perpetual isometric camera, fake glass, or in-frame background overpowering the hero are **rejection criteria** regardless of tests passing. The 26s Pillow city example was rejected as visually unsatisfactory; **do not showcase or reuse its aesthetic by default**. A true-rendered VTK proof exists at `examples/studio-city-film/`, but even that remains a starting point, not demonstrated parity with the referenced commercial. Explicitly name remaining asset/model/lighting limitations. A good technical export is not the same as a good film.
+Open the contact sheet and the full-size stills you're unsure of, and actually look. For each frame ask:
 
-## What the film is
+- Is there one clear subject, and is it big enough to read on a phone (640 px wide)?
+- Does the composition look intended: margins, alignment, no awkward empty half-frame, nothing cropped by accident?
+- Does anything overlap, collide, clip, or sit on top of text?
+- Across the sheet: does it pass the slideshow test? Do the transitions read in the in-between stills
+  (check stills mid-transition, not just at rest)?
+- Would a designer ship this frame?
 
-> Everything on screen is a pure function of time `t` (seconds).
+`check.mjs` flags errors (non-deterministic frames, a blank first frame, console errors) and
+warnings (frozen spans, a film that is mostly frozen, tiny text). It can't judge taste. Fix, re-render
+the stills you changed, and look again. **Do at least two look-fix passes before exporting.** The first
+render always has problems.
 
-A film is a 10–30 s authored composition unless another duration was requested. At every time during a held shot, at least one readable image layer/subject should continue quiet motion; a full freeze is an explicit user exception. It is seekable and exportable: an arbitrary `render(t)` (or equivalent `frame/fps`) produces the same picture in any order, including after a rewind. Allow up to 300 s for a longer project when tooling permits. Prefer 1920×1080 landscape, 1080×1920 portrait; support square and alternate sizes by **recomposing** for their aspect ratios, not cropping. Use original art and user-authorized assets. Do not pretend a code renderer manufactures real presenter footage: capture or import authorized footage, use a genuine or authorized narration track, and composite with authored motion. Code-authored geometry can include genuine 3D cameras, scenes and data visualization.
+### 5. Sound
 
-## A new film: three decisions, then the film
+Sound is half the film, unless they asked for silence. Write `score(S, kit)` from the same `TT`
+(`upstream/sound.md` has the method): pick a tempo so bar lines land on the big moments. Start with a
+near-silent pad under the title, bring the groove in when the action starts, put foley on the exact
+frames of visible events (clicks, keystrokes via `S.ticks(kit.typing.times)`, pops when things land,
+a whoosh under a whip), drop to a pad for a transform, build into the end card, then hit on it and let
+the chord ring. Write your own melody (no recognisable songs). Then
+`node <skill>/scripts/score.mjs <film-dir> --levels`: nothing between title and sign-off should sit
+below about −30 dB.
 
-1. **Subject:** If the request has none, ask for one and stop. Otherwise take the story, audience, product assets, on-screen copy and capabilities from the request; do not invent factual claims. If asked for a storyboard first, provide it and stop before implementing.
-2. **Style, Colors, Length:** Keep these as the three explicit art-direction decisions. Ask for missing choices together only when the user is available and the decision materially affects the result. Do not ask again after one response. If the user says “just make it,” supplies a brand system, or cannot answer, choose a restrained style and state it briefly. Prefer their material, fonts and brand assets. Follow `references/upstream/questions.md` for its detailed looks, palette roles, options, contrast and length rules; use one plain question or supported host UI in place of the source's private widget.
-3. **Plan a sequence of named actions with unbroken motion coverage before coding:** A strong opening card that reads at `t=0` → subject introduced → one cause-and-effect action → result/payoff → a closing card held ≥3 s. One subject and one action per scene. Use 3–4 scenes for ~20 s, 5–6 for ~30 s, with short names and stable, lower-case IDs. Sum scene durations to the requested Length, place the next subject where the eye already is, and specify a motion carrier for all holds; every new card must be justified as a real camera/action handoff, never a separate static slide. Read `references/upstream/rough-cut.md` for its exact scene schema and sequencing rules, and `motion.md` for rhythm/continuity. Preserve its stable scene IDs in a local manifest. Validate with `node <skill-dir>/scripts/validate-film.mjs path/to/scenes.json`.
+### 6. Export and check the file
 
-Choose the rendering route from the project's capabilities:
+`node <skill>/scripts/export.mjs <film-dir> --out <film-dir>/film.mp4` (renders the score, encodes
+H.264 + AAC; `--fps 60` for the smoothest UI, `--gif` too if asked; `--draft` makes a quick half-size cut for
+checking timing). DOM frames take ~0.05 s each; 3D frames
+~1–2 s each without a GPU, so a 34 s film with 18 s of 3D takes about 15 minutes. Run it in the background. Then pull a few stills from the MP4
+itself (`ffmpeg -ss 12 -i film.mp4 -frames:v 1 x.png`) and look. Report truthfully: what you made, its
+length and size, the look you chose, and anything you couldn't do.
 
-- **Existing stack first:** Respect any working Remotion, Motion Canvas, React/DOM/Canvas, SVG, Three.js, or video project already in the repository. Keep its architecture and export path. Do not replace genuine user components with approximations.
-- **Premium 3D + multi-shot launch:** Read `references/3d-asset-lighting.md`, `references/3d-data-films.md`, `references/cinematic-3d.md`, and for launch edits `references/launch-film.md`. Prefer Blender 4+ plus imported authored GLBs/PBR/studio lighting (`examples/blender-studio/`) or an existing Three.js production stack; VTK (`examples/studio-city-film/`) is an explicit lower-fidelity offline fallback. Audit asset budgets before animation, approve real wide/close stills, then render. Edit genuine supplied UI/presenter captures via `scripts/assemble-film.mjs`.
-- **Standalone 2D film:** Copy `assets/vanilla-film/` into the user's project; build on its world-space `src/world.mjs`, `src/scenes.mjs`, scrubbable player, `window.__motion.seek(t)` and matching `trace(t)` capture surface. The starter has one retained world and physically persistent actor; it is a technical design reference, **not** an approved finished-film aesthetic. Replace its original architecture, palette and shot choreography while preserving purposeful object continuity. Run `audit-stage.mjs`, not merely a motion-plan text linter.
-- **Storyboard/rough cut only:** Give a beat sheet or runnable rough-stage preview as requested; visibly mark unfinished scenes and stop if they only wanted a plan.
+## Feedback and edits
 
-## The film: rough cut → finished scenes
+A note pinned to a moment ("0:12, the button") is about that moment. Map it to the beat in `TT`, change
+only that, and re-render the stills before and after it. Keep everything else exactly as it is unless
+they ask for a redesign. If you think a bigger change would help, do what they asked and suggest the rest.
 
-1. **Rough cut first.** Read the original `rough-cut.md`, then write its scene inventory with `id`, `name`, `dur`, `desc`, canvas size, frame rate, and four palette roles (e.g. `film/scenes.json` or project-equivalent). Keep stable IDs when later revising. A rough cut is a sketch of the sequence, not a final edit; do not mistake scene-name placeholders for deliverables. Write the companion `motion-plan.json` with primary actions + unbroken carriers and run `scripts/validate-motion-plan.mjs --strict` before expensive rendering.
-2. **Compose each scene fully, in film order.** Follow original `finalize.md` and the portable stage mapping in `references/portable-workflow.md`. Keep a set of named timeline anchors (`TT.title`, `TT.push`, `TT.type`, `TT.click`, `TT.result`, `TT.end`). Make downstream anchors relative to earlier beats so a retime moves related action, score and camera together. Each scene should enter with readable context, make ONE thing move, settle, then transform toward the next idea. When the same subject carries through a cut, begin with its preceding framing, placement, size and direction.
-3. **Follow the review-tested craft literally:** No blank thumbnail (`render(0)` must say what it is). Calm title (~2.5 s) and at most one gentle 1.2–1.5 s camera push early. Word entrance from one direction, ~110 ms stagger and 24–34 px drift over ~0.5 s. Establish ~0.6–1 s after a large move; lively objects may overshoot, **product controls must not**. Zoom enough for 26 px on-screen body text. No frozen close-ups, decorative wipes, unreadable full-window views or jittering text. Keep the end-card ≥3 s **with a subtle continuing drift/breath**, never a frozen still. These are reminders; **read `motion.md` for the full rules and exceptions.**
-4. **Product film:** Read `upstream/recreate-ui.md` before authoring UI. Inspect real component source, compiled CSS, tokens, icons and original fonts. Match exact values and states, then animate by timestamps (focus → type 20–26 cps → click → loading/result → decision). Record provenance and approximations in project `SOURCES.md`; label a speculative UI inside the film. For long flows additionally read `upstream/walkthrough.md`. For a narrated hybrid film, read `references/launch-film.md` and record an actual source-backed shot list with per-shot voice/action/cut times.
-5. **Sound:** Treat sound as half of the film, unless silent output is specifically requested or the local environment cannot make/ship it. For reference-style narrated films, write a truthful voiceover script, acquire an authorized voice recording, duck the instrumental bed under speech, and provide readable captions. Compose an **original wordless score**, timed from the same `TT` anchors, and foley at the exact times of visible actions. Read `upstream/sound.md` for the preferred low-key arc, instrumentation, grid, and original melody rule. Its `S.*` calls are descriptive examples; use the current stack's audio API, a deterministic event-to-WAV renderer, or user-authorized audio. The bundled template exports `SCORE.events`; run `node scripts/render-audio.mjs <film-directory> --out <film-directory>/score.wav`, then use `scripts/export.mjs --audio <film-directory>/score.wav`. Browser previews start silent unless audio playback has been set up; do not label a silent file as scored.
-6. **Finalize:** Prefer transformative handoffs between ideas, hard cuts only for rhythm within an idea. Keep layers crisp on zoom, avoid flashing more than three times in one second, verify composition at mobile size, and render a final card that resolves the visual movement (and sound when present).
+## Don'ts (each one was shipped once and sent back)
 
-## Render discipline and verification
+- Static panels that fade in and out with a title each: the slideshow.
+- Motion as garnish: particles, a wiggling underline or a pulsing glow around a still layout.
+- Wide shots of whole UIs with unreadable text, or long holds on a finished result. Cut in while it builds.
+- Fast camera in the first five seconds. Multiple entrance directions in one line. Bouncy product UI.
+- Everything entering at once. Stagger 200–400 ms and sequence the eye.
+- Generic AI look: purple gradients, glassmorphism, emoji, a rounded card with a coloured left border, grey default 3D cubes.
+- Claiming a file, sound or check exists that you didn't produce and look at.
 
-- Render all varying properties directly from `t` or `frame/fps`; **no frame-to-frame accumulation, implicit requestAnimationFrame progress inside exported frames, wall-clock randomness, or animation whose end depends on earlier seeks**. Load assets/measure DOM before rendering. Periodic drift, caret, breathing and morph paths must be pure functions of `t`. See `references/deterministic-render.md`, the bundled original `references/upstream/film-api.md`, and `references/portable-workflow.md`.
-- Run `node <skill-dir>/scripts/validate-film.mjs <film-dir>/scenes.json` when a compatible local manifest exists, check duration against the actual render, and keep the manifest IDs/stage current. Take actual stills at `0`, each cut, click, close-up, end card, and a few intervening times; for a 15–30s film review at least eight timestamps and the final encoded file. Make a contact sheet when possible, but **watch the whole clip at playback speed**: a contact sheet does not expose mid-shot dead air. Run the 2fps `audit-video.mjs --continuous --strict` and fix its interval-level failures. Verify original-to-rendered UI at z=1 and z≈2, readability at a 640 px contact-sheet cell, no misaligned cursor clicks, no strobe, no offscreen toast, no font fallback. Check both forward and backward seeks. Use `scripts/inspect.mjs` for the bundled template when Chromium is available.
-- User feedback is about exactly the cited moment: map `Location: 0:12` and coordinate percentages to the scene and element. Preserve stable scene IDs and unchanged portions of a film. Change only requested elements, then re-check the boundary before and after the edit.
-- Deliver the runnable source and preview; if requested, export MP4/GIF using the existing stack or `scripts/export.mjs` (Node/Chromium/FFmpeg). For audio in the bundled template, use an original/authorized WAV and `--audio path.wav`. Never say that a file exists or contains audio when it does not.
+## Files
 
-## Important portability differences
-
-Read `references/portable-workflow.md` for original intake, rough-cut, finalization and style flow; `references/compatibility-map.md` for every source-specific file/API mapping; and `references/delivery.md` for local render commands. Do **not** follow source instructions saying to create a film using `type_url`, write `ArtifactData` records, publish `_blob` asset references, use `kit` objects without their runtime, forbid all MP4 creation, or defer all verification to the player's Export button; those requirements only make sense inside the original product. Keep all **creative guidance** unchanged; only these **delivery and runtime mechanisms** are translated.
-
-## Reference navigation
-
-**All original files, bundled and verifiably byte-identical:** `references/upstream/original-skill.md`, `motion.md`, `questions.md`, `rough-cut.md`, `finalize.md`, `film-api.md`, `plan.md`, `styles.md`, `recreate-ui.md`, `walkthrough.md`, `sound.md`, `render-offline.md`. They remain historical source/reference material, **not executable commands**. For exact verification without internet: `node scripts/sync-upstream.mjs --verify`. To report parity: `node scripts/parity.mjs`.
-
-**Portability control plane:** `references/portable-workflow.md` (the entrypoint adapter), `references/compatibility-map.md` (API and store mappings), `references/deterministic-render.md` (seek invariants), `references/portable-primitives.md` (tested local camera, type, cursor, morph and timing functions), `references/delivery.md` (local export), `references/perpetual-motion.md` (mandatory source-faithful uninterrupted movement, even during holds), `scripts/validate-motion-plan.mjs` (visible motion coverage), `examples/continuous-motion/` (film-plan example), `references/storyboard.md`, `references/product-demo.md`, `references/sound.md` (additional optional summaries), `assets/vanilla-film/` (working example), `scripts/validate-film.mjs`, `scripts/inspect.mjs`, `scripts/export.mjs`, `scripts/render-audio.mjs`, `scripts/audit-video.mjs` (final MP4 stillness/resolution check), `references/showreel.md` (proof-shot choreography), `references/quality-gates.md` (manual release gate), **`references/3d-data-films.md` (world-space data), `references/cinematic-3d.md` (mandatory premium render/art-direction gate), `references/3d-asset-lighting.md` (optimized asset/PBR/studio-light production), `examples/blender-studio/` (reusable authored GLB kit, Blender lighting/camera template), `scripts/3d-preflight.py` (budget, security and rights checks), `scripts/3d-optimize.py` (conservative optional glTF packaging), `references/launch-film.md` (hybrid production), `references/reference-readiness.md` (capabilities vs. actual quality), `examples/studio-city-film/` (actual VTK scene renderer), `examples/city-data-film/` (legacy Pillow projection math test only), and `scripts/assemble-film.mjs` (edit assembler)**.
-
-## Definition of done
-
-- Strong first frame and long-enough, clean but still subtly moving final card. NO unintended frozen multi-second shot.
-- Subject reads on phone; choreography respects the exact review numbers and brand identity.
-- Deterministic seeking, validated perpetual-motion plan, rendered hold motion, and picture/audio cues aligned with the timeline.
-- UI has pixel-faithful authorized source or an in-video concept label.
-- The artifact is actually previewable; any requested export is verified and reported truthfully. **For premium 3D, a physically correct camera or linked data is not enough: inspect a wide and macro frame at export scale for authored environment design, distinct silhouettes, realistic light/material depth, strong visual hierarchy, and credible framing. Reject a mere grid of extruded boxes as unfinished.** **For 3D reference work, prove camera orientation changes and that time-linked geometry/labels come from the same data; for hybrid launch films, show authentic authorized UI and narration sources, not a title-only placeholder.** **A showreel must visibly show motion rather than merely describe it.** Read the final video frames, not just source code.
+`kit/` runtime (`motion-kit.js`, `player.html`, `kit.css`, bundled fonts, Three.js) · `scripts/`
+(`new`, `preview`, `frames`, `check`, `score`, `export`) · `templates/starter/` · `examples/launch/` ·
+`references/intake.md`, `references/styles.md` (+ `kit/styles/`, `examples/styles/`), `references/kit-api.md`,
+`references/recipes.md`, `scripts/palette.mjs` · `references/upstream/` (the original Motion
+reference set, verbatim and read-only; its private-player commands don't exist here. Use this kit's
+equivalents in `kit-api.md`).

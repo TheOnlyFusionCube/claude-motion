@@ -1,0 +1,84 @@
+/* Style presets. One shared vocabulary of classes; each .s-<name> gives it a look.
+   Colours come from variables set by useStyle(): --ground --main --ink --accent --muted --surface.
+   <em> inside .s-head is the stressed phrase; JS animates it through --p (0 → 1). */
+
+.s { position: absolute; inset: 0; overflow: hidden; color: var(--ink); --p: 0; }
+.s > canvas.s-ground { position: absolute; left: 0; top: 0; }
+.s .s-words { position: absolute; display: flex; flex-direction: column; gap: 24px; margin: 0; }
+.s .s-words > * { margin: 0; }
+.s .s-kicker { font: 600 24px/1.1 var(--text); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.s .s-head { font: var(--head-weight, 700) 116px/1.02 var(--display); letter-spacing: -.03em; }
+.s .s-sub { font: 400 40px/1.3 var(--text); color: var(--muted); max-width: 1100px; }
+.s .s-stat { font: 700 260px/.9 var(--display); letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.s .s-label { font: 500 38px/1.2 var(--text); }
+.s .s-quote { font: 400 76px/1.12 var(--display); letter-spacing: -.02em; max-width: 1500px; }
+.s .s-by { font: 500 30px/1.2 var(--text); color: var(--muted); }
+.s .s-card { position: absolute; background: var(--surface); border-radius: 24px; padding: 40px 44px; box-sizing: border-box; }
+.s .s-window { position: absolute; background: var(--surface); border-radius: 18px; overflow: hidden; box-sizing: border-box; }
+.s .s-window > .s-bar { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 22px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); }
+.s .s-window > .s-bar i { width: 13px; height: 13px; border-radius: 50%; background: color-mix(in srgb, var(--ink) 18%, transparent); display: block; }
+.s .s-window > .s-pane { position: absolute; left: 0; right: 0; top: 52px; bottom: 0; }
+.s .s-chip { display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 999px; background: var(--surface); font: 600 26px/1 var(--text); }
+.s .s-rule { height: 2px; background: var(--ink); transform-origin: 0 50%; }
+.s .s-shape { background: var(--main); }
+.s em { font-style: normal; position: relative; display: inline-block; }
+
+/* ── sketch: whiteboard, black marker, one highlighter ── */
+.s-sketch { --display: "Shantell Sans", "Inter", sans-serif; --text: "Inter", sans-serif; --head-weight: 650; }
+.s-sketch .s-head { letter-spacing: -.01em; line-height: 1.08; }
+.s-sketch .s-kicker { font-family: "Shantell Sans", sans-serif; letter-spacing: .04em; text-transform: none; font-size: 32px; font-weight: 500; }
+.s-sketch .s-card, .s-sketch .s-window { background: var(--surface); border: var(--weight) solid var(--ink); border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px; box-shadow: none; }
+.s-sketch .s-window > .s-bar { border-bottom: calc(var(--weight) * .6) solid var(--ink); }
+.s-sketch .s-chip { border: 3px solid var(--ink); background: var(--surface); }
+.s-sketch .s-rule { height: var(--weight); border-radius: 9px; }
+.s-sketch[data-stress="highlight"] em { background: linear-gradient(var(--accent), var(--accent)) 0 88% / calc(var(--p) * 100%) 42% no-repeat; padding: 0 .08em; margin: 0 -.08em; }
+.s-sketch[data-stress="underline"] em::after { content: ""; position: absolute; left: 0; bottom: -.04em; height: .09em; width: calc(var(--p) * 100%); background: var(--main); border-radius: 9px; }
+.s-sketch[data-stress="circle"] em::after { content: ""; position: absolute; inset: -.12em -.22em; border: calc(var(--weight) * 1.2) solid var(--main); border-radius: 50% 46% 52% 48% / 55% 48% 52% 45%; transform: rotate(-3deg); clip-path: inset(0 calc((1 - var(--p)) * 100%) 0 0); }
+
+/* ── bubbles: glass spheres on a turning gradient ── */
+.s-bubbles { --display: "Inter Tight", sans-serif; --text: "Inter", sans-serif; --head-weight: 650; }
+.s-bubbles .s-head { letter-spacing: -.035em; }
+.s-bubbles .s-card, .s-bubbles .s-window, .s-bubbles .s-chip { background: color-mix(in srgb, var(--ink) 9%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent); backdrop-filter: blur(24px) saturate(140%); box-shadow: 0 30px 80px -30px rgba(0,0,0,.45); }
+.s-bubbles[data-ground="light"] .s-card, .s-bubbles[data-ground="light"] .s-window, .s-bubbles[data-ground="light"] .s-chip { background: rgba(255,255,255,.55); border-color: rgba(255,255,255,.8); box-shadow: 0 30px 80px -30px rgba(0,0,0,.18); }
+.s-bubbles em { color: color-mix(in srgb, var(--accent) calc(var(--p) * 100%), var(--ink)); text-shadow: 0 0 calc(var(--p) * 28px) color-mix(in srgb, var(--accent) 70%, transparent); }
+
+/* ── editorial: an annual report ── */
+.s-editorial { --display: "Fraunces", Georgia, serif; --text: "Inter", sans-serif; --head-weight: 420; }
+.s-editorial .s-head { font-size: calc(124px * var(--size)); letter-spacing: -.025em; line-height: 1.04; font-variation-settings: "opsz" 144; }
+.s-editorial .s-kicker { font: 600 22px/1.1 var(--text); letter-spacing: .22em; color: var(--main); }
+.s-editorial .s-stat { font-weight: 360; font-variation-settings: "opsz" 144; }
+.s-editorial .s-quote { font-style: italic; font-weight: 340; }
+.s-editorial .s-card, .s-editorial .s-window { border-radius: 2px; box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), 0 24px 60px -32px rgba(0,0,0,.3); }
+.s-editorial .s-rule { height: 1.5px; }
+.s-editorial[data-rules="bold"] .s-rule { height: 6px; }
+.s-editorial[data-rules="double"] .s-rule { height: 5px; background: linear-gradient(var(--ink) 1.5px, transparent 1.5px, transparent 3.5px, var(--ink) 3.5px); }
+.s-editorial[data-stress="italic"] em { font-style: italic; color: color-mix(in srgb, var(--main) calc(var(--p) * 100%), var(--ink)); transform: translateY(calc((1 - var(--p)) * .06em)); }
+.s-editorial[data-stress="underline"] em::after { content: ""; position: absolute; left: 0; bottom: -.1em; height: .045em; width: calc(var(--p) * 100%); background: var(--main); }
+.s-editorial[data-stress="marker"] em { background: linear-gradient(color-mix(in srgb, var(--accent) 55%, transparent), color-mix(in srgb, var(--accent) 55%, transparent)) 0 90% / calc(var(--p) * 100%) 34% no-repeat; }
+
+/* ── bold: Swiss poster ── */
+.s-bold { --display: "Inter Tight", sans-serif; --text: "Inter", sans-serif; --head-weight: 800; }
+.s-bold .s-head { font-size: calc(170px * var(--size)); letter-spacing: -.055em; line-height: .92; }
+.s-bold .s-kicker { font-weight: 700; color: var(--ink); letter-spacing: .02em; text-transform: none; font-size: 30px; }
+.s-bold .s-sub { color: var(--ink); font-weight: 500; }
+.s-bold .s-stat { font-weight: 800; letter-spacing: -.06em; }
+.s-bold .s-card, .s-bold .s-window, .s-bold .s-chip { border-radius: 0; box-shadow: none; }
+.s-bold .s-rule { height: 10px; }
+.s-bold em { background: linear-gradient(var(--accent), var(--accent)) 0 0 / calc(var(--p) * 100%) 100% no-repeat; padding: 0 .06em; margin: 0 -.06em; }
+
+/* ── midnight: a dark room, a wall of lamps ── */
+.s-midnight { --display: "Inter Tight", sans-serif; --text: "Inter", sans-serif; --head-weight: 600; }
+.s-midnight .s-head { letter-spacing: -.03em; text-shadow: 0 0 40px color-mix(in srgb, var(--main) 30%, transparent); }
+.s-midnight .s-kicker { font-family: "DM Mono", monospace; font-weight: 500; letter-spacing: .12em; color: var(--main); }
+.s-midnight .s-label, .s-midnight .s-by { font-family: "DM Mono", monospace; }
+.s-midnight .s-card, .s-midnight .s-window, .s-midnight .s-chip { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid color-mix(in srgb, var(--main) 25%, transparent); box-shadow: 0 0 60px -20px color-mix(in srgb, var(--main) 35%, transparent); }
+.s-midnight em { color: color-mix(in srgb, var(--main) calc(var(--p) * 100%), var(--ink)); text-shadow: 0 0 calc(var(--p) * 30px) var(--main); }
+
+/* ── showcase: product-first ── */
+.s-showcase { --display: "Manrope", sans-serif; --text: "Inter", sans-serif; --head-weight: 750; }
+.s-showcase .s-head { letter-spacing: -.035em; }
+.s-showcase .s-card, .s-showcase .s-window { border-radius: var(--corners); box-shadow: 0 2px 0 rgba(0,0,0,.02), 0 40px 90px -30px rgba(15,30,40, calc(var(--shadow) * .45)), 0 0 0 1px rgba(15,30,40,.05); }
+.s-showcase .s-chip { box-shadow: 0 10px 30px -12px rgba(15,30,40, calc(var(--shadow) * .4)); }
+.s-showcase[data-emphasis="chip"] em { padding: 0 .22em; margin: 0 .04em; border-radius: .3em; color: color-mix(in srgb, #ffffff calc(var(--p) * 100%), var(--ink)); background: color-mix(in srgb, var(--main) calc(var(--p) * 100%), transparent); }
+.s-showcase[data-emphasis="color"] em { color: color-mix(in srgb, var(--main) calc(var(--p) * 100%), var(--ink)); }
+.s-showcase[data-emphasis="line"] em::after { content: ""; position: absolute; left: 0; bottom: .02em; height: .08em; border-radius: 9px; width: calc(var(--p) * 100%); background: var(--main); }

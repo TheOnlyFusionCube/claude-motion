@@ -1,4 +1,4 @@
 interface:
   display_name: "Claude Motion"
-  short_description: "Subject-led cinematic motion films, real camera paths, 2D/3D render QA"
-  default_prompt: "Use claude-motion to create a polished, seekable animation from my brief, using my project's existing tools when practical."
+  short_description: "Launch-quality motion films in code: camera, UI, type, 3D, score, MP4"
+  default_prompt: "Use claude-motion to make a polished short film from my brief: write the beat sheet first, build it, look at the stills, fix, then export an MP4."
