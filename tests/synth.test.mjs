@@ -13,7 +13,7 @@ test('every patch, drum and foley renders, deterministically, without clipping',
   const score = { duration: 6, events, programs, master: {} };
   const a = synthesize(score), b = synthesize(score);
   assert.deepEqual(a.unknown, {});
-  assert.ok(a.peak > 0.05 && a.peak <= 0.9);
+  assert.ok(a.peak > 0.05 && a.peak <= 0.891);
   assert.equal(a.L.length, 6 * 48000);
   for (let i = 0; i < a.L.length; i += 997) assert.equal(a.L[i], b.L[i]);
   const w = wav(a); assert.equal(w.toString('ascii', 0, 4), 'RIFF'); assert.equal(w.length, 44 + a.L.length * 4);

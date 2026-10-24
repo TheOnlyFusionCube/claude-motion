@@ -65,7 +65,7 @@ one size — a second aspect ratio is a recomposed copy, never a crop.
 - `kit.tr({x, y, s, sx, sy, r})` → transform string.
 - `kit.svgLayer(parent?, {w, h})` → full-size SVG (for marks, charts).
 - Measure in `init`, at identity camera: `kit.offset(node, ancestor)` (layout box, ignores transforms),
-  `kit.srect(node)` (on-stage box), `kit.camrect(node, cam)` (scene box under a camera), `kit.center(node, dx, dy)` → lazy `() => [x, y]`.
+  `kit.srect(node)` (on-stage box, camera included), `kit.camrect(node, cam)`, `kit.center(node, dx, dy)` → lazy `() => [x, y]` of the layout centre (scene coords inside a camera layer; independent of the camera).
 - `kit.url(name)` resolves a path in the film folder; `kit.assets.image(name)` → Promise<HTMLImageElement>; `.text`, `.json`.
 - `kit.video(src, {start, loop})` → muted `<video>` shown at film time `t − start` (frame-exact in export); `kit.seek(video, s)` inside render to hold/offset.
 - `kit.fx` — a 2D canvas context ABOVE everything, cleared before each render. `kit.spotlight(rect, amount, {pad, radius})` dims outside a rect.
