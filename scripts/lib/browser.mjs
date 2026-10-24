@@ -54,7 +54,11 @@ export function serve(filmDir, port = 0) {
     res.writeHead(200, { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
     fs.createReadStream(file).pipe(res);
   });
-  return new Promise(r => server.listen(port, '127.0.0.1', () => r({ server, url: `http://127.0.0.1:${server.address().port}/` })));
+  // Fall back to a free port if the requested one is taken.
+  return new Promise((resolve, reject) => {
+    const go = p => { server.once('error', e => (e.code === 'EADDRINUSE' && p !== 0 ? go(0) : reject(e))); server.listen(p, '127.0.0.1', () => resolve({ server, url: `http://127.0.0.1:${server.address().port}/` })); };
+    go(port);
+  });
 }
 
 export async function launch() {

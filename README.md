@@ -1,81 +1,117 @@
-<h1 align="center">claude-motion</h1>
-
 <p align="center">
-  <strong>Launch-quality motion films, written in code by your coding agent.</strong><br/>
-  An Agent Skill for Claude Code, Codex, OpenCode, Pi and other skill-aware agents.
+  <img src=".claude-plugin/icon.png" alt="" width="88" />
 </p>
 
-<p align="center"><img src="examples/launch/poster.jpg" alt="Stills from the Meridian example film" width="900"/></p>
+<h1 align="center">Claude Motion</h1>
+
+<p align="center">
+  <strong>Launch-quality motion films, directed and rendered by your coding agent.</strong><br/>
+  Not animated slideshows: one camera through one world, real UI, real 3D, an original score, frame-exact MP4.
+</p>
+
+<p align="center">
+  <img alt="version 2.2.0" src="https://img.shields.io/badge/version-2.2.0-3355ff">
+  <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-161b22">
+  <img alt="Agent Skill: Codex, OpenCode, Pi" src="https://img.shields.io/badge/Agent_Skill-Codex_·_OpenCode_·_Pi-161b22">
+  <img alt="Node 22+" src="https://img.shields.io/badge/node-%E2%89%A522-161b22">
+  <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-161b22">
+</p>
+
+<p align="center">
+  <img src="examples/launch/hero.webp" alt="The camera pushes through a chart's dip and into a 3D city — from the Meridian example film" width="900" />
+  <br/><sub>From <a href="examples/launch/BEATS.md"><code>examples/launch</code></a>: a chart's dip becomes the way into a 3D city. Rendered by this repo, no editing.</sub>
+</p>
 
 ---
 
-Ask your agent for a product teaser, a launch film, an animated explainer or a data story, and you
-get a **film**: one camera travelling through one world, a subject that changes in every shot,
-transitions that carry the eye, type that moves with meaning, an original score, and a frame-exact
-1080p MP4. You don't get an animated slideshow.
+## Why
 
-It's built from three parts:
+Ask most agents for a launch video and you get a slideshow: a title card, then a panel fading in,
+then another panel. **Claude Motion makes films.** It runs your agent through the process a motion
+designer would use. It asks the three questions that decide the look, writes a beat sheet where
+every shot has a subject and an action, builds on a runtime made for this, renders real frames,
+looks at them, fixes what's off, scores the film, and exports a 1080p MP4.
 
-1. **A deterministic film runtime** (`kit/`). A DOM stage, so type and UI stay crisp at any zoom, plus
-   Three.js for real 3D. It includes a camera with drift and log-space zoom, an arcing cursor with
-   clicks, a typist, streamed text, word-by-word type effects, hand-drawn boiling marks, springs and
-   keyframes. Everything is a pure function of `t`, so any frame renders identically in any order.
-2. **A direction method** (`SKILL.md`). A beat sheet where every beat has a subject and a verb, one
-   world and one spine, transitions that say how the subject carries, a slideshow test, and a mandatory
-   look-and-fix loop on real rendered stills. It's grounded in the original Motion craft rules
-   (`references/upstream/motion.md`).
-3. **Tools that let the agent see** (`scripts/`). Exact stills and contact sheets, a check for
-   non-determinism, frozen spans, slideshow-shaped motion and phone-unreadable text, a synth that
-   turns `score(S)` into a WAV, and a parallel MP4 exporter.
-
-## The example
-
-`examples/launch/` is a 34 s launch film for a fictional bike-share ops tool. A question becomes a
-prompt in an app, the answer is a chart, the camera pushes through the chart's dip into a 3D city
-where Harbor runs out of bikes, a comment proposes a fix, and a replay shows it working. It ends on a
-logo built from the comment's pin. See its [beat sheet](examples/launch/BEATS.md).
-
-```bash
-node scripts/preview.mjs examples/launch                 # open the printed URL; space plays
-node scripts/export.mjs examples/launch --out meridian.mp4
-```
-
-## Before it builds: three questions
-
-For a new film the agent first asks **Style, Colours and Length** in one go: three looks invented for
-your film, your brand palette (found in your codebase if it can) next to two or three of its own, and
-three lengths that fit. You don't end up regretting what you didn't specify. If you'd rather it
-just decide, say "just make it".
-
-**Style presets:** six ready-made looks (`sketch`, `bubbles`, `editorial`, `bold`, `midnight`, `showcase`)
-with named palettes, animated backdrops and emphasis styles. See them all with
-`node scripts/frames.mjs examples/styles --count 12 --sheet`, and see [references/styles.md](references/styles.md).
-
-<p align="center"><img src="examples/styles/poster.jpg" alt="The six style presets" width="900"/></p>
+| | |
+|---|---|
+| **Asks first** | Style, colours and length, in one go: three looks invented for your film, your brand palette (found in your codebase), three lengths that fit. No "I wish I'd said…" |
+| **Directs** | A beat sheet with one world, one spine, a verb in every shot and a transition that carries the eye, checked against a built-in *slideshow test* |
+| **Builds** | A deterministic DOM + Three.js stage: camera with drift and log-zoom, arcing cursor, typing, streamed answers, word-by-word type, hand-drawn marks, springs, 3D clay worlds |
+| **Looks** | Exact stills and contact sheets the agent must read, plus a checker for frozen spans, non-determinism, blank first frames and phone-unreadable text |
+| **Scores** | An offline synth (marimba, EP, pads, kit, UI foley) timed to the same beats as the picture, loudness-normalised |
+| **Ships** | Frame-exact H.264 + AAC from parallel headless browsers, with half-size drafts for checking timing |
 
 ## Install
+
+**Claude Code** (plugin):
+
+```text
+/plugin install motion-films --marketplace TheOnlyFusionCube/claude-motion
+```
+
+**Any skill-aware agent** (Claude Code, Codex, OpenCode, Pi…):
 
 ```bash
 npx skills add TheOnlyFusionCube/claude-motion
 ```
 
-Or copy this folder to your agent's skills directory: `~/.claude/skills/claude-motion/` (Claude Code),
-`~/.agents/skills/claude-motion/` (Codex), `~/.config/opencode/skills/claude-motion/` (OpenCode),
-`~/.pi/agent/skills/claude-motion/` (Pi).
+<details>
+<summary>Or copy the folder by hand</summary>
+
+| Agent | Project | User |
+| --- | --- | --- |
+| Claude Code | `.claude/skills/claude-motion/` | `~/.claude/skills/claude-motion/` |
+| Codex | `.agents/skills/claude-motion/` | `~/.agents/skills/claude-motion/` |
+| OpenCode | `.opencode/skills/claude-motion/` | `~/.config/opencode/skills/claude-motion/` |
+| Pi | `.pi/skills/claude-motion/` | `~/.pi/agent/skills/claude-motion/` |
+
+</details>
+
+Then check the machine. The doctor prints the exact fix for anything missing:
+
+```bash
+node scripts/doctor.mjs
+```
 
 Rendering needs **Node ≥ 22**, **Playwright + Chromium** (`npm i -D playwright && npx playwright install chromium`)
-and **FFmpeg**. 3D uses your GPU if headless Chrome can reach it, and otherwise falls back to software
-(slower, same result).
+and **FFmpeg** for MP4. 3D uses your GPU when headless Chrome can reach it, and software rendering otherwise.
+
+## How it works
+
+```mermaid
+flowchart LR
+  A[Brief] --> B["3 questions<br/>style · colours · length"]
+  B --> C["Beat sheet<br/>subject + verb per shot"]
+  C --> D["Build film.js<br/>kit · camera · 3D"]
+  D --> E["Look & fix<br/>stills · contact sheet · check"]
+  E -->|at least twice| D
+  E --> F["Score<br/>synth + foley"]
+  F --> G["Export<br/>frame-exact MP4"]
+```
+
+A film is one folder with a `film.js`: `init` builds the stage once, and `render(t)` sets everything on it
+as a pure function of time. Any frame renders the same in any order, so scrubbing, stills, checks and
+parallel export all agree. The API mirrors the original Motion `kit`, so its craft rules apply directly.
+
+## Style presets
+
+Six ready-made looks with named palettes, animated backdrops and their own emphasis animation. They share
+one set of classes, so switching the look is a one-word change. Or skip presets and let the agent design a
+look for your film.
+
+<p align="center"><img src="examples/styles/poster.jpg" alt="The six style presets: sketch, bubbles, editorial, bold, midnight, showcase" width="900"/></p>
+
+`sketch` · `bubbles` · `editorial` · `bold` · `midnight` · `showcase`. See [references/styles.md](references/styles.md).
 
 ## Ask for things like
 
-> Make a 25-second teaser for the app in this repo: the user types a task, the board reorganises
-> itself, and it ends on our logo. Use our brand colours and fonts. Export an MP4.
+> Make a 25-second teaser for the app in this repo: the user types a task, the board reorganises itself,
+> and it ends on our logo. Use our brand colours. Export an MP4.
 
-> A 40-second explainer of how our sync engine resolves a conflict, in 3D. Two devices, an edit on
-> each, the merge, the result.
+> A 40-second explainer of how our sync engine resolves a conflict, in 3D: two devices, an edit on each,
+> the merge, the result.
 
-> Storyboard a vertical 20 s launch clip first; wait for my OK before building it.
+> Storyboard a vertical 20-second launch clip first; wait for my OK before building it.
 
 > At 0:12 the button click feels late. Move it earlier and keep everything else.
 
@@ -83,26 +119,47 @@ and **FFmpeg**. 3D uses your GPU if headless Chrome can reach it, and otherwise 
 
 | | |
 |---|---|
-| `node scripts/new.mjs my-film` | scaffold a film from the starter |
-| `node scripts/preview.mjs my-film` | player with scrubbing, frame stepping and sound |
-| `node scripts/frames.mjs my-film --at 0,2.5,c2,end --sheet` | exact stills plus a contact sheet |
-| `node scripts/check.mjs my-film` | determinism, first frame, frozen spans, slideshow smell, tiny text |
+| `node scripts/doctor.mjs` | check Node, Playwright, Chromium, WebGL, FFmpeg, with fixes |
+| `node scripts/new.mjs my-film [--style editorial]` | scaffold a film (optionally on a preset); `--portrait`, `--square` |
+| `node scripts/preview.mjs my-film` | player: scrub, space, ←/→ frame step, L loop, M mute |
+| `node scripts/frames.mjs my-film --at 0,2.5,c2,end --sheet` | exact stills plus a labelled contact sheet |
+| `node scripts/check.mjs my-film` | determinism, first frame, frozen spans, slideshow share, tiny text |
+| `node scripts/palette.mjs "#ground,#main,#ink,#accent"` | contrast-check a palette before using it |
 | `node scripts/score.mjs my-film --levels` | render the score to `score.wav` |
-| `node scripts/palette.mjs "#ground,#main,#ink,#accent"` | check a palette's contrast before using it |
-| `node scripts/export.mjs my-film --out film.mp4` | frame-exact H.264 + AAC (`--fps 60`, `--gif`) |
-| `npm test` | kit and synth unit tests |
+| `node scripts/export.mjs my-film [--draft] [--fps 60] [--gif x.gif]` | frame-exact MP4 with the score (`--draft`: half size, fast) |
+| `npm test` | runtime, synth and in-browser render tests |
 
-## What changed in 2.0
+## What's inside
 
-Version 1.x stacked rules, validators and parity claims on top of a weak Canvas starter, and
-agents still produced lightly animated slideshows. 2.0 replaces all of that with a real runtime that
-mirrors the original Motion `kit` API, a flagship example film to learn from, a short and opinionated
-SKILL.md built around the beat sheet and the look-fix loop, and tools that render what the viewer
-will actually see. See [CHANGELOG.md](CHANGELOG.md).
+```text
+SKILL.md                 the method: questions → beat sheet → build → look & fix → sound → export
+kit/                     motion-kit.js (runtime) · player.html · styles/ (presets) · fonts/ (10 OFL families) · vendor/ (Three.js)
+scripts/                 doctor · new · preview · frames · check · palette · score · export
+templates/               starter (the grammar) · preset (a film on a style preset)
+examples/launch/         34 s launch film: app → chart → 3D city → comment → replay → end card
+examples/styles/         one scene per preset
+references/              intake · styles · kit-api · recipes · upstream/ (the original Motion docs, verbatim)
+```
+
+## FAQ
+
+**Does it need a GPU?** No. Without one, Chromium renders WebGL in software. 2D frames take ~0.05 s each and
+3D frames ~1–2 s, so the 34 s example (18 s of 3D) took about 16 minutes on a 4-core machine with no GPU. 2D films export in
+well under a minute. With a GPU, 3D is much faster. While iterating, render stills of the beat you changed
+rather than whole exports.
+
+**Can it use my real product UI?** Yes, and it should: the skill tells the agent to read your components and CSS
+and match exact values. Speculative UI is labelled as a concept on the end card.
+
+**Voice-over?** The score and foley are generated. To add narration, mix it into a WAV and pass
+`export.mjs --audio mix.wav`.
+
+**Which agents and models?** Any agent that loads Agent Skills and can run Node. Results scale with the model's
+taste, but the method, example and look-and-fix loop are what lift a run from slideshow to film.
 
 ## Notes
 
-This is an independent project, not Anthropic's Motion player, and not affiliated with or endorsed by
-Anthropic. The original reference documents in `references/upstream/` are kept verbatim; see
-[NOTICE.md](NOTICE.md) and [SOURCE.md](SOURCE.md). Bundled fonts are SIL OFL 1.1 (Fontsource) and
-Three.js is MIT. See `kit/fonts/LICENSE.md` and `kit/vendor/THREE-LICENSE`.
+An independent project. It isn't Anthropic's Motion player and isn't affiliated with or endorsed by Anthropic.
+The original reference documents in `references/upstream/` are kept verbatim; see [NOTICE.md](NOTICE.md) and
+[SOURCE.md](SOURCE.md). Bundled fonts are SIL OFL 1.1 (`kit/fonts/LICENSE.md`); Three.js is MIT. Release notes:
+[CHANGELOG.md](CHANGELOG.md).

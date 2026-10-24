@@ -2,6 +2,7 @@
 // Export a film to MP4 (H.264 + AAC), frame-exact, in parallel browser workers.
 //   node scripts/export.mjs <film-dir> [--out film.mp4] [--fps 30] [--from 0] [--to end]
 //        [--jobs 4] [--audio score.wav | --no-audio] [--crf 16] [--gif out.gif]
+//        [--scale 0.5] [--draft]   (--draft = half size, 24 fps, quick encode: for checking timing, not delivery)
 // The score is rendered first (scripts/score.mjs) unless --no-audio or --audio is given.
 import fs from 'node:fs';
 import os from 'node:os';
@@ -11,6 +12,8 @@ import { args, launch, openFilm, snap, ffmpegPath } from './lib/browser.mjs';
 import { renderFilmScore } from './score.mjs';
 
 const a = args();
+if (a.draft) { a.scale ??= 0.5; a.fps ??= 24; a.crf ??= 23; a.preset ??= 'veryfast'; }
+const scale = +(a.scale || 1);
 const film = a._[0];
 if (!film) { console.log('usage: node scripts/export.mjs <film-dir> [--out film.mp4] [--fps n] [--from s] [--to s] [--jobs n] [--audio wav | --no-audio]'); process.exit(1); }
 const filmDir = path.resolve(film);
@@ -19,17 +22,17 @@ const ffmpeg = ffmpegPath();
 const browser = await launch();
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'export-'));
 try {
-  const first = await openFilm(browser, filmDir);
+  const first = await openFilm(browser, filmDir, { scale });
   const info = first.info; await first.ctx.close();
   const fps = +(a.fps || info.fps);
   const from = +(a.from || 0), to = a.to && a.to !== 'end' ? +a.to : info.duration;
   const N = Math.round((to - from) * fps);
   const jobs = Math.max(1, Math.min(+(a.jobs || Math.min(6, os.cpus().length)), N));
-  console.log(`${info.title}: ${info.width}×${info.height} @ ${fps}fps, ${(to - from).toFixed(2)}s = ${N} frames, ${jobs} workers`);
+  console.log(`${info.title}: ${Math.round(info.width * scale)}×${Math.round(info.height * scale)} @ ${fps}fps, ${(to - from).toFixed(2)}s = ${N} frames, ${jobs} workers`);
   const started = Date.now(); let done = 0;
   const worker = async (w) => {
     const logs = [];
-    const { page, ctx } = await openFilm(browser, filmDir, { logs });
+    const { page, ctx } = await openFilm(browser, filmDir, { logs, scale });
     const lo = Math.floor((w * N) / jobs), hi = Math.floor(((w + 1) * N) / jobs);
     for (let i = lo; i < hi; i++) {
       const buf = await snap(page, from + i / fps, 'jpeg', 94);
@@ -52,7 +55,7 @@ try {
   }
   const ff = ['-y', '-loglevel', 'error', '-framerate', String(fps), '-i', path.join(tmp, 'f%06d.jpg')];
   if (audio) ff.push('-ss', String(from), '-t', String(to - from), '-i', audio);
-  ff.push('-c:v', 'libx264', '-preset', a.preset || 'slow', '-crf', String(a.crf || 16), '-pix_fmt', 'yuv420p', '-tune', 'animation', '-movflags', '+faststart');
+  ff.push('-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-preset', a.preset || 'slow', '-crf', String(a.crf || 16), '-pix_fmt', 'yuv420p', '-tune', 'animation', '-movflags', '+faststart');
   if (audio) ff.push('-c:a', 'aac', '-b:a', '192k', '-shortest');
   ff.push(out);
   const r = spawnSync(ffmpeg, ff, { stdio: 'inherit' });

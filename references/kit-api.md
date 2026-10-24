@@ -169,13 +169,14 @@ Unknown names are silent and reported by `score.mjs`. `--levels` prints RMS per 
 
 | | |
 |---|---|
-| `node scripts/new.mjs <dir> [--portrait\|--square]` | scaffold from `templates/starter` |
+| `node scripts/doctor.mjs` | check Node, Playwright, Chromium, WebGL, FFmpeg; prints fixes |
+| `node scripts/new.mjs <dir> [--portrait\|--square] [--style <preset> [--palette <id>]]` | scaffold from `templates/starter` (or `templates/preset`) |
 | `node scripts/preview.mjs <dir>` | serve the player (scrub, space, ←/→, L, M) |
 | `node scripts/frames.mjs <dir> --at 0,2.5,c2+0.5,50%,end --sheet` | exact stills + contact sheet (also `--every 1`, `--count 16`) |
 | `node scripts/check.mjs <dir>` | errors, determinism, blank first frame, frozen spans, slideshow smell, tiny text |
 | `node scripts/score.mjs <dir> [--levels]` | render `score.wav` |
 | `node scripts/palette.mjs "#g,#m,#i,#a" …` | check palettes (ink ≥ 4.5:1 on ground, no mid-tone grounds) |
-| `node scripts/export.mjs <dir> --out film.mp4 [--fps 60] [--gif x.gif]` | frame-exact MP4 with the score; parallel workers |
+| `node scripts/export.mjs <dir> --out film.mp4 [--fps 60] [--gif x.gif] [--draft \| --scale .5]` | frame-exact MP4 with the score; parallel workers |
 
 Requirements: Node ≥ 22, Playwright with Chromium (`npm i -D playwright && npx playwright install chromium`,
 or `CHROMIUM_PATH`), FFmpeg for MP4 (`FFMPEG_PATH`). WebGL renders headless via SwiftShader (slower; fine).
