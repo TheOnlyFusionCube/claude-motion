@@ -34,10 +34,10 @@ It can have perfect type and still fail. This skill exists to prevent that.
 
 ### 0. Tools
 
-Node ≥ 22, Playwright + Chromium, FFmpeg. If `node <skill>/scripts/frames.mjs <skill>/examples/launch --at 1`
-fails, install: `npm i -D playwright && npx playwright install chromium` (or set `CHROMIUM_PATH`),
-plus FFmpeg (`FFMPEG_PATH`). Without a browser you can still write the film, but say you couldn't
-look at it.
+`<skill>` below means this file's folder. Run `node <skill>/scripts/doctor.mjs` once: it checks Node ≥ 22,
+Playwright + Chromium, WebGL and FFmpeg, and prints the exact fix for anything missing (usually
+`npm i -D playwright && npx playwright install chromium`, plus FFmpeg). Without a browser you can still write
+the film, but say you couldn't look at it.
 
 ### 1. Ask the three questions: style, colours, length
 
@@ -102,7 +102,8 @@ If they asked for a storyboard first, deliver the sheet (and a few key stills, i
 ### 3. Build
 
 `node <skill>/scripts/new.mjs <film-dir>` scaffolds the starter (`templates/starter`, a 14 s film
-showing the grammar), or start from a copy of the example. Then:
+showing the grammar). Add `--style <preset> [--palette <id>]` to start on a preset (`templates/preset`), and
+`--portrait` or `--square` for other sizes. Or start from a copy of the example. Then:
 
 - **One `TT` cascade** of named times (`TT.click = 4.5; TT.result = TT.click + .3`). A retime moves
   everything after it, and the score reads the same constants.
@@ -166,7 +167,8 @@ below about −30 dB.
 ### 6. Export and check the file
 
 `node <skill>/scripts/export.mjs <film-dir> --out <film-dir>/film.mp4` (renders the score, encodes
-H.264 + AAC; `--fps 60` for the smoothest UI, `--gif` too if asked). DOM frames take ~0.05 s each; 3D frames
+H.264 + AAC; `--fps 60` for the smoothest UI, `--gif` too if asked; `--draft` makes a quick half-size cut for
+checking timing). DOM frames take ~0.05 s each; 3D frames
 ~1–2 s each without a GPU, so a 34 s film with 18 s of 3D takes about 15 minutes. Run it in the background. Then pull a few stills from the MP4
 itself (`ffmpeg -ss 12 -i film.mp4 -frames:v 1 x.png`) and look. Report truthfully: what you made, its
 length and size, the look you chose, and anything you couldn't do.

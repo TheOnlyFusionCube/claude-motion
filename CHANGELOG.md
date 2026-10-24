@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.0: finishing touches
+
+- **Claude Code plugin:** `/plugin install motion-films --marketplace TheOnlyFusionCube/claude-motion`
+  (`.claude-plugin/plugin.json`, `marketplace.json` and icon; passes `claude plugin validate`).
+- **`scripts/doctor.mjs`:** checks Node, Playwright, Chromium, WebGL and FFmpeg, and prints the exact fix
+  for each problem (`--json` for agents).
+- **`new.mjs --style <preset> [--palette <id>]`:** scaffolds a film on a style preset (`templates/preset`).
+- **`export.mjs --draft` / `--scale`:** quick half-size cuts for checking timing.
+- `preview.mjs` falls back to a free port when the default one is taken; the player shows keyboard hints.
+- **In-browser tests** (`tests/render.test.mjs`): determinism, markup-preserving word splits, every preset, and
+  score recording. They skip cleanly where no browser is installed.
+- **README** rebuilt with an animated hero clip from the example film, install paths, a pipeline diagram,
+  the preset gallery and a FAQ.
+
 ## 2.1.0: opening questions and style presets
 
 - **Intake** (`references/intake.md`): for a new film the agent asks Style, Colours and Length once,

@@ -1,12 +1,13 @@
 {
   "name": "claude-motion",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "Launch-quality motion films in code for coding agents: deterministic DOM + Three.js film runtime, direction method, render/score/export tools",
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "doctor": "node scripts/doctor.mjs",
     "verify-upstream": "node scripts/sync-upstream.mjs --verify",
     "check": "node scripts/sync-upstream.mjs --verify && npm test",
     "check:example": "node scripts/check.mjs examples/launch",
