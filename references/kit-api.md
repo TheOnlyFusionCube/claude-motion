@@ -131,6 +131,21 @@ marks.add({ kind: 'circle', x, y, w, h, t0: 6.2, dur: .45, color: '#e5484d', wid
 `kit.cutPaper(seed, n = 7, irregularity)` → unit polygon; `kit.rectPoly(n, w, h)`; `kit.polyLerp(A, B, p)`
 (morph, point for point); `kit.polyStr(pts, cx, cy, sx, sy, rot)` → SVG `points`.
 
+## Motion design (reels)
+
+| | |
+|---|---|
+| `kit.bouncer({t0, h, n, fall, decay, x0, dx, squash, stretch, contact})` | a dropped object bouncing n times: `.at(t)` → `{x, y, sx, sy, vy}` (y above ground), `.contacts` (hit times), `.end` |
+| `kit.morph(el, A, B, p)` | box A → B (`{x, y, w, h, r?, bg?, opacity?}`, stage px): match cuts, object → UI |
+| `kit.iris(el, p, x, y)` | circular reveal of `el` from (x, y); p = 1 covers the frame (colour flood) |
+| `kit.letters(el)` | split text into one inline-block span per letter → array |
+| `kit.extrude(el, {depth, layers, side, dark, face})` | 3D extrusion by stacked layers; rotate under `perspective` → returns the face |
+| `kit.odometer(el, {digits, lead: 'collapse'})` | rolling-digit counter: `.set(value)` every frame |
+| `kit.grain(parent, {opacity, fps, blend})` | deterministic film grain: `.render(t)` |
+| `kit.focus(el, depth, focus, amount, max)` | depth-of-field blur by distance from the focal plane |
+| `kit.trail(f, t, {span, n, t0})` | n past samples of f (dotted arcs, ghosting) → `[{t, a, p}]` |
+| `motionBlur: {samples, shutter, fast: [[from, to, samples]]}` | film field: real motion blur in stills and export |
+
 ## Style presets
 
 `import { useStyle } from 'motion/styles/index.js'` → `await useStyle(kit, 'editorial', { palette, values, root })`.
@@ -159,7 +174,7 @@ Recorded as data in the browser, synthesized by `scripts/score.mjs` (48 kHz ster
 - `S.program(track, patch, {pan, gain dB, rev 0..1, bright 0..2})` — patches: `marimba vibes glock ep keys pluck bass pad` (aliases `kalimba piano bell`).
 - `S.note(track, 'F#4'|midi, {…, vel})`, `S.chord(track, [..], {…, spread})`, `S.pattern(track, 'x.X.o', {from, step = .5, repeat, pitch: [cycle], vel})`, `S.run(track, [..], {t, step, vel, cresc})`
 - Drums: `S.drum(name, {beat|t, vel})`, `S.drums({kick: 'x...', hat: '.x.x'}, {from, step, repeat})` — `kick snare clap sidestick hat openhat shaker tamb woodblock cowbell tom crash ride`. `X` accent, `o` ghost.
-- Foley at exact seconds: `S.fx(name, t, {dur, vel, pitch, pan, into})` — `tick click doubleclick pop ding chime sparkle whoosh revswell roll boing thud swipe`; `S.ticks(kit.typing.times, {vel})`.
+- Foley at exact seconds: `S.fx(name, t, {dur, vel, pitch, pan, into})` — `tick click doubleclick pop ding chime sparkle whoosh revswell roll boing thud swipe impact riser` (`riser` ends at t); `S.ticks(kit.typing.times, {vel})`.
 - `S.master({gain = -3, fadeOut = 1, reverb: {room, damp}})`.
 
 Unknown names are silent and reported by `score.mjs`. `--levels` prints RMS per second
@@ -172,12 +187,12 @@ Unknown names are silent and reported by `score.mjs`. `--levels` prints RMS per 
 | `node scripts/doctor.mjs` | check Node, Playwright, Chromium, WebGL, FFmpeg; prints fixes |
 | `node scripts/new.mjs <dir> [--portrait\|--square] [--style <preset> [--palette <id>]]` | scaffold from `templates/starter` (or `templates/preset`) |
 | `node scripts/preview.mjs <dir>` | serve the player (scrub, space, ←/→, L, M) |
-| `node scripts/frames.mjs <dir> --at 0,2.5,c2+0.5,50%,end --sheet` | exact stills + contact sheet (also `--every 1`, `--count 16`) |
+| `node scripts/frames.mjs <dir> --at 0,2.5,c2+0.5,50%,end --sheet` | exact stills + contact sheet (also `--every 1`, `--count 16`; motion blur included, `--no-blur` to skip) |
 | `node scripts/review.mjs <film.mp4 \| dir> [--sheet x.jpg]` | review any video: sound and loudness, frozen time, animated-deck signals, contact sheet |
 | `node scripts/check.mjs <dir>` | errors, determinism, blank first frame, frozen spans, slideshow smell, tiny text |
 | `node scripts/score.mjs <dir> [--levels]` | render `score.wav` |
 | `node scripts/palette.mjs "#g,#m,#i,#a" …` | check palettes (ink ≥ 4.5:1 on ground, no mid-tone grounds) |
-| `node scripts/export.mjs <dir> --out film.mp4 [--fps 60] [--gif x.gif] [--draft \| --scale .5]` | frame-exact MP4 with the score; parallel workers |
+| `node scripts/export.mjs <dir> --out film.mp4 [--fps 60] [--gif x.gif] [--draft \| --scale .5] [--blur n \| --no-blur]` | frame-exact MP4 with the score and motion blur; parallel workers |
 
 Requirements: Node ≥ 22, Playwright with Chromium (`npm i -D playwright && npx playwright install chromium`,
 or `CHROMIUM_PATH`), FFmpeg for MP4 (`FFMPEG_PATH`). WebGL renders headless via SwiftShader (slower; fine).

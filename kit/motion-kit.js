@@ -394,5 +394,103 @@
     };
   };
 
-  kit.version = '2.3.0';
+  // ───────────────────────── Motion-design toolkit ─────────────────────────
+  // For reels and sizzles: weight, match cuts, extruded type, rolling numbers, grain.
+  // Pair with the film's `motionBlur` (export averages sub-frames) for real smear on fast moves.
+
+  // Squash & stretch: a ball dropped at t0 from height h (px above the ground), bouncing n times.
+  // b = kit.bouncer({t0, h, n, fall, decay, x0, dx}); b.at(t) → {x, y, sx, sy, vy, k};
+  // y is height above the ground: place the ball's bottom at groundY - y. b.contacts: hit times (for sound).
+  kit.bouncer = ({ t0 = 0, h = 360, n = 4, fall = .5, decay = .5, x0 = 0, dx = 0, squash = .34, stretch = .26, contact = .085 } = {}) => {
+    const g = 2 * h / (fall * fall), contacts = [t0 + fall], heights = [h];
+    for (let k = 1; k <= n; k++) { const hk = h * Math.pow(decay, k); heights.push(hk); contacts.push(contacts[k - 1] + 2 * Math.sqrt(2 * hk / g)); }
+    const end = contacts[contacts.length - 1], vmax = Math.sqrt(2 * g * h);
+    const at = (t) => {
+      const px = clamp01((t - t0) / (end - t0)); const x = x0 + dx * (1 - Math.pow(1 - px, 1.7));
+      let y = 0, vy = 0, k = 0;
+      if (t < t0) y = h;
+      else if (t < contacts[0]) { const s = t - t0; y = h - .5 * g * s * s; vy = -g * s; }
+      else if (t < end) { while (k < n && t >= contacts[k + 1]) k++; const v0 = Math.sqrt(2 * g * heights[k + 1]), s = t - contacts[k]; y = Math.max(0, v0 * s - .5 * g * s * s); vy = v0 - g * s; }
+      // squash near a contact (scaled by that impact's speed), stretch along speed in flight
+      let sx = 1, sy = 1, hit = -1;
+      for (let i = 0; i < contacts.length; i++) if (Math.abs(t - contacts[i]) < contact) { hit = i; break; }
+      if (hit >= 0) { const amt = squash * Math.sqrt(heights[hit] / h) * (1 - Math.abs(t - contacts[hit]) / contact); sy = 1 - amt; sx = 1 + amt * .9; y = 0; }
+      else if (t >= t0 && t < end) { const st = stretch * Math.min(1, Math.abs(vy) / vmax); sy = 1 + st; sx = 1 - st * .55; }
+      return { x, y, sx, sy, vy, k, hit };
+    };
+    return { at, contacts, end, g };
+  };
+
+  // Shape morph / match cut: interpolate a box between two states (stage px, top-left).
+  // A, B: {x, y, w, h, r?, bg?, opacity?}. Use it to turn one thing into the next (a letter into a ball,
+  // a ball into a toggle, a card into the full frame) instead of cutting between them.
+  kit.morph = (el, A, B, p) => {
+    const v = k => lerp(A[k] ?? B[k], B[k] ?? A[k], p);
+    const st = { left: v('x') + 'px', top: v('y') + 'px', width: v('w') + 'px', height: v('h') + 'px' };
+    if (A.r != null || B.r != null) st.borderRadius = v('r') + 'px';
+    if (A.bg && B.bg) st.background = mixColor(A.bg, B.bg, p);
+    if (A.opacity != null || B.opacity != null) st.opacity = v('opacity');
+    kit.set(el, st); return el;
+  };
+
+  // Colour flood / iris: reveal `el` as a circle growing from (x, y). p 0..1 → covers the frame.
+  kit.iris = (el, p, x = kit.W / 2, y = kit.H / 2) => {
+    const R = Math.hypot(Math.max(x, kit.W - x), Math.max(y, kit.H - y));
+    el.style.clipPath = p >= 1 ? 'none' : `circle(${(R * clamp01(p)).toFixed(1)}px at ${x}px ${y}px)`;
+    el.style.visibility = p <= 0 ? 'hidden' : ''; return el;
+  };
+
+  // Depth of field: blur by distance from the focal plane. depth/focus in any unit; amount = px per unit.
+  kit.focus = (el, depth, focus = 0, amount = 6, max = 24) => { const b = Math.min(max, Math.abs(depth - focus) * amount); el.style.filter = b > .05 ? `blur(${b.toFixed(2)}px)` : 'none'; return b; };
+
+  // Motion trail: n samples of f(t) over the last `span` seconds, oldest first (dotted arcs, ghosting).
+  kit.trail = (f, t, { span = .6, n = 12, t0 = -Infinity } = {}) => { const out = []; for (let i = 0; i < n; i++) { const s = t - span + span * i / (n - 1); if (s >= t0) out.push({ t: s, a: (i + 1) / n, p: f(s) }); } return out; };
+
+  // Split text into one inline-block span per letter (for per-letter 3D, physics, staggered flips).
+  kit.letters = (el) => { const txt = el.textContent; el.textContent = ''; return [...txt].map(ch => kit.el('span', { class: 'kit-letter', text: ch === ' ' ? ' ' : ch, style: 'display:inline-block;position:relative;transform-style:preserve-3d', parent: el })); };
+
+  // Extruded 3D type (or any shape): stacks `layers` copies behind the face, darkening with depth.
+  // Rotate the element (rotateX/rotateY) under a parent with `perspective` to see the sides.
+  kit.extrude = (el, { depth = 40, layers = 16, side = '#8f8a82', dark = '#3a3733', face } = {}) => {
+    const html = el.innerHTML; el.innerHTML = '';
+    el.style.transformStyle = 'preserve-3d'; if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    for (let i = layers; i >= 1; i--) el.append(kit.el('span', { html, attrs: { 'aria-hidden': 'true' }, style: `position:absolute;left:0;top:0;width:100%;height:100%;white-space:inherit;color:${mixColor(side, dark, i / layers)};-webkit-text-fill-color:${mixColor(side, dark, i / layers)};background:none;transform:translateZ(${(-i * depth / layers).toFixed(2)}px);pointer-events:none` }));
+    const f = kit.el('span', { html, style: `position:relative;display:inline-block;transform:translateZ(0.5px)${face ? ';color:' + face : ''}` }); el.append(f);
+    return f;
+  };
+
+  // Rolling-digit counter (odometer). o = kit.odometer(el, {digits: 3}); o.set(value) every frame.
+  // Columns roll continuously, carries roll the next column, leading zeros collapse. Fast rolls + motion blur read as a spin.
+  kit.odometer = (el, { digits = 3, lead = 'collapse' } = {}) => {
+    el.textContent = ''; el.style.display = 'inline-flex'; el.style.fontVariantNumeric = 'tabular-nums';
+    const cols = [];
+    for (let i = digits - 1; i >= 0; i--) {
+      const col = kit.el('span', { class: 'kit-odo-col', style: 'display:inline-block;overflow:hidden;height:1em;line-height:1em;vertical-align:top', parent: el });
+      const strip = kit.el('span', { style: 'display:block;will-change:transform', html: '0123456789'.split('').concat('0').map(d => `<span style="display:block;height:1em">${d}</span>`).join(''), parent: col });
+      cols.unshift({ col, strip, place: Math.pow(10, i) });
+    }
+    return { el, cols, set(v) {
+      v = Math.max(0, v);
+      for (const { col, strip, place } of cols) {
+        const d = Math.floor(v / place) % 10, rem = v % place, roll = place === 1 ? v - Math.floor(v) : clamp01(rem - (place - 1));
+        strip.style.transform = `translateY(${(-(d + roll)).toFixed(4)}em)`;
+        if (place > 1 && lead === 'collapse') { const vis = clamp01(v - (place - 1)); col.style.maxWidth = (vis * 1).toFixed(3) + 'em'; col.style.opacity = vis.toFixed(3); }
+      }
+    } };
+  };
+
+  // Film grain: a deterministic noise overlay that changes `fps` times a second. g = kit.grain(parent); g.render(t).
+  kit.grain = (parent, { opacity = .045, size = 220, frames = 6, fps = 12, blend = 'overlay', seed = 9 } = {}) => {
+    const urls = [];
+    for (let k = 0; k < frames; k++) {
+      const c = document.createElement('canvas'); c.width = c.height = size; const x = c.getContext('2d'), im = x.createImageData(size, size), r = rng(seed * 101 + k);
+      for (let i = 0; i < im.data.length; i += 4) { const v = Math.floor(r() * 255); im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+      x.putImageData(im, 0, 0); urls.push(`url(${c.toDataURL('image/png')})`);
+    }
+    const el = kit.el('div', { class: 'kit-grain', style: `position:absolute;left:0;top:0;width:${kit.W}px;height:${kit.H}px;pointer-events:none;z-index:50;mix-blend-mode:${blend};opacity:${opacity}`, parent: parent || kit.stage });
+    let last = -1;
+    return { el, render(t) { const k = Math.floor(Math.max(0, t) * fps); if (k === last) return; last = k; el.style.backgroundImage = urls[k % frames]; el.style.backgroundPosition = `${Math.floor(hash(k, 1) * size)}px ${Math.floor(hash(k, 2) * size)}px`; } };
+  };
+
+  kit.version = '2.4.0';
 })();

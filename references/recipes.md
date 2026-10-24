@@ -133,7 +133,20 @@ marks.add({ kind: 'underline', …, t0: TT.end + 1.5, color: accent });         
 - Shapes breathe: `scale(kit.breathe(t, .012, 3.2))`. Title creep ~2 px/s.
 - Status dots: `opacity = .35 + .65 * max(0, sin(t*7 − i*.9))`.
 
-## 10. Fake motion blur
+## 10. Motion blur
+
+**Real blur** (whips, flying letters, rolling digits, anything fast): declare it on the film, and the stills
+and the export average sub-frames around each frame.
+
+```js
+export default { …, motionBlur: { samples: 8, shutter: 0.5, fast: [[8.3, 8.8, 32]] } }   // fast: [from, to, samples]
+```
+
+8 samples is enough for ordinary moves. A whip pan that crosses the frame in a few frames shows separate
+ghost copies at 8, so list it in `fast` with 16–32. Render time scales with samples: `--draft` skips blur,
+`--no-blur` / `--blur n` override.
+
+**Cheap smear** for one element, with no render cost: stretch it along its travel.
 
 ```js
 const x = f(t), v = kit.speedOf(f, t);
@@ -175,3 +188,57 @@ scene.add(sun, new THREE.HemisphereLight('#ffffff', '#d9d2c4', .9));
 
 Recompose rather than crop: stack what sat side by side, display type 90–170 px, keep words clear of
 the top 250 px, bottom 420 px and right 120 px (platform UI), and zoom further into the UI.
+
+## 13. Reel moves (motion design)
+
+All in `examples/reel/film.js`. Each one is a way for one thing to **become** the next.
+
+**Letters from depth, extruded.** Under a parent with `perspective: 1500px`:
+
+```js
+letters = kit.letters(wordEl).map(el => ({ el, face: kit.extrude(el, { depth: 46, layers: 18, side: '#a9a39a', dark: '#4a4640' }) }));
+// render: each letter i lands at ta = T + i*.085 over .62 s (eoq), from z −1700, rotateY −70°+26°·i, rotateX 35°
+el.style.transform = `translate3d(${x*q}px,${y*q}px,${-1700*q}px) rotateY(${ry*q}deg) rotateX(${35*q}deg)`;  // q = 1 − p
+```
+
+Swing the whole word a few degrees on Y while it holds so the extruded sides show.
+
+**Match cut: a letter becomes an object.** Measure the letter in `init` (`kit.offset(face, world)`), fade it
+out over 0.12 s and morph a new element out of its box:
+
+```js
+kit.morph(ball, { x: o.x, y: o.y, w: o.w, h: o.h, r: o.w / 2, bg: CREAM }, { x: X0 - 60, y: TOP, w: 120, h: 120, r: 60, bg: BLUE }, eio(p));
+```
+
+**Squash and stretch.** One call describes the whole bounce; contacts drive the sound.
+
+```js
+const b = kit.bouncer({ t0: TT.drop, h: 380, n: 4, fall: .48, decay: .5, x0: 620, dx: 700 });
+const s = b.at(t);   // {x, y (height above ground), sx, sy}
+kit.set(ball, { left: s.x - 60 + 'px', top: GROUND - s.y - 120 + 'px', transform: `scale(${s.sx},${s.sy})` });  // transform-origin: 50% 100%
+// score: b.contacts.forEach((c, i) => S.fx('thud', c, { vel: 100 - i * 14 }));
+```
+
+A dotted trail of where it has been: `kit.trail(s => b.at(s), t, { span: 1.3, n: 26, t0: TT.drop })`.
+
+**Pull back to reveal the tool.** Build the editor chrome around the first shot's frame (window, toolbar,
+a curve panel below it) in the same world. At z = 1 it's off screen, then a camera key to z ≈ .56 reveals that
+the first shot was a preview. Then *use* the tool: drag a handle and the subject moves differently.
+
+**Object → UI.** The ball becomes a toggle's knob (colour to white), and a track morphs out of it
+(`kit.morph` from the ball's box to the pill). The cursor clicks, the knob slides (`eob`), and the track fills.
+
+**Colour flood into the next world.** `kit.iris(floodEl, eiq(p), x, y)` from the knob's stage position
+(`cam.toStage(...)`). Open the next world with the camera so close that one tile in the flood's colour
+fills the frame, then whip pan. The flood was that tile all along.
+
+**Whip pans.** Camera keys 0.3 s apart with `ease: kit.eiox`, each landing on a subject that's already moving.
+Put a `swipe` on each, and add the span to `motionBlur.fast`.
+
+**Rolling count.** `const o = kit.odometer(el, { digits: 3 })`, then `o.set(N * eoq(seg(t, a, b)))`. Under
+motion blur the units column spins into a blur. Colour the last column with `.kit-odo-col:last-child`.
+
+**Texture.** One soft radial glow in the accent under the subject, a studio gradient ground, and grain on top
+(`g = kit.grain(kit.stage, { opacity: .045, fps: 12 })` in init, `g.render(t)` last in render). Keep grain
+subtle and slow: noise that changes every frame can multiply the MP4's size several times. Depth of field:
+`kit.focus(el, depth, focusDepth, 6)`.

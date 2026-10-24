@@ -94,7 +94,7 @@ export async function openFilm(browser, filmDir, { scale = 1, logs = [] } = {}) 
   page.on('pageerror', e => logs.push(`pageerror: ${e.message}`));
   await page.goto('http://motion.local/kit/player.html?film=/film/&capture=1');
   const ok = await page.evaluate(() => window.__film.ready);
-  const info = await page.evaluate(() => ({ width: __film.width, height: __film.height, fps: __film.fps, duration: __film.duration, chapters: __film.chapters, errors: __film.errors, title: __film.title }));
+  const info = await page.evaluate(() => ({ width: __film.width, height: __film.height, fps: __film.fps, duration: __film.duration, chapters: __film.chapters, errors: __film.errors, title: __film.title, motionBlur: __film.motionBlur }));
   if (!ok) throw new Error('Film failed to load:\n' + info.errors.join('\n') + (logs.length ? '\n' + logs.join('\n') : ''));
   await page.setViewportSize({ width: info.width, height: info.height });
   return { page, ctx, info };
@@ -115,6 +115,57 @@ export function parseTimes(spec, info) {
 export async function snap(page, t, type = 'png', quality) {
   await page.evaluate(tt => __film.seekExact(tt), t);
   return page.screenshot({ type, quality, animations: 'disabled', caret: 'initial' });
+}
+
+// Motion blur. A film opts in with `motionBlur: { samples: 8, shutter: 0.5, fast: [[from, to, samples], …] }`.
+// shutter = share of the frame interval the "camera" is open (0.5 = 180°). Each output frame averages
+// sub-frames centred on t; `fast` spans (whip pans, smash moves) take more samples so the smear is smooth, not ghosted.
+// `opt` is a CLI value: undefined → the film's setting, false/'off' → none, a number → that many samples everywhere.
+export function blurSetting(info, opt) {
+  if (opt === false || opt === 'off' || opt === '0' || opt === 0) return null;
+  const mb = info.motionBlur || {};
+  const forced = opt != null && opt !== true ? +opt : null;
+  const samples = forced || mb.samples || (opt === true ? 8 : 0);
+  if (!(samples > 1)) return null;
+  return { samples: Math.round(samples), shutter: Math.min(1, Math.max(0.05, +(mb.shutter ?? 0.5))), fast: forced ? [] : (mb.fast || []) };
+}
+export function blurTimes(t, fps, mb, duration = Infinity) {
+  if (!mb) return [t];
+  const f = mb.fast.find(([a, b]) => t >= a && t < b), n = Math.max(2, Math.round(f ? f[2] : mb.samples));
+  return Array.from({ length: n }, (_, k) => Math.min(Math.max(0, t + (k / (n - 1) - 0.5) * mb.shutter / fps), duration - 1e-4));
+}
+// Average sub-frames in a helper page (float accumulation, no banding). Returns a PNG or JPEG buffer.
+export async function makeBlender(browser) {
+  const ctx = await browser.newContext(); const page = await ctx.newPage();
+  await page.setContent('<canvas id=c></canvas>');
+  const blend = async (bufs, type = 'png', quality = 92) => Buffer.from(await page.evaluate(async ({ list, type, quality }) => {
+    const ims = await Promise.all(list.map(async b64 => { const im = new Image(); im.src = 'data:image/jpeg;base64,' + b64; await im.decode(); return im; }));
+    const c = document.getElementById('c'); c.width = ims[0].naturalWidth; c.height = ims[0].naturalHeight;
+    const x = c.getContext('2d', { willReadFrequently: true }); let acc = null;
+    for (const im of ims) { x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height).data; if (!acc) acc = new Float32Array(d.length); for (let i = 0; i < d.length; i++) acc[i] += d[i]; }
+    const out = x.createImageData(c.width, c.height), n = ims.length; for (let i = 0; i < acc.length; i++) out.data[i] = acc[i] / n;
+    x.putImageData(out, 0, 0); return c.toDataURL(type === 'jpeg' ? 'image/jpeg' : 'image/png', quality / 100).split(',')[1];
+  }, { list: bufs.map(b => b.toString('base64')), type, quality }), 'base64');
+  // Share of pixels that differ visibly between two frames (to skip blur where nothing moves).
+  blend.moved = async (a, b) => page.evaluate(async ([a, b]) => {
+    const load = async b64 => { const im = new Image(); im.src = 'data:image/jpeg;base64,' + b64; await im.decode(); return im; };
+    const [A, B] = await Promise.all([load(a), load(b)]); const w = 480, h = Math.round(480 * A.naturalHeight / A.naturalWidth);
+    const c = document.getElementById('c'); c.width = w; c.height = h; const x = c.getContext('2d', { willReadFrequently: true });
+    x.drawImage(A, 0, 0, w, h); const da = x.getImageData(0, 0, w, h).data; x.drawImage(B, 0, 0, w, h); const db = x.getImageData(0, 0, w, h).data;
+    let n = 0; for (let i = 0; i < da.length; i += 4) if (Math.abs(da[i] - db[i]) + Math.abs(da[i + 1] - db[i + 1]) + Math.abs(da[i + 2] - db[i + 2]) > 18) n++;
+    return n / (w * h);
+  }, [a.toString('base64'), b.toString('base64')]);
+  return blend;
+}
+// A frame exactly as the export shows it: a plain snap, or the average of the motion-blur sub-frames.
+export async function snapFrame(page, t, info, mb, blender, type = 'png', quality) {
+  if (!mb || !blender) return snap(page, t, type, quality);
+  const ts = blurTimes(t, info.fps, mb, info.duration);
+  // Shutter open and close look the same: nothing is moving fast, so no blur to add.
+  const first = await snap(page, ts[0], 'jpeg', 95), last = await snap(page, ts[ts.length - 1], 'jpeg', 95);
+  if (await blender.moved(first, last) < 0.0005) return snap(page, t, type, quality);
+  const bufs = [first]; for (const s of ts.slice(1, -1)) bufs.push(await snap(page, s, 'jpeg', 95)); bufs.push(last);
+  return blender(bufs, type, quality ?? 94);
 }
 
 export function ffmpegPath() {

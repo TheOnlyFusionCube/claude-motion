@@ -55,3 +55,21 @@ test('rng / noise are deterministic', () => {
   const n = kit.vnoise(3); assert.equal(n(1.5), n(1.5)); assert.ok(Math.abs(n(2.3)) <= 1);
   assert.equal(kit.mixColor('#000000', '#ffffff', 0.5), '#808080');
 });
+
+test('bouncer: falls, squashes on contact, loses height, comes to rest', () => {
+  const b = kit.bouncer({ t0: 1, h: 400, n: 3, fall: .5, decay: .5, x0: 0, dx: 300 });
+  assert.equal(b.contacts.length, 4);
+  assert.ok(Math.abs(b.contacts[0] - 1.5) < 1e-9);
+  assert.equal(b.at(0.5).y, 400);
+  const hit = b.at(b.contacts[0]); assert.equal(hit.y, 0); assert.ok(hit.sy < 1 && hit.sx > 1, 'squash');
+  const fall = b.at(1.4); assert.ok(fall.sy > 1 && fall.sx < 1, 'stretch while falling fast');
+  const apex1 = b.at((b.contacts[0] + b.contacts[1]) / 2); assert.ok(Math.abs(apex1.y - 200) < 1, 'second arc reaches h·decay');
+  const rest = b.at(b.end + 1); assert.equal(rest.y, 0); assert.equal(rest.x, 300); assert.equal(rest.sx, 1);
+  assert.equal(JSON.stringify(b.at(1.234)), JSON.stringify(b.at(1.234)));
+});
+
+test('trail samples the past in order', () => {
+  const tr = kit.trail(s => s * 2, 5, { span: 1, n: 5 });
+  assert.deepEqual(Array.from(tr, o => o.p), [8, 8.5, 9, 9.5, 10]);
+  assert.equal(kit.trail(s => s, 5, { span: 1, n: 5, t0: 4.6 }).length, 2);
+});

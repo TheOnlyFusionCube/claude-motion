@@ -132,6 +132,9 @@ const FX = {
   boing: () => render(0.6, s => Math.sin(TAU * (190 * s + 14 * Math.sin(TAU * 9 * s) * Math.exp(-5 * s))) * Math.exp(-6 * s)),
   thud: (e, s0) => add(render(0.4, s => Math.sin(TAU * (60 * s + (40 / 18) * (1 - Math.exp(-18 * s)))) * Math.exp(-11 * s)), filtered(0.15, 'lp', 600, 0.7, s => Math.exp(-30 * s) * 0.6, s0)),
   swipe: (e, s0) => FX.whoosh({ dur: e.dur || 0.28 }, s0),
+  // Reel hits: a sub drop with a noise transient (lands a cut), and a rising noise sweep into a cut (ends at t + dur).
+  impact: (e, s0) => add(render(1.1, s => Math.tanh(2.2 * Math.sin(TAU * (38 * s + (120 / 9) * (1 - Math.exp(-9 * s))))) * Math.exp(-3.2 * s) * 0.9), filtered(0.5, 'lp', 2600, 0.8, s => Math.exp(-14 * s), s0), 0.7),
+  riser: (e, s0) => { const d = e.dur || 0.8, b = new Biquad('bp', 400, 1.4); return render(d + 0.02, (s, i) => { const p = Math.min(1, s / d); if (i % 32 === 0) b.set(250 + 6000 * p * p); return (b.run(noise(i, s0)) * 1.4 + Math.sin(TAU * (180 * s + 260 * s * p)) * 0.12) * p ** 2.2; }); },
 };
 
 // Freeverb-style stereo reverb.
@@ -157,7 +160,7 @@ function reverb(L, R, { room = 0.84, damp = 0.28, width = 1 } = {}) {
 
 const DEFAULTS = { marimba: { rev: 0.25 }, vibes: { rev: 0.35 }, glock: { rev: 0.35, gain: -6 }, ep: { rev: 0.25 }, keys: { rev: 0.3 }, pluck: { rev: 0.3 }, bass: { rev: 0.04, gain: -1 }, pad: { rev: 0.55, gain: -5 } };
 const DRUM_GAIN = { kick: 0, snare: -6, clap: -6, sidestick: -9, hat: -14, openhat: -14, shaker: -16, tamb: -15, woodblock: -10, cowbell: -12, tom: -6, crash: -14, ride: -16 };
-const FX_GAIN = { tick: -16, click: -8, doubleclick: -8, pop: -9, ding: -12, chime: -12, sparkle: -16, whoosh: -12, revswell: -12, roll: -12, boing: -10, thud: -6, swipe: -12 };
+const FX_GAIN = { tick: -16, click: -8, doubleclick: -8, pop: -9, ding: -12, chime: -12, sparkle: -16, whoosh: -12, revswell: -12, roll: -12, boing: -10, thud: -6, swipe: -12, impact: -4, riser: -12 };
 
 export function synthesize(score, { sampleRate = SR } = {}) {
   if (sampleRate !== SR) throw new Error('only 48000 Hz');
@@ -187,7 +190,7 @@ export function synthesize(score, { sampleRate = SR } = {}) {
     } else if (e.kind === 'fx') {
       const f = FX[e.name]; if (!f) { unknown['fx:' + e.name] = (unknown['fx:' + e.name] || 0) + 1; return; }
       const buf = f(e, k + seed * 7);
-      const t0 = e.name === 'revswell' ? e.t - (e.dur || 1.2) : e.t;
+      const t0 = e.name === 'revswell' || e.name === 'riser' ? e.t - (e.dur || (e.name === 'riser' ? 0.8 : 1.2)) : e.t;
       place(buf, Math.max(0, t0), (e.vel / 127) ** 1.2 * db(FX_GAIN[e.name]) * 0.9, e.pan || 0, 0.18);
     }
   });

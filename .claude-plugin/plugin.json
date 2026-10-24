@@ -1,7 +1,7 @@
 {
   "name": "motion-films",
   "displayName": "Claude Motion",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Launch-quality motion films in code: asks style/colours/length, directs a beat sheet, builds on a deterministic DOM + Three.js stage, and exports frame-exact MP4 with an original score.",
   "author": { "name": "TheOnlyFusionCube", "url": "https://github.com/TheOnlyFusionCube" },
   "homepage": "https://github.com/TheOnlyFusionCube/claude-motion",

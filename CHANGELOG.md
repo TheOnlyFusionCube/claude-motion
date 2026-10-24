@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.4.0: motion-design reels
+
+Asked for: the fast, crafted "sizzle" style, where letters fly in as 3D type, the O becomes a bouncing
+ball, a pull back reveals an editor, a toggle floods the frame, whip pans cross a grid, and a counter rolls.
+
+- **Real motion blur.** A film sets `motionBlur: { samples, shutter, fast: [[from, to, samples]] }`. Stills
+  (`frames.mjs`) and exports average sub-frames around each frame, with more samples on listed fast spans
+  so whips smear instead of ghosting. `--draft` skips it; `--blur n` / `--no-blur` override.
+- **Kit:** `kit.bouncer` (squash and stretch, contact times for sound), `kit.morph` (match cuts,
+  object → UI), `kit.iris` (colour flood), `kit.letters` + `kit.extrude` (3D extruded type), `kit.odometer`
+  (rolling digits), `kit.grain`, `kit.focus` (depth of field), `kit.trail` (dotted arcs).
+- **Synth:** `impact` (a sub drop for the cut a move lands on) and `riser` (ends on its time).
+- **`examples/reel/`:** a 13.6 s reel using all of it, with a beat sheet. SKILL.md gains "Reels and
+  sizzles" (every move hands off, ~1–1.5 s per idea, weight everywhere, sound cut to picture), and
+  recipes.md gains §13 "Reel moves".
+
 ## 2.3.0: beyond the animated deck
 
 Tested with another model on "tell a story about being an LLM". Its films moved continuously and had a
