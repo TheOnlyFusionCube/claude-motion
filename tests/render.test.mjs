@@ -48,3 +48,20 @@ test('score records events from the film timeline', { skip }, async () => {
   assert.ok(s.events.length > 30 && s.events.every(e => e.t >= 0 && e.t < s.duration + 1));
   await ctx.close();
 });
+
+test('kit.space: an element lands where sp.project says; icons inside text animate as units', { skip }, async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'motion-test-'));
+  fs.writeFileSync(path.join(dir, 'film.js'), `let sp, line; export default { width: 1280, height: 720, duration: 2,
+    init(kit) { sp = window.__sp = kit.space(kit.stage, { fov: 35 }); sp.add(kit.h('<div id="dot" style="width:20px;height:20px;background:red"></div>'), { x: 140, y: -60, z: -200 });
+      line = kit.h('<div id="l">Grow <span class="kit-unit">*</span> fast <svg width="10" height="10"></svg></div>'); kit.stage.append(line); },
+    render(t, kit) { sp.camera([300, -400, 900], [0, 0, 0]); kit.TextFx.in(line, t, 0); } };`);
+  const { page, ctx } = await openFilm(browser, dir);
+  const r = await page.evaluate(async () => {
+    await __film.seekExact(1);
+    const st = document.getElementById('stage').getBoundingClientRect(), b = document.getElementById('dot').getBoundingClientRect();
+    return { dom: [b.left + b.width / 2 - st.left, b.top + b.height / 2 - st.top], proj: window.__sp.project([140, -60, -200]), units: document.querySelectorAll('#l .kit-word').length };
+  });
+  assert.equal(r.units, 4, 'two words + a kit-unit + an inline svg');
+  assert.ok(Math.hypot(r.proj[0] - r.dom[0], r.proj[1] - r.dom[1]) < 2, `projected ${r.proj} vs laid out ${r.dom}`);
+  await ctx.close(); fs.rmSync(dir, { recursive: true, force: true });
+});

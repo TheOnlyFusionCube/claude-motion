@@ -24,6 +24,8 @@
 }
 /* Everything is a pure function of t: the runtime owns all motion. */
 #stage *, #stage *::before, #stage *::after { transition: none !important; animation: none !important; }
+/* will-change makes Chrome reuse a raster from an earlier frame: the picture would depend on seek order. */
+#stage * { will-change: auto !important; }
 #stage .layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
 #stage .fill { position: absolute; inset: 0; }
 #stage svg.kit-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }

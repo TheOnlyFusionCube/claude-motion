@@ -103,7 +103,7 @@ api.ready = (async () => {
     finally { Math.random = realRandom; Date.now = realNow; }
   };
   Object.assign(api, {
-    width: W, height: H, fps: FPS, duration, chapters: CUT.chapters || [], title: CUT.title || document.title,
+    width: W, height: H, fps: FPS, duration, chapters: CUT.chapters || [], title: CUT.title || document.title, motionBlur: CUT.motionBlur || null,
     seek: (t) => { render(t); },
     // Exact seek for capture: renders, syncs clips, waits for paint.
     seekExact: async (t) => { render(t); if (kit._videos.length) { await kit._syncVideos(t, true); render(t); } await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },

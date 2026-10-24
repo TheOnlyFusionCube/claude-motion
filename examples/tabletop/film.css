@@ -1,0 +1,37 @@
+/* "Build": a tabletop of real UI, and a box character who walks across it. Warm dark room, white desk, one orange. */
+#stage { --orange: #ee5f2f; --ink: #17171a; --desk: #f6f5f2; --violet: #7b6cff; font-family: "Inter", system-ui, sans-serif; }
+.room { position: absolute; inset: 0; background: radial-gradient(1400px 900px at 50% 85%, #6b4b37 0%, #3a281d 45%, #1d140f 100%); }
+
+.desk { width: 3200px; height: 2200px; background: radial-gradient(closest-side, #ffffff 0%, #f6f5f2 70%, #ecebe7 100%); border-radius: 24px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.05); }
+.plate { border-radius: 26px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.06); }
+
+.canvas { width: 640px; height: 460px; background: #fbfbfa; background-image: radial-gradient(#d9d8d4 1.6px, transparent 1.6px); background-size: 28px 28px; }
+.canvas .sticker { position: absolute; left: 260px; top: 190px; width: 120px; height: 84px; border-radius: 6px; background: var(--orange); }
+.canvas .sel { position: absolute; left: 248px; top: 178px; width: 144px; height: 108px; border: 3px solid var(--violet); border-radius: 4px; }
+.canvas .sel i { position: absolute; width: 14px; height: 14px; background: #fff; border: 3px solid var(--violet); border-radius: 3px; }
+.canvas .size { position: absolute; left: 270px; top: 300px; padding: 6px 12px; border-radius: 8px; background: var(--violet); color: #fff; font: 600 20px/1 "Inter", sans-serif; }
+.canvas .name { position: absolute; left: 252px; top: 146px; font: 500 20px/1 "Inter", sans-serif; color: var(--violet); }
+
+.toolbar { width: 560px; height: 92px; background: #fff; display: flex; align-items: center; justify-content: space-around; padding: 0 20px; box-sizing: border-box; color: #3b3c40;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 8px 20px rgba(0,0,0,.06); }
+.toolbar .on { width: 60px; height: 60px; border-radius: 16px; background: #2f6bff; color: #fff; display: grid; place-items: center; }
+
+.panel { width: 520px; height: 640px; background: #fff; padding: 34px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
+.panel b { font: 700 30px/1 "Inter", sans-serif; color: var(--ink); }
+.panel .row { height: 58px; border-radius: 14px; background: #f1f0ed; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font: 500 22px/1 "Inter", sans-serif; color: #55565c; }
+.panel .row span:last-child { color: var(--ink); font-weight: 600; }
+
+.button { width: 240px; height: 96px; border-radius: 28px; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; gap: 12px; font: 700 34px/1 "Inter", sans-serif;
+  box-shadow: 0 10px 0 #b8431c; }
+
+.screen-art { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; background: #0e0e10; }
+.screen-art .burst { width: 210px; height: 210px; }
+.screen-art .made { font: 800 54px/0.95 "Bricolage Grotesque", sans-serif; color: #fff; text-align: center; letter-spacing: -0.01em; }
+.screen-art .made em { font-style: normal; color: var(--orange); }
+
+.trace { overflow: visible; }
+
+/* the character */
+.kit-face-front .eye { position: absolute; top: 24px; width: 12px; height: 26px; border-radius: 6px; background: #241712; }
+.shadowc { width: 170px; height: 130px; border-radius: 50%; background: radial-gradient(closest-side, rgba(40,20,10,.38), rgba(40,20,10,0)); }

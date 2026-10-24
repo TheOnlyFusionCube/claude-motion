@@ -1,5 +1,39 @@
 # Changelog
 
+## 2.5.0: every genre
+
+Asked for: four more kinds of film, a crypto-style brand promo, a 3D tabletop with a walking mascot, an
+App Store promo, and a kinetic poster reel with chrome and particles.
+
+- **CSS 3D space** (`kit.space`): real DOM UI on planes under a perspective camera (desks of screens,
+  tilted dashboards), with `project` and `depth` for labels and depth of field. **Characters** from boxes
+  (`kit.box3d`) with a walk cycle driven by distance (`kit.gait`).
+- **`kit/three-kit.js`:** `view3d` (renderer, studio environment, camera, lights), materials (clay, plastic,
+  chrome, glass), shapes (star, knot, ring, tube, coin with a face texture, rounded box), `textPoints` +
+  `particles` (particles that form words), instanced `field`s, SVG and canvas textures.
+- **`kit/ui/devices.js`:** phone, status bar, app icons, home screen, store listing, chat input, browser
+  window, glossy/red/green pills and 26 original glyphs, for fictional apps.
+- **Type:** `kit.marquee` (endless rows, with a whip-out), and `kit-unit` / inline `img`/`svg` inside text
+  animate as one word (icons inside sentences).
+- **Four examples**, each with a beat sheet: `examples/poster/`, `examples/tabletop/`, `examples/app-promo/`,
+  `examples/brand-promo/`. SKILL.md now picks the reference film by genre, and recipes.md gains §14–18.
+
+## 2.4.0: motion-design reels
+
+Asked for: the fast, crafted "sizzle" style, where letters fly in as 3D type, the O becomes a bouncing
+ball, a pull back reveals an editor, a toggle floods the frame, whip pans cross a grid, and a counter rolls.
+
+- **Real motion blur.** A film sets `motionBlur: { samples, shutter, fast: [[from, to, samples]] }`. Stills
+  (`frames.mjs`) and exports average sub-frames around each frame, with more samples on listed fast spans
+  so whips smear instead of ghosting. `--draft` skips it; `--blur n` / `--no-blur` override.
+- **Kit:** `kit.bouncer` (squash and stretch, contact times for sound), `kit.morph` (match cuts,
+  object → UI), `kit.iris` (colour flood), `kit.letters` + `kit.extrude` (3D extruded type), `kit.odometer`
+  (rolling digits), `kit.grain`, `kit.focus` (depth of field), `kit.trail` (dotted arcs).
+- **Synth:** `impact` (a sub drop for the cut a move lands on) and `riser` (ends on its time).
+- **`examples/reel/`:** a 13.6 s reel using all of it, with a beat sheet. SKILL.md gains "Reels and
+  sizzles" (every move hands off, ~1–1.5 s per idea, weight everywhere, sound cut to picture), and
+  recipes.md gains §13 "Reel moves".
+
 ## 2.3.0: beyond the animated deck
 
 Tested with another model on "tell a story about being an LLM". Its films moved continuously and had a
