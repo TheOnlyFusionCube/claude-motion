@@ -242,3 +242,88 @@ motion blur the units column spins into a blur. Colour the last column with `.ki
 (`g = kit.grain(kit.stage, { opacity: .045, fps: 12 })` in init, `g.render(t)` last in render). Keep grain
 subtle and slow: noise that changes every frame can multiply the MP4's size several times. Depth of field:
 `kit.focus(el, depth, focusDepth, 6)`.
+
+## 14. A tabletop in CSS 3D (real UI on planes, a character)
+
+`examples/tabletop/`. DOM planes under a perspective camera stay crisp at any angle and stay *the real UI*.
+
+```js
+const sp = kit.space(kit.stage, { fov: 32 });                      // y is down: the desk is y = 0, "up" is −y
+sp.add(kit.h('<div class="desk"></div>'), { rx: 90 });              // rx: 90 lays an element flat in the x–z plane
+const card = sp.add(uiEl, { x: -700, y: -1, z: 210, rx: 90 });      // lift plates 1 px off the desk
+// render: move the camera from t (keys over [px, py, pz, tx, ty, tz]); follow a subject by blending in
+sp.camera([px, py, pz], [tx, ty, tz]);
+kit.focus(card, sp.depth([x, 0, z]), sp.depth(subject), .011, 9);   // depth of field (flat planes only)
+```
+
+A character: `kit.box3d({w, h, d, color, faces: {front: {html: eyes}}})` for the body, four small boxes in hip
+wrappers for legs, and `kit.gait(distance, {legs: 4, stride})` to swing them, driven by **distance travelled**
+so feet never slide. Its pose (position, heading from the path's direction, hops, squash) is one pure function
+of t, which the score also reads to place a tick on every footfall. A plate that stands up rotates about a hinge
+edge: centre = hinge + rotX(a)·(0, −h/2, 0).
+
+## 15. Three.js that looks designed (three-kit)
+
+`kit/three-kit.js` (`import { view3d, mat, shapes, … } from 'motion/three-kit.js'`). `examples/poster/` and
+`examples/brand-promo/`.
+
+```js
+const v = view3d(kit, { fov: 30, env: 1, exposure: 1.1, z: 1 });  // transparent canvas over your DOM ground
+v.light('#ffffff', 1.6, [4, 6, 6]); v.light(ACCENT, 1.2, [-6, -2, 3]);   // a coloured rim tints the chrome
+const knot = new THREE.Mesh(shapes.knot({ p: 2, q: 3 }), mat.chrome('#ecffd0'));
+const coin = shapes.coin({ radius: .62, face: await svgTexture(svg) });  // tokens, badges, app coins
+const P = particles(5000, { size: .036, colors: [ACCENT, '#fff'] }); P.points.material.toneMapped = false;
+const word = textPoints('MOVE', { font: '900 300px "Inter Tight"', n: 5000, scale: 225 });
+const F = field(new THREE.BoxGeometry(.2, 1, .2), mat.clay(), 30, 18, { gap: .26 });   // a block field
+// render: set every transform from t, then v.look(pos, target).render()
+```
+
+- **Particles that become a word:** sample the source shape's vertices (`geometry.attributes.position`, transformed
+  to the moment of the burst) and the word's points, then lerp them with a swirl (`sin(πu)`-weighted rotation and
+  push) so they leave and arrive as a cloud. Keep `toneMapped = false` so they stay bright.
+- **Block fields:** heights from a ripple (`sin(k·d − ω·t)`), a press under a rolling ball (`exp(−d²/σ)`), and
+  colour by crest. The camera starts top-down (it reads as a flat grid) and tilts into perspective.
+- `mat.glass()` uses transmission, which is slow in software GL; `mat.glass(tint, { cheap: true })` fakes it.
+- DOM labels pinned to 3D things: `v.project([x, y, z])` → stage px.
+
+## 16. App promos (device UI)
+
+`kit/ui/devices.js` (`await useDevices()` in init) gives phone, status bar, app icons, home screen, store page,
+chat input, browser window and pills, plus original glyphs. `examples/app-promo/`.
+
+- **The icon is the subject.** It lands (with a soft blurred echo), flies to its slot on the store page (hide the
+  page's own icon), and the page builds around it.
+- **A button becomes the field:** morph a blob from the button's rect to the input's (`kit.morph`), then swap in the
+  real input and type into `input.field` with `kit.typist`.
+- **The field folds back into the icon** on the home screen (zoomed so the icon is at the centre); a tap presses
+  it and floods the frame.
+- **Glossy word pills:** each pill enters with overshoot, types its word letter by letter with a pop
+  (`TextFx.in(…, { mode: 'chars', ease: x => eob(x, 1.8) })`), then drops back into a stack as the next arrives.
+  Icon chips drift round them in light 3D tilt.
+
+## 17. Kinetic posters
+
+`examples/poster/`.
+
+- **A wall of type:** rows of one phrase, alternating solid and outline (`-webkit-text-stroke`), alternating
+  direction (`kit.marquee(row, { speed: ±150 })`), the whole wall slightly rotated and creeping in scale. To leave,
+  ramp `render(t, extraPx)` with `ei` so the rows whip out under motion blur, and swell one accent row into the
+  next frame's ground.
+- **Slammed type:** `TextFx.in(el, t, t0, { mode: 'chars', from: 'bottom', d: 160, stagger: .045, dur: .38, ease: x => eob(x, 1.5) })`,
+  exit up quicker. Second line in outline.
+- **The HUD** (corner ticks, a section label, `F 123` frame counter, BPM) is texture: small, at the edges, and
+  coloured for each ground.
+
+## 18. Brand promos
+
+`examples/brand-promo/`.
+
+- **Icons inside a sentence:** `Grow <span class="ico kit-unit">…svg…</span> what you <em>save</em>`. A `kit-unit`
+  (and any inline `img`/`svg`) enters as one word.
+- **Rays behind the logo:** a `repeating-conic-gradient` disc with a radial mask, centred on the logo's projected
+  position, turning slowly.
+- **Claims as pills:** red ✕ pills that land with a small shake, dimmed when the green ✓ pill arrives; they fold
+  into the next thing (the URL field).
+- **A tilted dashboard:** a plate in `kit.space` swinging from steep to gentle while its bars and balance fill, with
+  the key number flipping up in front of it (rotateX from 90°).
+- **The end:** the URL typed in a glowing field, then two half-moons slide in from the edges round the name.

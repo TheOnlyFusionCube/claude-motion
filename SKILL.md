@@ -1,6 +1,6 @@
 ---
 name: claude-motion
-description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, motion-design reels and sizzles, kinetic type, data stories, 3D scenes) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Asks style, colours and length up front; offers six style presets. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
+description: Make polished, continuously moving short films in code (product launch films, UI walkthroughs, animated explainers, motion-design reels and sizzles, kinetic typography posters, app and brand promos, 3D product and character scenes, data stories) and export frame-exact MP4 with an original score. Use when asked to make an animation, motion graphic, promo, teaser, launch video, demo video, explainer, showreel or animated chart, to edit one, or to critique one. Asks style, colours and length up front; offers six style presets. Built on a deterministic DOM + Three.js stage with camera, cursor, typing, hand-drawn marks and a synth, and a direction method that produces films rather than animated slideshows.
 ---
 
 # Claude Motion
@@ -24,16 +24,20 @@ It can have perfect type and still fail. This skill exists to prevent that.
 
 1. `references/upstream/motion.md`: the original craft rules and the numbers that review taught.
    Read all of it. Skip what's specific to its private player (Artifact, `kit.module`, check.ts).
-2. **The two reference films.** Copy their techniques, never their look, story or words.
-   - `examples/launch/`: a 34 s product launch (title → app → question → chart → push into a 3D city →
-     comment → replay with the fix → end card, with score).
-   - `examples/journey/`: a 22 s **abstract story** (how a message crosses the world) told with one
-     physical subject, a camera that goes from finger scale to map scale and back, and almost no words.
-     Read it for any brief that's an idea rather than a product.
-   - `examples/reel/`: a 13 s **motion-design reel** (3D letters → the O becomes a ball → squash and stretch →
-     pull back into an editor → the ball becomes a toggle → a colour flood → whip pans over a grid → a rolling
-     count), with motion blur. Read it for a sizzle, showreel, brand sting or anything that should feel fast and crafted.
-   Each has a `BEATS.md`: read the sheet, then the code.
+2. **The reference film for this genre.** Copy its techniques, never its look, story or words. Each has a
+   `BEATS.md`: read the sheet, then the code. Pick by the brief:
+
+   | The brief | Read | What it shows |
+   |---|---|---|
+   | product launch, feature film, UI walkthrough | `examples/launch/` (34 s) | app → chart → push into a 3D city → replay, with score |
+   | an idea, a process, "what it's like to be…" | `examples/journey/` (22 s) | one physical subject, finger scale → map scale → back, almost no words |
+   | sizzle, showreel, brand sting, "what this can do" | `examples/reel/` (13.6 s) | 3D letters, squash and stretch, editor reveal, flood, whips, motion blur |
+   | kinetic typography, poster/Swiss look, music-driven | `examples/poster/` (12.5 s) | scrolling type walls, slammed type, chrome 3D, particles that form a word, a block field |
+   | 3D product scene, mascot or character, "made with" | `examples/tabletop/` (11 s) | real UI as plates on a desk in CSS 3D, a box character that walks, depth of field |
+   | app promo, App Store / mobile launch | `examples/app-promo/` (12.6 s) | icon → store page → field → home screen tap → glossy word pills → logo |
+   | brand promo, fintech / web3 / SaaS hype | `examples/brand-promo/` (14 s) | glossy 3D coins, rays, icons inside sentences, tilted dashboard, ✕ pills, URL end |
+
+   For a mix (most briefs), read the two closest. The genre changes the pace and the toolkit, not the method.
 3. `references/intake.md` (the opening questions), `references/recipes.md` (the specific moves you'll use),
    `references/kit-api.md` (the API) and, if a preset is picked, `references/styles.md`.
 
@@ -83,6 +87,20 @@ Its own rules (all used in `examples/reel/`):
 - **Words: one at a time, one or two words** ("Weight.", "Timing."). Numbers roll (`kit.odometer`).
 - **Sound is cut to the picture:** a hit on every landing (`thud`, `pop`), a `swipe` under every whip, a `riser`
   into a flood or smash, an `impact` on the cut it lands, a groove under the fastest section.
+
+The same rules carry the other fast genres:
+
+- **Kinetic posters** (`examples/poster/`): type is the picture. Walls of scrolling rows (`kit.marquee`), letters
+  slammed in with overshoot (`TextFx.in` mode `chars`, `eob`), hard cuts on the beat, one acid accent, chrome or
+  glass objects (`three-kit.js`). Small HUD labels (corners, a frame counter) are allowed here as the poster's
+  texture, never as slide headers.
+- **Promos** (`examples/app-promo/`, `examples/brand-promo/`): one object carries the film (the app icon, the brand
+  coin) and becomes each next thing. Sentences can carry icons inside them (`<span class="kit-unit">` animates as
+  a word). Claims come as pills (✕ for what it isn't, ✓ for what it is), numbers flip or roll, and it ends on a URL
+  or store badge, then the logo.
+- **3D product and character scenes** (`examples/tabletop/`): put real UI on planes in CSS 3D (`kit.space`), so it
+  stays sharp and stays the real UI; build a character from boxes (`kit.box3d`, `kit.gait`), and use depth of field.
+  Use Three.js (`three-kit.js`) for what DOM can't do: chrome, glass, particles, thousands of instances.
 
 ## Workflow
 
@@ -259,7 +277,8 @@ they ask for a redesign. If you think a bigger change would help, do what they a
 
 `kit/` runtime (`motion-kit.js`, `player.html`, `kit.css`, bundled fonts, Three.js) · `scripts/`
 (`doctor`, `new`, `preview`, `frames`, `check`, `review`, `score`, `export`) · `templates/starter/` ·
-`examples/launch/`, `examples/journey/`, `examples/reel/` ·
+`examples/` (launch, journey, reel, poster, tabletop, app-promo, brand-promo, styles) · `kit/three-kit.js` (3D) ·
+`kit/ui/devices.js` (phone, icons, store page, input, browser, pills) ·
 `references/intake.md`, `references/styles.md` (+ `kit/styles/`, `examples/styles/`), `references/kit-api.md`,
 `references/recipes.md`, `scripts/palette.mjs` · `references/upstream/` (the original Motion
 reference set, verbatim and read-only; its private-player commands don't exist here. Use this kit's

@@ -184,6 +184,10 @@
             const sp = kit.el('span', { class: 'kit-word', text: p }); frag.append(sp); units.push(sp);
           }
           n.replaceWith(frag);
+        } else if (n.nodeType === 1 && (n.tagName === 'IMG' || n.tagName === 'svg' || n.tagName === 'SVG' || n.classList.contains('kit-unit'))) {
+          // an icon, chip or badge inside a sentence moves as one unit, like a word
+          if (getComputedStyle(n).display === 'inline') n.style.display = 'inline-block';
+          n.classList.add('kit-word'); units.push(n);
         } else if (n.nodeType === 1 && n.tagName !== 'BR' && !n.classList.contains('kit-word')) walk(n);
       }
     };
@@ -466,7 +470,7 @@
     const cols = [];
     for (let i = digits - 1; i >= 0; i--) {
       const col = kit.el('span', { class: 'kit-odo-col', style: 'display:inline-block;overflow:hidden;height:1em;line-height:1em;vertical-align:top', parent: el });
-      const strip = kit.el('span', { style: 'display:block;will-change:transform', html: '0123456789'.split('').concat('0').map(d => `<span style="display:block;height:1em">${d}</span>`).join(''), parent: col });
+      const strip = kit.el('span', { style: 'display:block', html: '0123456789'.split('').concat('0').map(d => `<span style="display:block;height:1em">${d}</span>`).join(''), parent: col });
       cols.unshift({ col, strip, place: Math.pow(10, i) });
     }
     return { el, cols, set(v) {
@@ -492,5 +496,79 @@
     return { el, render(t) { const k = Math.floor(Math.max(0, t) * fps); if (k === last) return; last = k; el.style.backgroundImage = urls[k % frames]; el.style.backgroundPosition = `${Math.floor(hash(k, 1) * size)}px ${Math.floor(hash(k, 2) * size)}px`; } };
   };
 
-  kit.version = '2.4.0';
+  // ───────────────────────── CSS 3D space (DOM planes under a perspective camera) ─────────────────────────
+  // Crisp, real UI laid out in 3D: a desk of screens, a tilted dashboard, cards in depth, box characters.
+  // const sp = kit.space(parent, {fov: 35}); sp.add(el, {x, y, z, rx, ry, rz, s}) (y is DOWN, the floor is y = 0,
+  // "up" is −y); every frame: sp.camera([x, y, z], [tx, ty, tz], roll).  sp.project(p) → stage [x, y, scale];
+  // sp.depth(p) → distance from the camera (for kit.focus). A floor: sp.add(el, {rx: 90}) lies in the x–z plane.
+  // Note: a CSS filter (blur) flattens 3D children. Blur flat planes only, never a box.
+  kit.space = (parent, { fov = 35, w = kit.W, h = kit.H } = {}) => {
+    const f = (h / 2) / Math.tan(fov * Math.PI / 360);
+    const view = kit.el('div', { class: 'kit-space', style: `position:absolute;left:0;top:0;width:${w}px;height:${h}px;overflow:hidden;perspective:${f.toFixed(2)}px;perspective-origin:50% 50%`, parent: parent || kit.stage });
+    const world = kit.el('div', { class: 'kit-space-world', style: `position:absolute;left:${w / 2}px;top:${h / 2}px;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0`, parent: view });
+    const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const norm = a => { const l = Math.hypot(...a) || 1; return a.map(v => v / l); };
+    const sp = { view, world, f, fov, pos: [0, -400, 1200], target: [0, 0, 0], xc: [1, 0, 0], yc: [0, 1, 0], zc: [0, 0, 1],
+      add(el, o = {}) { world.append(el); el.style.position = 'absolute'; el.style.left = '0'; el.style.top = '0'; el.style.transformOrigin = '0 0'; el.style.transformStyle = 'preserve-3d'; sp.place(el, o); return el; },
+      // place by centre: translate to (x, y, z), rotate (Y, then X, then Z), scale, centre the element on that point
+      place(el, { x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, s = 1, center = true } = {}) {
+        el.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,${z.toFixed(2)}px) rotateY(${ry}deg) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${s})${center ? ' translate(-50%,-50%)' : ''}`; return el;
+      },
+      camera(pos, target, roll = 0) {
+        sp.pos = pos; sp.target = target;
+        const fwd = norm(sub(target, pos)), up = Math.abs(fwd[1]) > .999 ? [0, 0, -1] : [0, -1, 0];
+        const xc = norm(cross(up, fwd)), zc = fwd.map(v => -v), yc = cross(zc, xc);
+        Object.assign(sp, { xc, yc, zc });
+        const tr = [-dot(xc, pos), -dot(yc, pos), -dot(zc, pos)];
+        const m = [xc[0], yc[0], zc[0], 0, xc[1], yc[1], zc[1], 0, xc[2], yc[2], zc[2], 0, tr[0], tr[1], tr[2], 1].map(v => +v.toFixed(6));
+        world.style.transform = `translateZ(${f.toFixed(2)}px) rotateZ(${roll}deg) matrix3d(${m.join(',')})`;
+        return sp;
+      },
+      cam(p) { const d = sub(p, sp.pos); return [dot(sp.xc, d), dot(sp.yc, d), dot(sp.zc, d)]; },
+      depth(p) { return -sp.cam(p)[2]; },
+      project(p) { const c = sp.cam(p), s = f / Math.max(1e-3, -c[2]); return [w / 2 + c[0] * s, h / 2 + c[1] * s, s]; },
+    };
+    return sp;
+  };
+
+  // A box made of six DOM faces (characters, blocks, devices with thickness). Origin = the box centre.
+  // faces: {front, back, left, right, top, bottom} → colour string or {bg, html}. Unlisted faces get `color`
+  // shaded for a fixed light (top lighter, sides darker).
+  kit.box3d = ({ w = 100, h = 100, d = 100, color = '#e8643a', faces = {}, radius = 0, parent } = {}) => {
+    const box = kit.el('div', { class: 'kit-box', style: 'position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d' });
+    const shade = { front: 0, back: -.18, left: -.14, right: -.22, top: .14, bottom: -.35 };
+    const spec = { front: [w, h, `translateZ(${d / 2}px)`], back: [w, h, `rotateY(180deg) translateZ(${d / 2}px)`], right: [d, h, `rotateY(90deg) translateZ(${w / 2}px)`],
+      left: [d, h, `rotateY(-90deg) translateZ(${w / 2}px)`], top: [w, d, `rotateX(90deg) translateZ(${h / 2}px)`], bottom: [w, d, `rotateX(-90deg) translateZ(${h / 2}px)`] };
+    box.faces = {};
+    for (const [k, [fw, fh, tr]] of Object.entries(spec)) {
+      const o = typeof faces[k] === 'string' ? { bg: faces[k] } : (faces[k] || {});
+      const s = shade[k], bg = o.bg || (s >= 0 ? mixColor(color, '#ffffff', s) : mixColor(color, '#000000', -s));
+      const fe = kit.el('div', { class: 'kit-face kit-face-' + k, html: o.html || '', style: `position:absolute;left:${-fw / 2}px;top:${-fh / 2}px;width:${fw}px;height:${fh}px;background:${bg};transform:${tr};backface-visibility:hidden;border-radius:${radius}px;overflow:hidden`, parent: box });
+      box.faces[k] = fe;
+    }
+    if (parent) parent.append(box);
+    return box;
+  };
+
+  // Walk cycle, driven by DISTANCE travelled so feet never slide. kit.gait(dist, {stride, legs, lift, swing})
+  // → {legs: [{swing (deg), lift (px)}], bob (px, ≤0 = up), sway (deg)}. Legs alternate (diagonal pairs for 4).
+  kit.gait = (dist, { stride = 60, legs = 2, lift = 10, swing = 28, bob = 6 } = {}) => {
+    const ph = 2 * Math.PI * dist / stride, L = [];
+    for (let i = 0; i < legs; i++) { const p = ph + (legs === 4 ? ((i === 0 || i === 3) ? 0 : Math.PI) : i * Math.PI); L.push({ swing: swing * Math.sin(p), lift: lift * Math.max(0, Math.cos(p)) }); }
+    return { legs: L, bob: -bob * Math.abs(Math.sin(ph)), sway: 3 * Math.sin(ph) };
+  };
+
+  // Endless rows of type (kinetic posters). Put the content in rowEl once; kit.marquee duplicates it and
+  // render(t, extraPx) scrolls by speed px/s (negative = the other way) plus extraPx (for a whip-out). const m = kit.marquee(rowEl, {speed: 140}); m.render(t)
+  kit.marquee = (rowEl, { speed = 120, offset = 0, copies = 3 } = {}) => {
+    const inner = kit.el('div', { style: 'display:inline-flex;white-space:nowrap' });
+    const unit = kit.el('div', { html: rowEl.innerHTML, style: 'display:inline-flex;white-space:nowrap;flex:none' });
+    rowEl.innerHTML = ''; rowEl.style.overflow = 'hidden'; rowEl.style.whiteSpace = 'nowrap'; inner.append(unit); rowEl.append(inner);
+    for (let i = 1; i < copies; i++) inner.append(unit.cloneNode(true));
+    let uw = unit.offsetWidth;   // measured now (rowEl must be in the stage); re-tried if it was hidden
+    return { el: rowEl, render(t, extra = 0) { if (!uw) uw = unit.offsetWidth; if (!uw) return; const x = (((t * speed + offset + extra) % uw) + uw) % uw; inner.style.transform = `translateX(${(-x).toFixed(2)}px)`; } };
+  };
+
+  kit.version = '2.5.0';
 })();

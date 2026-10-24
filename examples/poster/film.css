@@ -1,0 +1,30 @@
+/* "Make it move": a kinetic poster reel. Black, acid lime, chrome. Swiss poster type with a light HUD. */
+#stage { --acid: #c6ff2e; --black: #0b0b0c; --white: #f3f3ef; font-family: "Inter Tight", "Inter", sans-serif; color: var(--white); }
+.ground { position: absolute; inset: 0; background: var(--black); }
+.flood { position: absolute; inset: 0; background: var(--acid); }
+.ink { position: absolute; inset: 0; background: var(--black); }
+
+/* marquee wall */
+.wall { position: absolute; left: -300px; top: -260px; width: 2520px; height: 1600px; display: flex; flex-direction: column; justify-content: center; gap: 0; transform-origin: 50% 50%; }
+.wall .row { position: relative; height: 150px; font: 900 136px/150px "Inter Tight", sans-serif; letter-spacing: -0.03em; text-transform: uppercase; }
+.wall .row span { padding-right: 40px; }
+.wall .row.out { color: transparent; -webkit-text-stroke: 2.5px var(--white); }
+.wall .row.solid { color: var(--white); }
+.wall .row.band { color: var(--black); }
+.wall .bandbg { position: absolute; left: 0; right: 0; top: 50%; height: 150px; margin-top: -75px; background: var(--acid); }
+
+/* posters */
+.poster { position: absolute; inset: 0; }
+.poster .big { position: absolute; left: 120px; top: 300px; font: 900 250px/0.86 "Inter Tight", sans-serif; letter-spacing: -0.05em; color: var(--black); text-transform: uppercase; }
+.poster .sub { position: absolute; left: 128px; top: 540px; font: 900 112px/0.92 "Inter Tight", sans-serif; letter-spacing: -0.03em; color: var(--black); text-transform: uppercase; }
+.poster .sub em { font-style: normal; color: transparent; -webkit-text-stroke: 3px var(--black); }
+.poster .note { position: absolute; left: 130px; top: 800px; font: 500 26px/1.35 "DM Mono", monospace; color: var(--black); }
+.end .big { color: var(--black); }
+
+/* HUD: the poster's frame, not slide furniture — it is a texture of the look */
+.hud { position: absolute; inset: 0; pointer-events: none; font: 500 22px/1 "DM Mono", monospace; letter-spacing: .04em; }
+.hud .tl, .hud .tr, .hud .bl, .hud .br { position: absolute; }
+.hud .tl { left: 60px; top: 52px; } .hud .tr { right: 60px; top: 52px; } .hud .bl { left: 60px; bottom: 50px; } .hud .br { right: 60px; bottom: 50px; font-variant-numeric: tabular-nums; }
+.hud i { position: absolute; width: 26px; height: 26px; border-color: currentColor; border-style: solid; }
+.hud i.a { left: 30px; top: 30px; border-width: 3px 0 0 3px; } .hud i.b { right: 30px; top: 30px; border-width: 3px 3px 0 0; }
+.hud i.c { left: 30px; bottom: 30px; border-width: 0 0 3px 3px; } .hud i.d { right: 30px; bottom: 30px; border-width: 0 3px 3px 0; }

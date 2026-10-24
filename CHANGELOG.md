@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.5.0: every genre
+
+Asked for: four more kinds of film, a crypto-style brand promo, a 3D tabletop with a walking mascot, an
+App Store promo, and a kinetic poster reel with chrome and particles.
+
+- **CSS 3D space** (`kit.space`): real DOM UI on planes under a perspective camera (desks of screens,
+  tilted dashboards), with `project` and `depth` for labels and depth of field. **Characters** from boxes
+  (`kit.box3d`) with a walk cycle driven by distance (`kit.gait`).
+- **`kit/three-kit.js`:** `view3d` (renderer, studio environment, camera, lights), materials (clay, plastic,
+  chrome, glass), shapes (star, knot, ring, tube, coin with a face texture, rounded box), `textPoints` +
+  `particles` (particles that form words), instanced `field`s, SVG and canvas textures.
+- **`kit/ui/devices.js`:** phone, status bar, app icons, home screen, store listing, chat input, browser
+  window, glossy/red/green pills and 26 original glyphs, for fictional apps.
+- **Type:** `kit.marquee` (endless rows, with a whip-out), and `kit-unit` / inline `img`/`svg` inside text
+  animate as one word (icons inside sentences).
+- **Four examples**, each with a beat sheet: `examples/poster/`, `examples/tabletop/`, `examples/app-promo/`,
+  `examples/brand-promo/`. SKILL.md now picks the reference film by genre, and recipes.md gains §14–18.
+
 ## 2.4.0: motion-design reels
 
 Asked for: the fast, crafted "sizzle" style, where letters fly in as 3D type, the O becomes a bouncing

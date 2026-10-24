@@ -146,6 +146,31 @@ marks.add({ kind: 'circle', x, y, w, h, t0: 6.2, dur: .45, color: '#e5484d', wid
 | `kit.trail(f, t, {span, n, t0})` | n past samples of f (dotted arcs, ghosting) → `[{t, a, p}]` |
 | `motionBlur: {samples, shutter, fast: [[from, to, samples]]}` | film field: real motion blur in stills and export |
 
+## CSS 3D, characters, type walls
+
+| | |
+|---|---|
+| `kit.space(parent, {fov})` | DOM in 3D under a perspective camera: `.add(el, {x, y, z, rx, ry, rz, s})`, `.place(el, …)`, `.camera(pos, target, roll)` each frame, `.project(p)` → `[x, y, scale]`, `.depth(p)`, `.world` (y is down; `rx: 90` lays a plane flat) |
+| `kit.box3d({w, h, d, color, faces, radius, parent})` | a box of six DOM faces (characters, blocks); faces: colour or `{bg, html}`; `.faces.front` etc. |
+| `kit.gait(dist, {stride, legs, lift, swing, bob})` | walk cycle from distance travelled → `{legs: [{swing, lift}], bob, sway}` |
+| `kit.marquee(rowEl, {speed, offset})` | endless scrolling row: `.render(t, extraPx)` |
+| `<span class="kit-unit">` | inside text animated by TextFx: moves as one word (icons, chips); inline `img`/`svg` too |
+
+## Three.js helpers — `motion/three-kit.js`
+
+`view3d(kit, {parent, fov, background, exposure, env, shadows, z})` → `{THREE, scene, camera, renderer, look(pos, target), light(color, intensity, pos), project(p), render()}` ·
+`mat.clay|plastic|chrome|glass(tint, {cheap})|glow|toon` · `shapes.star|knot|ring|tube(points)|coin({face})|roundedBox` ·
+`canvasTexture(size, draw)` · `await svgTexture(svg)` · `textPoints(text, {font, n, scale})` · `particles(n, {size, colors})` → `.set(i => [x, y, z])` ·
+`field(geo, material, cols, rows, {gap})` → `.set((i, j, x, z, o) => { o.sy, o.y, o.s, o.color })`.
+
+## Device UI — `motion/ui/devices.js`
+
+`await useDevices()` · `phone({dark})` → `{el, screen}` · `statusBar()` · `appIcon({glyph | mark, bg, fg, size, badge, label})` ·
+`homeScreen({icons, wallpaper})` → `{el, apps}` · `storeListing({name, maker, icon, button, stats, dark})` → `{el, icon, button}` ·
+`chatInput({placeholder, dark, width})` → `{el, field, go}` · `browser({url, width, height, dark})` → `{el, body}` ·
+`pill(text, {tone: glossy|accent|red|green|dark|glass, icon, size})` · `glyph(name, {size, stroke})` (`GLYPHS` lists them). For fictional apps;
+rebuild a real product's UI from its code.
+
 ## Style presets
 
 `import { useStyle } from 'motion/styles/index.js'` → `await useStyle(kit, 'editorial', { palette, values, root })`.
