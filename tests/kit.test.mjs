@@ -73,3 +73,13 @@ test('trail samples the past in order', () => {
   assert.deepEqual(Array.from(tr, o => o.p), [8, 8.5, 9, 9.5, 10]);
   assert.equal(kit.trail(s => s, 5, { span: 1, n: 5, t0: 4.6 }).length, 2);
 });
+
+test('gait: legs alternate, driven by distance, feet planted when lifted', () => {
+  const g0 = kit.gait(0, { stride: 60, legs: 2 }), gq = kit.gait(15, { stride: 60, legs: 2 });
+  assert.equal(g0.legs.length, 2);
+  assert.ok(Math.abs(gq.legs[0].swing + gq.legs[1].swing) < 1e-9, 'two legs swing opposite');
+  const g4 = kit.gait(15, { stride: 60, legs: 4 });
+  assert.ok(Math.abs(g4.legs[0].swing - g4.legs[3].swing) < 1e-9 && Math.abs(g4.legs[0].swing + g4.legs[1].swing) < 1e-9, 'diagonal pairs');
+  assert.equal(JSON.stringify(kit.gait(37, {})), JSON.stringify(kit.gait(37, {})));
+  assert.ok(kit.gait(60, { stride: 60 }).bob > -1e-9, 'one full stride returns to rest');
+});

@@ -1,0 +1,34 @@
+/* "Sprout": a brand promo for a fictional savings app. Near-black, one green, glossy coins, soft glows. */
+#stage { --g: #4be37a; --mint: #c3ffd6; --ink: #eafff0; --red: #ff4d5e; --ground: #07110b; font-family: "Manrope", "Inter", sans-serif; color: var(--ink); }
+.ground { position: absolute; inset: 0; background: radial-gradient(900px 600px at 50% 55%, #0f2a18 0%, #07110b 60%, #040806 100%); }
+.glow { position: absolute; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; background: radial-gradient(closest-side, rgba(75,227,122,.35), rgba(75,227,122,0)); }
+.rays { position: absolute; width: 2600px; height: 2600px; margin: -1300px 0 0 -1300px; border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(195,255,214,.95) 0deg 7deg, rgba(75,227,122,.0) 7deg 22.5deg);
+  -webkit-mask: radial-gradient(closest-side, #000 18%, rgba(0,0,0,.6) 45%, transparent 75%); mask: radial-gradient(closest-side, #000 18%, rgba(0,0,0,.6) 45%, transparent 75%); }
+.line { position: absolute; left: 0; right: 0; text-align: center; font: 700 76px/1.15 "Manrope", sans-serif; letter-spacing: -0.02em; }
+.line em { font-style: normal; color: var(--g); }
+.ico { display: inline-grid; place-items: center; width: 1.05em; height: 1.05em; border-radius: 50%; vertical-align: -0.16em; margin: 0 .08em; background: linear-gradient(180deg, #7dffa3, #2fbf5d); color: #062010; box-shadow: 0 0 30px rgba(75,227,122,.5); }
+.ico.red { background: linear-gradient(180deg, #ff8a95, #ff3b50); color: #fff; box-shadow: 0 0 30px rgba(255,77,94,.5); }
+.brand { position: absolute; left: 980px; top: 410px; }
+.brand .name { font: 800 200px/1 "Manrope", sans-serif; letter-spacing: -0.04em; color: #c3ffd6; text-shadow: 0 0 60px rgba(75,227,122,.45); white-space: nowrap; }
+.brand .sub { white-space: nowrap; margin-top: 18px; font: 500 40px/1 "Manrope", sans-serif; color: #9fdcb4; }
+.orbits { position: absolute; left: 0; top: 0; overflow: visible; }
+.plabel { position: absolute; font: 600 30px/1 "Manrope", sans-serif; color: var(--ink); white-space: nowrap; display: flex; align-items: center; gap: 12px; }
+.plabel i { width: 12px; height: 12px; border-radius: 50%; background: var(--g); display: block; box-shadow: 0 0 14px var(--g); }
+.dash { width: 1500px; height: 900px; border-radius: 30px; background: #0b1710; box-shadow: 0 0 0 2px rgba(75,227,122,.7), 0 0 80px rgba(75,227,122,.35); padding: 56px; box-sizing: border-box; color: var(--ink); }
+.dash .hd { display: flex; justify-content: space-between; font: 600 30px/1 "Manrope", sans-serif; color: #9fdcb4; }
+.dash .bal { margin-top: 30px; font: 800 140px/1 "Manrope", sans-serif; letter-spacing: -0.03em; }
+.dash .bars { position: absolute; left: 56px; right: 56px; bottom: 56px; height: 360px; display: flex; align-items: flex-end; gap: 18px; }
+.dash .bars i { flex: 1; border-radius: 10px 10px 0 0; background: linear-gradient(180deg, #4be37a, rgba(75,227,122,.15)); display: block; }
+.rate { position: absolute; display: flex; align-items: center; gap: 26px; }
+.rate .old { font: 700 70px/1 "Manrope", sans-serif; color: #7fa48c; text-decoration: line-through; text-decoration-thickness: 5px; }
+.rate .new { padding: 26px 46px; border-radius: 34px; font: 800 150px/1 "Manrope", sans-serif; color: #062010; background: linear-gradient(180deg, #a6ffbf, #4be37a); box-shadow: 0 0 80px rgba(75,227,122,.6), inset 0 3px 0 rgba(255,255,255,.6); }
+.pills { position: absolute; left: 0; right: 0; top: 330px; display: flex; flex-direction: column; align-items: center; gap: 34px; }
+.pills .dv-pill { font-size: 54px; }
+.url { position: absolute; left: 50%; top: 50%; width: 1280px; height: 170px; margin: -85px 0 0 -640px; border-radius: 85px; background: #0d1f14; box-shadow: 0 0 0 3px rgba(75,227,122,.75), 0 0 90px rgba(75,227,122,.35);
+  display: flex; align-items: center; gap: 30px; padding: 0 56px; box-sizing: border-box; font: 700 82px/1 "Manrope", sans-serif; color: var(--ink); }
+.url .gl { color: var(--g); display: grid; }
+.half { position: absolute; width: 520px; height: 520px; border-radius: 50%; background: linear-gradient(180deg, #8bffad, #2fbf5d); box-shadow: inset 0 -30px 60px rgba(0,60,20,.4); }
+.endt { position: absolute; left: 0; right: 0; top: 440px; text-align: center; }
+.endt .name { font: 800 150px/1 "Manrope", sans-serif; letter-spacing: -0.04em; color: var(--ink); }
+.endt .sub { margin-top: 22px; font: 500 40px/1 "Manrope", sans-serif; color: #9fdcb4; }
