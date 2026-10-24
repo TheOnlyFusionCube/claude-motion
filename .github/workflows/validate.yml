@@ -9,12 +9,17 @@ permissions:
   contents: read
 
 jobs:
-  integrity-and-tests:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify source parity, example manifest, and tests
+      - name: Upstream integrity and unit tests
         run: npm run check
+      - name: Render check of the example film
+        run: |
+          npm i --no-save playwright
+          npx playwright install --with-deps chromium
+          node scripts/check.mjs examples/launch

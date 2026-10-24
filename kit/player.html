@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motion player</title>
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three.module.min.js",
+  "three/addons/": "./vendor/addons/",
+  "motion/": "./"
+} }
+</script>
+<link rel="stylesheet" href="kit.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #0e0f11; color: #d8dadf; font: 13px/1.3 "Inter", system-ui, sans-serif; overflow: hidden; }
+  #wrap { position: absolute; left: 0; top: 0; right: 0; bottom: 56px; display: grid; place-items: center; }
+  #frame { position: relative; box-shadow: 0 20px 60px rgba(0,0,0,.5); overflow: hidden; }
+  #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 18px; box-sizing: border-box; background: #16181b; border-top: 1px solid #23262b; user-select: none; }
+  #bar button { background: #262a30; color: #e8eaee; border: 0; border-radius: 6px; height: 30px; min-width: 38px; font: inherit; cursor: pointer; }
+  #bar button:hover { background: #30353c; }
+  #time { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; min-width: 128px; }
+  #scrub { position: relative; flex: 1; height: 30px; cursor: pointer; }
+  #track { position: absolute; left: 0; right: 0; top: 13px; height: 4px; background: #2b2f35; border-radius: 2px; }
+  #fill { position: absolute; left: 0; top: 13px; height: 4px; background: #7aa2ff; border-radius: 2px; }
+  #head { position: absolute; top: 7px; width: 2px; height: 16px; background: #fff; margin-left: -1px; }
+  .chap { position: absolute; top: 9px; width: 1px; height: 12px; background: #5b616b; }
+  .chapl { position: absolute; top: -6px; font-size: 10px; color: #8a909a; white-space: nowrap; transform: translateX(3px); }
+  #err { position: absolute; left: 16px; top: 16px; right: 16px; z-index: 99999; white-space: pre-wrap; font: 13px/1.4 "JetBrains Mono", monospace; color: #fff; background: #b4232c; padding: 12px 14px; border-radius: 8px; display: none; }
+  body.capture { background: transparent; }
+  body.capture #bar { display: none; }
+  body.capture #wrap { inset: 0; display: block; }
+  body.capture #frame { box-shadow: none; }
+</style>
+<script src="motion-kit.js"></script>
+</head>
+<body>
+<div id="wrap"><div id="frame"><div id="stage"></div></div></div>
+<div id="err"></div>
+<div id="bar">
+  <button id="play" title="Space">▶</button>
+  <span id="time">0:00.00 / 0:00.00</span>
+  <div id="scrub"><div id="track"></div><div id="fill"></div><div id="head"></div></div>
+  <button id="loop" title="L">loop</button>
+  <button id="mute" title="M">sound</button>
+</div>
+<script type="module">
+const q = new URLSearchParams(location.search);
+const capture = q.has('capture');
+if (capture) document.body.classList.add('capture');
+const errBox = document.getElementById('err');
+const errors = [];
+const fail = (msg) => { errors.push(String(msg)); console.error('[film]', msg); errBox.style.display = 'block'; errBox.textContent = errors.join('\n'); };
+window.addEventListener('error', e => fail(e.message + (e.filename ? `  (${e.filename.split('/').pop()}:${e.lineno})` : '')));
+window.addEventListener('unhandledrejection', e => fail(e.reason && (e.reason.stack || e.reason.message) || e.reason));
+
+let filmBase = q.get('film') || '../examples/launch/';
+if (!filmBase.endsWith('/')) filmBase += '/';
+const base = new URL(filmBase, location.href);
+const kit = window.kit;
+kit.base = base.href;
+kit.url = (name) => new URL(name, base).href;
+kit.assets = {
+  url: kit.url,
+  image: (name) => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('image failed: ' + name)); im.src = kit.url(name); }),
+  text: async (name) => (await fetch(kit.url(name))).text(),
+  json: async (name) => (await fetch(kit.url(name))).json(),
+};
+
+const api = window.__film = { ready: null, errors, t: 0 };
+api.ready = (async () => {
+  const mod = await import(new URL('film.js', base).href);
+  const CUT = mod.default || window.CUT;
+  if (!CUT || typeof CUT.render !== 'function') throw new Error('film.js must `export default` (or set window.CUT to) an object with render(t, kit)');
+  const W = kit.W = CUT.width || 1920, H = kit.H = CUT.height || 1080, FPS = CUT.fps || 30;
+  const duration = CUT.duration;
+  if (!(duration > 0 && duration <= 600)) throw new Error('CUT.duration must be seconds (0, 600]');
+  const stage = kit.stage = document.getElementById('stage');
+  Object.assign(stage.style, { width: W + 'px', height: H + 'px', background: CUT.background || '#ffffff' });
+  for (const href of [].concat(CUT.css || [])) {
+    await new Promise((res, rej) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = kit.url(href); l.onload = res; l.onerror = () => rej(new Error('css failed: ' + href)); document.head.append(l); });
+  }
+  // Load every bundled face that the film's CSS might use before measuring anything.
+  await document.fonts.ready;
+  const faces = ['Inter', 'Inter Tight', 'Fraunces', 'Instrument Serif', 'Space Grotesk', 'Manrope', 'Bricolage Grotesque', 'JetBrains Mono', 'DM Mono'];
+  await Promise.all(faces.flatMap(f => [`400 20px "${f}"`, `700 20px "${f}"`, `italic 400 20px "${f}"`]).map(s => document.fonts.load(s).catch(() => {})));
+  if (CUT.init) await CUT.init(kit);
+  const fx = document.createElement('canvas'); fx.width = W; fx.height = H; fx.className = 'kit-fx'; stage.append(fx);
+  kit.fx = fx.getContext('2d'); kit.fxCanvas = fx;
+  const events = [];
+  if (CUT.score) {
+    const S = makeRecorder(events);
+    try { CUT.score(S, kit); } catch (e) { fail('score(): ' + (e.stack || e.message)); }
+  }
+  const realRandom = Math.random, realNow = Date.now;
+  const render = (t) => {
+    api.t = t;
+    let r = kit.rng(Math.floor(t * 1000) + 1);
+    Math.random = r; Date.now = () => Math.round(t * 1000);
+    try { kit.fx.setTransform(1, 0, 0, 1, 0, 0); kit.fx.clearRect(0, 0, W, H); CUT.render(t, kit); }
+    catch (e) { fail('render(' + t.toFixed(3) + '): ' + (e.stack || e.message)); }
+    finally { Math.random = realRandom; Date.now = realNow; }
+  };
+  Object.assign(api, {
+    width: W, height: H, fps: FPS, duration, chapters: CUT.chapters || [], title: CUT.title || document.title,
+    seek: (t) => { render(t); },
+    // Exact seek for capture: renders, syncs clips, waits for paint.
+    seekExact: async (t) => { render(t); if (kit._videos.length) { await kit._syncVideos(t, true); render(t); } await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
+    score: () => ({ duration, events, master: events.master || {}, programs: events.programs || {}, tempo: events.tempo || null }),
+  });
+  document.title = (CUT.title || 'Film') + ' — Motion';
+  layout(); render(0);
+  if (!capture) setupUI();
+  return true;
+})().catch(e => { fail(e.stack || e.message || e); return false; });
+
+function layout() {
+  const frame = document.getElementById('frame'), W = kit.W, H = kit.H;
+  if (capture) { kit._scale = 1; frame.style.width = W + 'px'; frame.style.height = H + 'px'; return; }
+  const wrap = document.getElementById('wrap');
+  const s = Math.min((wrap.clientWidth - 40) / W, (wrap.clientHeight - 40) / H);
+  kit._scale = s;
+  frame.style.width = W * s + 'px'; frame.style.height = H * s + 'px';
+  document.getElementById('stage').style.transform = `scale(${s})`;
+}
+
+// Records score events as pure data; the synth (scripts/score.mjs) renders them to WAV.
+function makeRecorder(events) {
+  let bpm = 120, t0 = 0, seedN = 1;
+  events.programs = {}; events.master = {};
+  const B = () => 60 / bpm;
+  const when = (o = {}) => {
+    const t = o.t != null ? o.t : t0 + (o.beat || 0) * B();
+    const dur = o.dur != null ? o.dur : (o.beats != null ? o.beats * B() : null);
+    return { t, dur };
+  };
+  const push = (e) => { if (e.t < -0.1) return; if (e.t < 0) e.t = 0; events.push(e); };
+  const S = {
+    tempo(b, o = {}) { bpm = b; t0 = o.t0 || 0; events.tempo = { bpm, t0 }; },
+    beat: (n) => t0 + n * B(), toBeat: (t) => (t - t0) / B(), get spb() { return B(); },
+    seed(n) { seedN = n; events.seed = n; },
+    program(track, patch, o = {}) { events.programs[track] = { patch, ...o }; },
+    note(track, pitch, o = {}) { const w = when(o); push({ kind: 'note', track, pitch, t: w.t, dur: w.dur ?? B() * .9, vel: o.vel ?? 80 }); },
+    chord(track, pitches, o = {}) { const w = when(o); pitches.forEach((p, i) => push({ kind: 'note', track, pitch: p, t: w.t + i * (o.spread || 0), dur: w.dur ?? B() * 2, vel: o.vel ?? 64 })); },
+    pattern(track, str, o = {}) {
+      const stepB = o.step ?? .5, rep = o.repeat ?? 1, pitches = [].concat(o.pitch || ['C4']); let k = 0;
+      for (let r = 0; r < rep; r++) for (let i = 0; i < str.length; i++) {
+        const c = str[i]; if (c === '.' || c === '-' || c === ' ') continue;
+        const beat = (o.from ?? 0) + (r * str.length + i) * stepB;
+        const vel = (o.vel ?? 70) * (c === 'X' ? 1.25 : c === 'o' ? .5 : 1);
+        push({ kind: 'note', track, pitch: pitches[k++ % pitches.length], t: t0 + beat * B(), dur: o.dur ?? stepB * B() * .95, vel });
+      }
+    },
+    run(track, pitches, o = {}) { pitches.forEach((p, i) => push({ kind: 'note', track, pitch: p, t: (o.t ?? S.beat(o.beat || 0)) + i * (o.step ?? .1), dur: o.dur ?? .4, vel: (o.vel ?? 60) + i * (o.cresc ?? 0) })); },
+    drum(name, o = {}) { const w = when(o); push({ kind: 'drum', name, t: w.t, vel: o.vel ?? 90 }); },
+    drums(map, o = {}) {
+      const stepB = o.step ?? .5, rep = o.repeat ?? 1;
+      for (const [name, str] of Object.entries(map)) for (let r = 0; r < rep; r++) for (let i = 0; i < str.length; i++) {
+        const c = str[i]; if (c === '.' || c === '-' || c === ' ') continue;
+        const beat = (o.from ?? 0) + (r * str.length + i) * stepB;
+        push({ kind: 'drum', name, t: t0 + beat * B(), vel: (o.vel ?? 90) * (c === 'X' ? 1.2 : c === 'o' ? .45 : 1) });
+      }
+    },
+    fx(name, t, o = {}) { push({ kind: 'fx', name, t, ...o, vel: o.vel ?? 80 }); },
+    ticks(times, o = {}) { times.forEach((t, i) => push({ kind: 'fx', name: 'tick', t, vel: o.vel ?? 30, i })); },
+    master(o = {}) { Object.assign(events.master, o); },
+  };
+  return S;
+}
+
+function setupUI() {
+  const api = window.__film, D = api.duration;
+  const playB = document.getElementById('play'), timeEl = document.getElementById('time'), scrub = document.getElementById('scrub'), fill = document.getElementById('fill'), head = document.getElementById('head'), loopB = document.getElementById('loop'), muteB = document.getElementById('mute');
+  let t = 0, playing = false, loop = true, last = 0, muted = false;
+  const audio = new Audio(kit.url('score.wav')); let hasAudio = false;
+  audio.addEventListener('canplaythrough', () => { hasAudio = true; muteB.style.opacity = 1; }, { once: true });
+  audio.addEventListener('error', () => { muteB.style.opacity = .35; muteB.title = 'no score.wav — run scripts/score.mjs'; });
+  for (const c of api.chapters) {
+    const x = (c.t / D) * 100; const m = document.createElement('div'); m.className = 'chap'; m.style.left = x + '%'; scrub.append(m);
+    const l = document.createElement('div'); l.className = 'chapl'; l.style.left = x + '%'; l.textContent = c.label; scrub.append(l);
+  }
+  const fmt = s => `${Math.floor(s / 60)}:${(s % 60).toFixed(2).padStart(5, '0')}`;
+  const draw = () => { api.seek(t); const p = (t / D) * 100; fill.style.width = p + '%'; head.style.left = p + '%'; timeEl.textContent = `${fmt(t)} / ${fmt(D)}`; playB.textContent = playing ? '❚❚' : '▶'; loopB.style.opacity = loop ? 1 : .45; };
+  const syncAudio = () => { if (!hasAudio) return; if (playing && !muted) { if (Math.abs(audio.currentTime - t) > .08) audio.currentTime = t; if (audio.paused) audio.play().catch(() => {}); } else audio.pause(); };
+  const tick = (now) => {
+    if (playing) {
+      t += (now - last) / 1000; last = now;
+      if (t >= D) { if (loop) { t = 0; audio.currentTime = 0; } else { t = D; playing = false; } }
+      draw(); syncAudio();
+    }
+    requestAnimationFrame(tick);
+  };
+  const toggle = () => { playing = !playing; last = performance.now(); if (playing && t >= D) t = 0; syncAudio(); draw(); };
+  const seekTo = (v) => { t = Math.max(0, Math.min(D, v)); if (hasAudio) audio.currentTime = t; draw(); };
+  playB.onclick = toggle; loopB.onclick = () => { loop = !loop; draw(); }; muteB.onclick = () => { muted = !muted; muteB.textContent = muted ? 'muted' : 'sound'; syncAudio(); };
+  const scrubAt = e => { const r = scrub.getBoundingClientRect(); seekTo(((e.clientX - r.left) / r.width) * D); };
+  scrub.onpointerdown = e => { scrub.setPointerCapture(e.pointerId); scrubAt(e); scrub.onpointermove = scrubAt; };
+  scrub.onpointerup = () => { scrub.onpointermove = null; };
+  addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    else if (e.code === 'ArrowRight') seekTo(t + (e.shiftKey ? 1 : 1 / api.fps));
+    else if (e.code === 'ArrowLeft') seekTo(t - (e.shiftKey ? 1 : 1 / api.fps));
+    else if (e.code === 'Home') seekTo(0); else if (e.code === 'End') seekTo(D);
+    else if (e.code === 'KeyL') { loop = !loop; draw(); } else if (e.code === 'KeyM') muteB.onclick();
+  });
+  addEventListener('resize', () => { layout(); draw(); });
+  const t0 = parseFloat(q.get('t')); if (t0 >= 0) t = t0;
+  draw(); requestAnimationFrame(n => { last = n; tick(n); });
+  if (q.has('autoplay')) toggle();
+}
+</script>
+</body>
+</html>

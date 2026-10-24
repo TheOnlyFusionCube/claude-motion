@@ -1,0 +1,80 @@
+/* Meridian — a fictional bike-share ops tool. Palette: paper ground, ink, cobalt (bikes), vermilion (empty). */
+#stage {
+  --paper: #f3f1ec; --panel: #ffffff; --line: #e4e0d7; --ink: #161b22; --muted: #6b7280; --faint: #a3a8b0;
+  --cobalt: #3355ff; --verm: #ff5a36; --sans: "Inter", system-ui, sans-serif; --display: "Instrument Serif", Georgia, serif;
+  color: var(--ink); font-family: var(--sans);
+}
+.title { position: absolute; left: 0; top: 0; white-space: nowrap; font: 400 132px/1 var(--display); letter-spacing: -0.01em; transform-origin: 0 0; }
+.title em { font-style: italic; }
+
+/* The desk the app window floats on is the stage ground, so shapes can become windows without a seam. */
+.win { position: absolute; left: 240px; top: 90px; width: 1440px; height: 900px; background: var(--panel); border-radius: 18px;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 30px 80px -20px rgba(22,27,34,.22), 0 0 0 1px rgba(22,27,34,.06); overflow: hidden; transform-origin: 50% 60%; }
+.side { position: absolute; left: 0; top: 0; bottom: 0; width: 248px; background: #faf9f6; border-right: 1px solid var(--line); padding: 26px 18px; box-sizing: border-box; }
+.brand { display: flex; align-items: center; gap: 10px; font: 600 19px/1 var(--sans); margin: 0 6px 34px; letter-spacing: -0.01em; }
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav div { padding: 10px 12px; border-radius: 8px; font: 500 15px/1 var(--sans); color: #4b5260; }
+.nav div.on { background: #eceae4; color: var(--ink); }
+.navh { font: 600 11px/1 var(--sans); letter-spacing: .08em; color: var(--faint); margin: 26px 12px 10px; }
+.top { position: absolute; left: 248px; right: 0; top: 0; height: 68px; border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 32px; box-sizing: border-box; gap: 14px; }
+.top h3 { margin: 0; font: 600 17px/1 var(--sans); }
+.top .crumb { font: 500 15px/1 var(--sans); color: var(--muted); }
+.top .live { margin-left: auto; display: flex; align-items: center; gap: 8px; font: 500 13px/1 var(--sans); color: var(--muted); }
+.top .live i { width: 8px; height: 8px; border-radius: 50%; background: #1fae6b; display: block; }
+.av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 12px/1 var(--sans); color: #fff; }
+
+.main { position: absolute; left: 248px; right: 0; top: 68px; bottom: 0; }
+.answer { position: absolute; left: 64px; top: 40px; width: 1064px; }
+.q { font: 500 16px/1.4 var(--sans); color: var(--muted); display: flex; gap: 10px; align-items: center; }
+.q .av { width: 24px; height: 24px; font-size: 10px; }
+.reply { margin-top: 18px; font: 400 25px/1.4 var(--sans); letter-spacing: -0.01em; min-height: 36px; }
+.reply b { font-weight: 600; }
+.status { font: 500 15px/1 var(--sans); color: var(--muted); display: flex; align-items: center; gap: 10px; margin-top: 22px; }
+.status .dots i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--cobalt); margin-right: 4px; }
+
+.card { position: absolute; left: 64px; top: 196px; width: 1064px; height: 470px; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-sizing: border-box; }
+.card .hd { position: absolute; left: 28px; top: 24px; font: 600 17px/1 var(--sans); }
+.card .sub { position: absolute; left: 28px; top: 50px; font: 500 14px/1 var(--sans); color: var(--muted); }
+.card .btn { position: absolute; right: 22px; top: 20px; height: 38px; padding: 0 16px; border-radius: 9px; border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; font: 500 14px/1 var(--sans); background: #fff; }
+.legend { position: absolute; left: 28px; bottom: 22px; display: flex; gap: 22px; font: 500 13px/1 var(--sans); color: var(--muted); }
+.legend span { display: flex; align-items: center; gap: 7px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: block; }
+.chart { position: absolute; left: 28px; top: 92px; overflow: visible; }
+.chart text { font: 500 12px var(--sans); fill: var(--faint); }
+
+.composer { position: absolute; left: 64px; right: 64px; bottom: 34px; height: 74px; border: 1px solid #d9d5cb; border-radius: 16px; background: #fff;
+  box-shadow: 0 8px 24px -12px rgba(22,27,34,.18); display: flex; align-items: center; padding: 0 12px 0 26px; box-sizing: border-box; }
+.composer .ph { font: 400 24px/1 var(--sans); letter-spacing: -0.01em; flex: 1; white-space: nowrap; }
+.ask { height: 50px; padding: 0 22px; border-radius: 12px; background: var(--ink); color: #fff; font: 600 17px/1 var(--sans); display: flex; align-items: center; gap: 10px; }
+
+/* City HUD (stage space, over the WebGL canvas) */
+.hud { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; }
+.clock { position: absolute; left: 72px; top: 64px; padding: 22px 26px 20px; background: rgba(255,255,255,.92); border-radius: 16px; box-shadow: 0 10px 30px -12px rgba(22,27,34,.25); width: 270px; box-sizing: border-box; }
+.clock .k { font: 600 12px/1 var(--sans); letter-spacing: .1em; color: var(--muted); }
+.clock .v { font: 600 54px/1 var(--sans); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 10px; }
+.clock .v small { font-size: 22px; font-weight: 500; color: var(--muted); margin-left: 6px; letter-spacing: 0; }
+.clock .bar { height: 4px; background: #e9e6df; border-radius: 2px; margin-top: 16px; position: relative; overflow: hidden; }
+.clock .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 2px; }
+.empty { position: absolute; right: 72px; top: 64px; padding: 22px 26px 20px; background: rgba(255,255,255,.92); border-radius: 16px; box-shadow: 0 10px 30px -12px rgba(22,27,34,.25); width: 270px; box-sizing: border-box; }
+.empty .k { font: 600 12px/1 var(--sans); letter-spacing: .1em; color: var(--muted); }
+.empty .v { font: 600 54px/1 var(--sans); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 10px; }
+.tag { position: absolute; left: 0; top: 0; transform-origin: 0 100%; white-space: nowrap; }
+.tag .p { display: inline-flex; align-items: center; gap: 9px; padding: 10px 16px 10px 13px; background: #fff; border-radius: 999px; font: 600 25px/1 var(--sans); box-shadow: 0 8px 22px -10px rgba(22,27,34,.35); }
+.tag .p i { width: 10px; height: 10px; border-radius: 50%; display: block; background: var(--ink); }
+.tag .s { font: 500 21px/1 var(--sans); color: var(--muted); margin: 8px 0 0 14px; }
+.bubble { position: absolute; left: 0; top: 0; width: 420px; background: #fff; border-radius: 18px 18px 18px 4px; box-shadow: 0 18px 50px -14px rgba(22,27,34,.4), 0 0 0 1px rgba(22,27,34,.05); padding: 18px 20px; box-sizing: border-box; transform-origin: 0 100%; }
+.bubble .who { display: flex; align-items: center; gap: 10px; font: 600 16px/1 var(--sans); }
+.bubble .who span { font-weight: 500; color: var(--muted); }
+.bubble .txt { font: 400 26px/1.3 var(--sans); margin-top: 12px; min-height: 34px; letter-spacing: -0.01em; }
+.bubble .caret { display: inline-block; width: 2px; height: 28px; background: var(--cobalt); vertical-align: -5px; margin-left: 2px; }
+.bubble .send { position: absolute; right: 16px; bottom: 14px; width: 36px; height: 36px; border-radius: 10px; background: var(--cobalt); display: grid; place-items: center; }
+
+/* End card */
+.endc { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+.wordmark { position: absolute; left: 0; width: 1920px; top: 452px; text-align: center; font: 400 170px/1 var(--display); letter-spacing: -0.015em; }
+.tagline { position: absolute; left: 0; width: 1920px; top: 664px; text-align: center; font: 400 44px/1.2 var(--sans); color: #4b5260; letter-spacing: -0.01em; }
+.concept { position: absolute; left: 0; width: 1920px; bottom: 54px; text-align: center; font: 500 16px/1 var(--sans); color: var(--faint); letter-spacing: .02em; }
+.empty-state { position: absolute; left: 64px; right: 64px; bottom: 150px; }
+.empty-state .hi { font: 400 64px/1.1 var(--display); color: var(--ink); margin-bottom: 26px; letter-spacing: -0.01em; }
+.empty-state .sug { display: flex; gap: 10px; }
+.empty-state .sug span { padding: 11px 16px; border-radius: 999px; border: 1px solid var(--line); font: 500 15px/1 var(--sans); color: #4b5260; background: #faf9f6; }
