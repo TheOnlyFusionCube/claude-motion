@@ -40,6 +40,19 @@ node scripts/preview.mjs examples/launch                 # open the printed URL;
 node scripts/export.mjs examples/launch --out meridian.mp4
 ```
 
+## Before it builds: three questions
+
+For a new film the agent first asks **Style, Colours and Length** in one go: three looks invented for
+your film, your brand palette (found in your codebase if it can) next to two or three of its own, and
+three lengths that fit. You don't end up regretting what you didn't specify. If you'd rather it
+just decide, say "just make it".
+
+**Style presets:** six ready-made looks (`sketch`, `bubbles`, `editorial`, `bold`, `midnight`, `showcase`)
+with named palettes, animated backdrops and emphasis styles. See them all with
+`node scripts/frames.mjs examples/styles --count 12 --sheet`, and see [references/styles.md](references/styles.md).
+
+<p align="center"><img src="examples/styles/poster.jpg" alt="The six style presets" width="900"/></p>
+
 ## Install
 
 ```bash
@@ -75,6 +88,7 @@ and **FFmpeg**. 3D uses your GPU if headless Chrome can reach it, and otherwise 
 | `node scripts/frames.mjs my-film --at 0,2.5,c2,end --sheet` | exact stills plus a contact sheet |
 | `node scripts/check.mjs my-film` | determinism, first frame, frozen spans, slideshow smell, tiny text |
 | `node scripts/score.mjs my-film --levels` | render the score to `score.wav` |
+| `node scripts/palette.mjs "#ground,#main,#ink,#accent"` | check a palette's contrast before using it |
 | `node scripts/export.mjs my-film --out film.mp4` | frame-exact H.264 + AAC (`--fps 60`, `--gif`) |
 | `npm test` | kit and synth unit tests |
 
