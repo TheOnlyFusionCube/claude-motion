@@ -1,0 +1,21 @@
+/* "Lumen": an app promo. White → black store page → home screen → soft sky pills → logo. Fictional app. */
+#stage { --sky1: #cfe2ff; --sky2: #eef4ff; --ink: #111214; font-family: "Inter", system-ui, sans-serif; }
+.ground { position: absolute; inset: 0; }
+.echo { position: absolute; left: 50%; top: 50%; width: 900px; height: 900px; margin: -450px 0 0 -450px; filter: blur(26px); opacity: .1; }
+.mark-wrap { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.listing { position: absolute; left: 0; top: 0; width: 430px; height: 932px; transform-origin: 0 0; }
+.blob { position: absolute; background: #2f6bff; }
+.homewrap { position: absolute; left: 0; top: 0; width: 430px; height: 932px; transform-origin: 0 0; overflow: hidden; border-radius: 40px; }
+.tap { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; background: rgba(255,255,255,.55); }
+.whiteflood { position: absolute; inset: 0; background: linear-gradient(180deg, var(--sky1), var(--sky2)); }
+.pillwrap { position: absolute; left: 50%; top: 50%; }
+.pillwrap .dv-pill { transform: translate(-50%, -50%); font-size: 68px; padding: .5em 1.5em; min-width: 380px; justify-content: center; }
+.chip { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 34px; display: grid; place-items: center;
+  background: linear-gradient(180deg, #ffffff, #e9edf5); box-shadow: 0 18px 40px -14px rgba(30,50,110,.45), inset 0 2px 0 #fff; color: #2f6bff; }
+.endrow { position: absolute; left: 0; right: 0; top: 0; height: 1080px; display: flex; align-items: center; justify-content: center; gap: 34px; }
+.endrow .word { font: 700 150px/1 "Bricolage Grotesque", sans-serif; letter-spacing: -0.03em; color: var(--ink); }
+.endrow .tag { position: absolute; top: 660px; left: 0; right: 0; text-align: center; font: 500 38px/1 "Inter", sans-serif; color: #6b7080; }
+.dv-input { height: 130px; border-radius: 65px; padding: 0 22px 0 34px; gap: 22px; }
+.dv-input .dv-field { font-size: 46px; }
+.dv-input .dv-go { width: 86px; height: 86px; }
+.chip { width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 42px; }

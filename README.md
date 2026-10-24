@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 2.3.0" src="https://img.shields.io/badge/version-2.3.0-3355ff">
+  <img alt="version 2.5.0" src="https://img.shields.io/badge/version-2.5.0-3355ff">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-161b22">
   <img alt="Agent Skill: Codex, OpenCode, Pi" src="https://img.shields.io/badge/Agent_Skill-Codex_·_OpenCode_·_Pi-161b22">
   <img alt="Node 22+" src="https://img.shields.io/badge/node-%E2%89%A522-161b22">
@@ -36,7 +36,7 @@ looks at them, fixes what's off, scores the film, and exports a 1080p MP4.
 |---|---|
 | **Asks first** | Style, colours and length, in one go: three looks invented for your film, your brand palette (found in your codebase), three lengths that fit. No "I wish I'd said…" |
 | **Directs** | A beat sheet with one world, one spine, a verb in every shot and a transition that carries the eye, checked against a built-in *slideshow test* |
-| **Builds** | A deterministic DOM + Three.js stage: camera with drift and log-zoom, arcing cursor, typing, streamed answers, word-by-word type, hand-drawn marks, springs, 3D clay worlds |
+| **Builds** | A deterministic DOM + Three.js stage: camera with drift and log-zoom, CSS 3D space, arcing cursor, typing, word-by-word type, type walls, hand-drawn marks, springs, squash and stretch, morphs, extruded type, box characters, chrome/glass/particles, device UI, real motion blur |
 | **Looks** | Exact stills and contact sheets the agent must read, plus a checker for frozen spans, non-determinism, blank first frames and phone-unreadable text |
 | **Scores** | An offline synth (marimba, EP, pads, kit, UI foley) timed to the same beats as the picture, loudness-normalised |
 | **Ships** | Frame-exact H.264 + AAC from parallel headless browsers, with half-size drafts for checking timing |
@@ -100,6 +100,31 @@ a camera that goes from finger scale to map scale and back, and almost no words 
 
 <p align="center"><img src="examples/journey/poster.jpg" alt="Delivered: a message typed, split into words, carried across an ocean, reassembled" width="900"/></p>
 
+## Motion-design reels
+
+Sizzles and showreels where every move turns into the next. `examples/reel/` has 3D letters flying in,
+and the O becomes a ball that bounces with squash and stretch. The camera pulls back to reveal an editor,
+the ball becomes a toggle whose click floods the frame, whip pans cross a grid, and a counter rolls to
+the end. All of it uses real motion blur.
+
+<p align="center"><img src="examples/reel/poster.jpg" alt="Everything moves: extruded letters, a bouncing ball, an editor, a toggle, a blurred whip pan, a rolling counter" width="900"/></p>
+
+## Every genre
+
+Each genre has a reference film with its beat sheet, and the agent picks the closest one for your brief.
+
+| | |
+|:---:|:---:|
+| <img src="examples/poster/poster.jpg" width="440" alt="Kinetic poster: type walls, chrome knot, particles forming a word, a block field"/><br/>**Kinetic poster**: type walls, chrome 3D, particles that form words (`examples/poster`) | <img src="examples/tabletop/poster.jpg" width="440" alt="Tabletop: a box character walks across a desk of UI plates"/><br/>**3D tabletop**: real UI on a desk in CSS 3D, a walking character (`examples/tabletop`) |
+| <img src="examples/app-promo/poster.jpg" width="440" alt="App promo: icon, store page, prompt field, home screen, glossy pills"/><br/>**App promo**: icon → store page → prompt → home screen → pills (`examples/app-promo`) | <img src="examples/brand-promo/poster.jpg" width="440" alt="Brand promo: glossy coins, rays, dashboard, claims pills"/><br/>**Brand promo**: glossy coins, rays, tilted dashboard, ✕/✓ claims (`examples/brand-promo`) |
+
+Underneath them:
+- **CSS 3D space** (`kit.space`): crisp DOM on planes under a perspective camera.
+- **Box characters** with a walk cycle.
+- **`three-kit.js`:** chrome, glass, coins, stars, knots, particles, instanced fields.
+- **`ui/devices.js`:** phone, app icons, home screen, store page, input, browser, pills, glyphs.
+- **Scrolling type walls** and icons inside animated sentences.
+
 ## Style presets
 
 Six ready-made looks with named palettes, animated backdrops and their own emphasis animation. They share
@@ -134,18 +159,23 @@ look for your film.
 | `node scripts/review.mjs film.mp4 --sheet sheet.jpg` | review **any** video (from any tool or model): sound, loudness, frozen time, animated-deck signals |
 | `node scripts/palette.mjs "#ground,#main,#ink,#accent"` | contrast-check a palette before using it |
 | `node scripts/score.mjs my-film --levels` | render the score to `score.wav` |
-| `node scripts/export.mjs my-film [--draft] [--fps 60] [--gif x.gif]` | frame-exact MP4 with the score (`--draft`: half size, fast) |
+| `node scripts/export.mjs my-film [--draft] [--fps 60] [--gif x.gif]` | frame-exact MP4 with the score and motion blur (`--draft`: half size, fast, no blur) |
 | `npm test` | runtime, synth and in-browser render tests |
 
 ## What's inside
 
 ```text
 SKILL.md                 the method: questions → beat sheet → build → look & fix → sound → export
-kit/                     motion-kit.js (runtime) · player.html · styles/ (presets) · fonts/ (10 OFL families) · vendor/ (Three.js)
+kit/                     motion-kit.js (runtime) · three-kit.js (3D) · ui/devices.js · player.html · styles/ (presets) · fonts/ · vendor/ (Three.js)
 scripts/                 doctor · new · preview · frames · check · review · palette · score · export
 templates/               starter (the grammar) · preset (a film on a style preset)
 examples/launch/         34 s launch film: app → chart → 3D city → comment → replay → end card
 examples/journey/        22 s abstract story: one message from phone to ocean to phone
+examples/reel/           13 s motion-design reel: extruded type, squash & stretch, morphs, whips, motion blur
+examples/poster/         12.5 s kinetic poster: type walls, chrome knot, particles → word, block field
+examples/tabletop/       11 s 3D tabletop: UI plates on a desk, a walking box character, depth of field
+examples/app-promo/      12.6 s app promo: icon → store page → prompt → home screen → glossy pills
+examples/brand-promo/    14 s brand promo: 3D coins, rays, icons in sentences, tilted dashboard, claims
 examples/styles/         one scene per preset
 references/              intake · styles · kit-api · recipes · upstream/ (the original Motion docs, verbatim)
 ```

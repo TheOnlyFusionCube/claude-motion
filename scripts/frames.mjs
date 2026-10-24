@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 // Render stills of a film exactly as the export sees them, plus an optional contact sheet.
 //   node scripts/frames.mjs <film-dir> [--at 0,2.5,c2,c3+0.5,50%,end] [--every 1] [--count 12]
-//                                      [--out dir] [--sheet] [--scale 1] [--cols 4]
+//                                      [--out dir] [--sheet] [--scale 1] [--cols 4] [--blur n | --no-blur]
+// Stills include the film's motion blur (if it declares `motionBlur`), as the export will.
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { args, launch, openFilm, parseTimes, snap } from './lib/browser.mjs';
+import { args, launch, openFilm, parseTimes, snapFrame, blurSetting, makeBlender } from './lib/browser.mjs';
 import { contactSheet } from './lib/sheet.mjs';
 
 const a = args();
@@ -22,8 +23,10 @@ try {
   const out = a.out || fs.mkdtempSync(path.join(os.tmpdir(), 'frames-'));
   fs.mkdirSync(out, { recursive: true });
   const shots = [];
+  const mb = blurSetting(info, a['no-blur'] ? false : a.blur), blender = mb ? await makeBlender(browser) : null;
+  if (mb) console.log(`motion blur: ${mb.samples} samples, shutter ${mb.shutter}`);
   for (const t of times) {
-    const buf = await snap(page, t);
+    const buf = await snapFrame(page, t, info, mb, blender);
     const name = `t_${t.toFixed(3).padStart(7, '0')}.png`;
     fs.writeFileSync(path.join(out, name), buf);
     shots.push({ buf, label: `${t.toFixed(2)}s`, w: info.width, h: info.height });
