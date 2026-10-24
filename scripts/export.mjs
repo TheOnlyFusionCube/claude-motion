@@ -52,6 +52,7 @@ try {
     const wav = path.join(filmDir, 'score.wav');
     const r = await renderFilmScore(filmDir, wav, { browser, quiet: true });
     if (r && r.events > 0) audio = wav;
+    else console.warn('\n  ⚠ SILENT EXPORT: this film has no score(S, kit). Sound is half the film; add one unless silence was asked for.\n');
   }
   const ff = ['-y', '-loglevel', 'error', '-framerate', String(fps), '-i', path.join(tmp, 'f%06d.jpg')];
   if (audio) ff.push('-ss', String(from), '-t', String(to - from), '-i', audio);

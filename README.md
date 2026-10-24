@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 2.2.0" src="https://img.shields.io/badge/version-2.2.0-3355ff">
+  <img alt="version 2.3.0" src="https://img.shields.io/badge/version-2.3.0-3355ff">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-161b22">
   <img alt="Agent Skill: Codex, OpenCode, Pi" src="https://img.shields.io/badge/Agent_Skill-Codex_·_OpenCode_·_Pi-161b22">
   <img alt="Node 22+" src="https://img.shields.io/badge/node-%E2%89%A522-161b22">
@@ -93,6 +93,13 @@ A film is one folder with a `film.js`: `init` builds the stage once, and `render
 as a pure function of time. Any frame renders the same in any order, so scrubbing, stills, checks and
 parallel export all agree. The API mirrors the original Motion `kit`, so its craft rules apply directly.
 
+## Abstract stories, too
+
+Ideas don't need slides. `examples/journey/` tells how a message crosses the world with one subject,
+a camera that goes from finger scale to map scale and back, and almost no words on screen.
+
+<p align="center"><img src="examples/journey/poster.jpg" alt="Delivered: a message typed, split into words, carried across an ocean, reassembled" width="900"/></p>
+
 ## Style presets
 
 Six ready-made looks with named palettes, animated backdrops and their own emphasis animation. They share
@@ -123,7 +130,8 @@ look for your film.
 | `node scripts/new.mjs my-film [--style editorial]` | scaffold a film (optionally on a preset); `--portrait`, `--square` |
 | `node scripts/preview.mjs my-film` | player: scrub, space, ←/→ frame step, L loop, M mute |
 | `node scripts/frames.mjs my-film --at 0,2.5,c2,end --sheet` | exact stills plus a labelled contact sheet |
-| `node scripts/check.mjs my-film` | determinism, first frame, frozen spans, slideshow share, tiny text |
+| `node scripts/check.mjs my-film` | determinism, first frame, frozen spans, animated-deck signals, tiny text |
+| `node scripts/review.mjs film.mp4 --sheet sheet.jpg` | review **any** video (from any tool or model): sound, loudness, frozen time, animated-deck signals |
 | `node scripts/palette.mjs "#ground,#main,#ink,#accent"` | contrast-check a palette before using it |
 | `node scripts/score.mjs my-film --levels` | render the score to `score.wav` |
 | `node scripts/export.mjs my-film [--draft] [--fps 60] [--gif x.gif]` | frame-exact MP4 with the score (`--draft`: half size, fast) |
@@ -134,9 +142,10 @@ look for your film.
 ```text
 SKILL.md                 the method: questions → beat sheet → build → look & fix → sound → export
 kit/                     motion-kit.js (runtime) · player.html · styles/ (presets) · fonts/ (10 OFL families) · vendor/ (Three.js)
-scripts/                 doctor · new · preview · frames · check · palette · score · export
+scripts/                 doctor · new · preview · frames · check · review · palette · score · export
 templates/               starter (the grammar) · preset (a film on a style preset)
 examples/launch/         34 s launch film: app → chart → 3D city → comment → replay → end card
+examples/journey/        22 s abstract story: one message from phone to ocean to phone
 examples/styles/         one scene per preset
 references/              intake · styles · kit-api · recipes · upstream/ (the original Motion docs, verbatim)
 ```

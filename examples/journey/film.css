@@ -1,0 +1,31 @@
+/* Night map. Amber = the message. */
+#stage { --night: #0b1422; --land: #121d30; --coast: #22324c; --dot: #263753; --amber: #ffb547; --ink: #121821; --paper: #f4f1ea; --muted: #8a96aa;
+  font-family: "Inter", system-ui, sans-serif; color: var(--paper); }
+
+.phone { position: absolute; width: 520px; height: 1060px; border-radius: 74px; background: #05080f; box-shadow: 0 0 0 3px #2b3954, 0 60px 120px -40px rgba(0,0,0,.8); }
+.phone .screen { position: absolute; inset: 16px; border-radius: 60px; background: var(--paper); overflow: hidden; color: var(--ink); }
+.phone .island { position: absolute; left: 50%; top: 22px; width: 130px; height: 36px; margin-left: -65px; border-radius: 20px; background: #05080f; }
+.phone .bar { position: absolute; left: 0; right: 0; top: 0; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; padding-bottom: 18px; border-bottom: 1px solid #e3ddd1; box-sizing: border-box; }
+.phone .av { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font: 600 28px/1 "Inter", sans-serif; color: #fff; }
+.phone .nm { font: 600 24px/1 "Inter", sans-serif; }
+.phone .msgs { position: absolute; left: 26px; right: 26px; bottom: 120px; display: flex; flex-direction: column; gap: 14px; }
+.phone .b { max-width: 78%; padding: 16px 22px; border-radius: 30px; font: 500 30px/1.25 "Inter", sans-serif; letter-spacing: -0.01em; white-space: nowrap; }
+.phone .b.in { align-self: flex-start; background: #ffffff; box-shadow: 0 1px 0 #e3ddd1; border-bottom-left-radius: 8px; }
+.phone .b.out { align-self: flex-end; background: var(--amber); border-bottom-right-radius: 8px; }
+.phone .composer { position: absolute; left: 22px; right: 22px; bottom: 30px; height: 70px; border-radius: 36px; background: #fff; box-shadow: 0 0 0 1.5px #e0d9cc; display: flex; align-items: center; padding: 0 10px 0 28px; box-sizing: border-box; gap: 4px; }
+.phone .field { font: 400 30px/1 "Inter", sans-serif; letter-spacing: -0.01em; white-space: pre; }
+.phone .caret { display: inline-block; width: 3px; height: 34px; background: #e08a00; }
+.phone .send { margin-left: auto; width: 52px; height: 52px; border-radius: 50%; background: #d9d3c7; display: grid; place-items: center; }
+.phone .send.on { background: var(--ink); }
+.phone .tap { position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 4px solid rgba(18,24,33,.55); pointer-events: none; }
+
+.tile { position: absolute; left: 0; top: 0; padding: 0 16px; height: 60px; line-height: 60px; border-radius: 16px; background: var(--amber); color: var(--ink); font: 500 30px/60px "Inter", sans-serif; letter-spacing: -0.01em; white-space: nowrap; transform-origin: 50% 50%; box-shadow: 0 0 0 0 rgba(255,181,71,0); }
+
+.ms { position: absolute; left: 80px; bottom: 70px; }
+.ms span { display: inline-block; padding: 12px 22px; border-radius: 999px; background: rgba(11,20,34,.75); box-shadow: 0 0 0 1px #2b3954; font: 500 30px/1 "JetBrains Mono", monospace; color: var(--paper); font-variant-numeric: tabular-nums; }
+
+.endc { position: absolute; inset: 0; }
+.endc .words { position: absolute; left: 0; right: 0; top: 400px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.endc .w1 { font: 400 170px/1 "Instrument Serif", Georgia, serif; letter-spacing: -0.01em; color: var(--paper); }
+.endc .w2 { font: 400 40px/1.2 "Inter", sans-serif; color: var(--muted); }
+.endc .concept { position: absolute; left: 0; right: 0; bottom: 50px; text-align: center; font: 500 20px/1 "Inter", sans-serif; color: #6c7990; letter-spacing: .02em; }

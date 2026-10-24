@@ -1,6 +1,6 @@
 {
   "name": "claude-motion",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "description": "Launch-quality motion films in code for coding agents: deterministic DOM + Three.js film runtime, direction method, render/score/export tools",
   "type": "module",

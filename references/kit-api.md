@@ -173,6 +173,7 @@ Unknown names are silent and reported by `score.mjs`. `--levels` prints RMS per 
 | `node scripts/new.mjs <dir> [--portrait\|--square] [--style <preset> [--palette <id>]]` | scaffold from `templates/starter` (or `templates/preset`) |
 | `node scripts/preview.mjs <dir>` | serve the player (scrub, space, ←/→, L, M) |
 | `node scripts/frames.mjs <dir> --at 0,2.5,c2+0.5,50%,end --sheet` | exact stills + contact sheet (also `--every 1`, `--count 16`) |
+| `node scripts/review.mjs <film.mp4 \| dir> [--sheet x.jpg]` | review any video: sound and loudness, frozen time, animated-deck signals, contact sheet |
 | `node scripts/check.mjs <dir>` | errors, determinism, blank first frame, frozen spans, slideshow smell, tiny text |
 | `node scripts/score.mjs <dir> [--levels]` | render `score.wav` |
 | `node scripts/palette.mjs "#g,#m,#i,#a" …` | check palettes (ink ≥ 4.5:1 on ground, no mid-tone grounds) |
