@@ -166,7 +166,7 @@ export default {
     tags.harbor.querySelector('i').style.background = C.verm;
     bubble = kit.h(`<div class="bubble"><div class="who"><div class="av" style="background:#8a6cf0;width:28px;height:28px;font-size:11px">AK</div>Aiko <span>· now</span></div><div class="txt"><span></span><i class="caret"></i></div><div class="send">${ARROW}</div></div>`);
     hud.append(bubble); bubbleTxt = bubble.querySelector('.txt span');
-    pinEl = kit.h(`<div style="position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#8a6cf0;border:4px solid #fff;box-sizing:border-box;box-shadow:0 6px 16px -4px rgba(22,27,34,.45);color:#fff;font:600 13px/36px var(--sans);text-align:center">AK</div>`);
+    pinEl = kit.h(`<div style="display:none;position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#8a6cf0;border:4px solid #fff;box-sizing:border-box;box-shadow:0 6px 16px -4px rgba(22,27,34,.45);color:#fff;font:600 13px/36px var(--sans);text-align:center">AK</div>`);
     typed = kit.typist(COMMENT, TT.type, 21, 4);
     TT.send = typed.end + 0.4;
 
@@ -292,7 +292,7 @@ export default {
       pinEl.style.background = leave > 0.5 ? kit.mixColor('#8a6cf0', C.cobalt, seg(leave, .5, 1)) : '#8a6cf0';
       pinEl.style.color = leave > 0.4 ? 'transparent' : '#fff';
       curB.render(t);
-    } else curB.el.style.display = 'none';
+    } else { curB.el.style.display = 'none'; pinEl.style.display = 'none'; }
 
     // ── End card (paper rises over the city; the pin becomes the mark's dot)
     const e = eio(seg(t, TT.rise + 0.6, TT.logo + 0.1));
@@ -338,9 +338,9 @@ export default {
     // groove A: from Ask to the whip
     const a0 = bar(TT.ask), a1 = bar(TT.whip);
     const progA = [['D3', 'A3', 'C#4', 'F#4'], ['B2', 'F#3', 'A3', 'D4'], ['G2', 'D3', 'F#3', 'B3'], ['A2', 'E3', 'G3', 'C#4']];
-    for (let b = a0, i = 0; b + 4 <= a1 + 0.01; b += 4, i++) {
+    for (let b = a0, i = 0; b < a1 - 0.5; b += 4, i++) {      // last bar may be partial: it runs right up to the whip
       const ch = progA[i % 4];
-      S.chord('keys', ch.slice(1), { beat: b, beats: 3.6, vel: 58 });
+      S.chord('keys', ch.slice(1), { beat: b, beats: Math.min(3.6, a1 - b), vel: 58 });
       S.note('bass', ch[0].replace(/\d/, m => +m - 1), { beat: b, beats: 1.4, vel: 82 }); S.note('bass', ch[0].replace(/\d/, m => +m - 1), { beat: b + 2.5, beats: .9, vel: 66 });
       S.pattern('mal', 'x.xx.x.x', { from: b, repeat: 1, pitch: [ch[3].replace(/\d/, m => +m + 1), ch[2].replace(/\d/, m => +m + 1), ch[1].replace(/\d/, m => +m + 2)], vel: 60 });
       if (b >= bar(TT.chart)) S.drums({ kick: 'x...x...', sidestick: '..x...x.', shaker: 'oxoxoxox' }, { from: b, vel: 78 });

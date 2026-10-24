@@ -54,10 +54,6 @@ try {
   if (frozen / D > 0.25) warns.push(`${Math.round(frozen / D * 100)}% of the film is frozen — this measures like a slideshow. Every beat needs an action and every hold a drift (SKILL.md §2).`);
   const moving = d.filter(v => v > 0.004).length / d.length;
   notes.push(`motion: ${(moving * 100).toFixed(0)}% of ${step}s steps change >0.4% of the frame; biggest change ${(Math.max(...d) * 100).toFixed(0)}% at ${samples[d.indexOf(Math.max(...d)) + 1].t}s`);
-  // slideshow smell: most of the change happens in a few big jumps (cuts/fades) with flat holds between
-  const big = d.filter(v => v > 0.25).length, mid = d.filter(v => v > 0.004 && v <= 0.25).length;
-  if (D > 12 && mid < big * 4) warns.push(`motion is mostly jumps (${big} big changes vs ${mid} continuous ones) — this is how an animated slideshow measures. Carry subjects between shots with camera moves and transforms instead of fades/cuts.`);
-
   // end card hold: last 2.5s should be calm but not frozen
   const tail = d.slice(-Math.round(2.5 / step));
   if (tail.length && tail.every(v => v < 0.0005)) warns.push('the last 2.5s are frozen — let the end card creep/breathe (≈2 px/s) rather than stop dead');

@@ -104,9 +104,11 @@
   // Geometry: stage rect of a node, and the same in the camera's un-zoomed scene space.
   kit.srect = node => { const s = kit.stage.getBoundingClientRect(), r = node.getBoundingClientRect(), k = kit._scale || 1; return { x: (r.left - s.left) / k, y: (r.top - s.top) / k, w: r.width / k, h: r.height / k }; };
   kit.camrect = (node, cam) => { const r = kit.srect(node); const st = cam ? cam.state : { cx: kit.W / 2, cy: kit.H / 2, z: 1, r: 0 }; const z = st.z; return { x: (r.x - kit.W / 2) / z + st.cx, y: (r.y - kit.H / 2) / z + st.cy, w: r.w / z, h: r.h / z }; };
-  kit.center = (node, dx = 0, dy = 0) => { let c; return () => { if (!c) { const r = kit.srect(node); c = [r.x + r.w / 2, r.y + r.h / 2]; } return [c[0] + dx, c[1] + dy]; }; };
-  // Layout-space offset of a node relative to an ancestor (ignores transforms — measure once in init).
-  kit.offset = (node, ancestor) => { let x = 0, y = 0, n = node; while (n && n !== ancestor) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; } return { x, y, w: node.offsetWidth, h: node.offsetHeight }; };
+  // Layout-space box of a node relative to an ancestor (default: the stage). Ignores transforms, so for
+  // anything inside a camera layer this IS its scene position, whatever the camera is doing.
+  kit.offset = (node, ancestor) => { ancestor = ancestor || kit.stage; let x = 0, y = 0, n = node; while (n && n !== ancestor && n !== document.body) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; } return { x, y, w: node.offsetWidth, h: node.offsetHeight }; };
+  // Centre of a node in layout/scene space → a () => [x, y] for cursor keys. Pure: never depends on camera state.
+  kit.center = (node, dx = 0, dy = 0) => { let c; return () => { if (!c) { const r = kit.offset(node); c = [r.x + r.w / 2, r.y + r.h / 2]; } return [c[0] + dx, c[1] + dy]; }; };
 
   // ───────────────────────── Camera ─────────────────────────
   // keys: [{t, cx, cy, z, r?, ease?, cut?, from?, hold?, drift?:[dx/s, dy/s, dlogz/s]}]
@@ -292,7 +294,7 @@
   const HAND = '<svg width="34" height="38" viewBox="0 0 34 38" style="overflow:visible;transform:translate(-9px,-1px);filter:drop-shadow(0 3px 5px rgba(0,0,0,.28))"><path d="M9 4 Q9 1.5 11.5 1.5 Q14 1.5 14 4 V16 L14 13 Q14 10.5 16.5 10.5 Q19 10.5 19 13 V16 Q19 13.5 21.5 13.5 Q24 13.5 24 16 V18 Q24 15.5 26.5 15.5 Q29 15.5 29 18 V27 Q29 36 20 36 H16 Q11 36 8 31 L3 22 Q1.6 19.4 4 18 Q6.4 16.8 8 19 L9 21 Z" fill="#fff" stroke="#111" stroke-width="2.2" stroke-linejoin="round"/></svg>';
   kit.cursors = { arrow: ARROW, text: IBEAM, hand: HAND, pointer: HAND };
   kit.cursor = ({ cam = null, size = 1, parent, ring = '#1d1f22' } = {}) => {
-    const el = kit.el('div', { class: 'kit-cursor' }); const gfx = kit.el('div', { class: 'kit-cursor-gfx', html: ARROW }); const rg = kit.el('div', { class: 'kit-ring', style: `color:${ring}` });
+    const el = kit.el('div', { class: 'kit-cursor', style: 'display:none' }); const gfx = kit.el('div', { class: 'kit-cursor-gfx', html: ARROW }); const rg = kit.el('div', { class: 'kit-ring', style: `color:${ring}` });
     el.append(rg, gfx); (parent || kit.stage).append(el);
     const cur = { el, gfx, ringEl: rg, cam, size, keys: [], clicks: [], holds: [], shapes: [], visible: () => 1, _shape: ARROW,
       pos(t) {

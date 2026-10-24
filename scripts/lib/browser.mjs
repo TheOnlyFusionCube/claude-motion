@@ -86,7 +86,7 @@ export async function openFilm(browser, filmDir, { scale = 1, logs = [] } = {}) 
     route.fulfill({ status: 200, body: fs.readFileSync(file), headers: { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream' } });
   });
   await page.route(/^(?!http:\/\/motion\.local\/|data:|blob:|about:)/, route => { logs.push(`blocked network request: ${route.request().url()}`); route.abort(); });
-  page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') logs.push(`${m.type()}: ${m.text()}`); });
+  page.on('console', m => { if ((m.type() === 'error' || m.type() === 'warning') && !/GL Driver Message|GPU stall/.test(m.text())) logs.push(`${m.type()}: ${m.text()}`); });
   page.on('pageerror', e => logs.push(`pageerror: ${e.message}`));
   await page.goto('http://motion.local/kit/player.html?film=/film/&capture=1');
   const ok = await page.evaluate(() => window.__film.ready);

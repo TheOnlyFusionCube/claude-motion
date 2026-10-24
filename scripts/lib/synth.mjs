@@ -199,12 +199,21 @@ export function synthesize(score, { sampleRate = SR } = {}) {
     L[i] = (L[i] + wl[i] * 0.9) * g * Math.max(0, f); R[i] = (R[i] + wr[i] * 0.9) * g * Math.max(0, f);
     peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]));
   }
-  // Gentle soft clip above -3 dBFS, then make sure nothing exceeds -1 dBFS.
-  const knee = 0.7, sc = x => (Math.abs(x) < knee ? x : Math.sign(x) * (knee + (1 - knee) * Math.tanh((Math.abs(x) - knee) / (1 - knee))));
-  let peak2 = 0;
-  for (let i = 0; i < n; i++) { L[i] = sc(L[i]); R[i] = sc(R[i]); peak2 = Math.max(peak2, Math.abs(L[i]), Math.abs(R[i])); }
-  const lim = peak2 > 0.89 ? 0.89 / peak2 : 1;
-  if (lim !== 1) for (let i = 0; i < n; i++) { L[i] *= lim; R[i] *= lim; }
+  // Loudness: bring the gated RMS to a target (≈ −16 LUFS for web video), then a look-ahead peak limiter at −1 dBFS.
+  const target = master.loudness ?? -16;
+  if (target !== false) {
+    const blk = SR * 0.4; let sum = 0, cnt = 0;
+    for (let b0 = 0; b0 < n; b0 += blk) { let e = 0; const b1 = Math.min(n, b0 + blk); for (let i = b0; i < b1; i++) e += L[i] * L[i] + R[i] * R[i]; e /= 2 * (b1 - b0); if (e > 1e-6) { sum += e; cnt++; } }
+    if (cnt) { const rms = 10 * Math.log10(sum / cnt), gain = 10 ** ((target - 2.5 - rms) / 20); for (let i = 0; i < n; i++) { L[i] *= gain; R[i] *= gain; } }
+  }
+  const ceil = 0.89, look = Math.round(SR * 0.002), rel = Math.exp(-1 / (SR * 0.08));
+  const peakAt = new Float32Array(n); for (let i = 0; i < n; i++) peakAt[i] = Math.max(Math.abs(L[i]), Math.abs(R[i]));
+  // running max over the look-ahead window (monotonic deque)
+  const need = new Float32Array(n), dq = new Int32Array(n); let h = 0, tl = 0;
+  for (let i = n - 1; i >= 0; i--) { while (tl > h && peakAt[dq[tl - 1]] <= peakAt[i]) tl--; dq[tl++] = i; while (dq[h] > i + look) h++; need[i] = peakAt[dq[h]]; }
+  let lg = 1, peak2 = 0;
+  for (let i = 0; i < n; i++) { const want = need[i] > ceil ? ceil / need[i] : 1; lg = want < lg ? want : want + (lg - want) * rel; L[i] *= lg; R[i] *= lg; peak2 = Math.max(peak2, Math.abs(L[i]), Math.abs(R[i])); }
+  const lim = 1;
   return { L, R, sampleRate: SR, unknown, peak: peak2 * lim };
 }
 

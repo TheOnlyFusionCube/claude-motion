@@ -11,7 +11,7 @@
   shapes, clips and optional scenes. Three.js 0.180 and addons are bundled behind an import map, along
   with nine OFL font families. The player has scrubbing, frame stepping, chapters and score playback.
 - `scripts/`: `new` (scaffold), `preview`, `frames` (exact stills + contact sheet), `check`
-  (determinism, blank first frame, frozen spans, slideshow-shaped motion, tiny text), `score` (offline
+  (determinism, blank first frame, frozen spans, frozen share of the film, tiny text), `score` (offline
   synth: 8 patches, 13 drums, 13 foley, reverb, limiter) and `export` (parallel frame-exact MP4 + AAC, GIF).
 - `examples/launch/`: a 34 s launch film (app UI → chart → push-through into a 3D city → comment →
   replay → end card) with a beat sheet and score.

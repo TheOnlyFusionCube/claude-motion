@@ -99,6 +99,9 @@ showing the grammar), or start from a copy of the example. Then:
 - **`init` builds and measures once; `render` only sets.** Everything from `t`: no
   `requestAnimationFrame`, timers, CSS transitions/animations, accumulated state or `Math.random`
   (use `kit.rng(seed)`). `render(t)` must give the same picture whatever order it's called in.
+- **`render` sets every element, every frame, including hiding what isn't in this beat.** An element
+  you only touch inside an `if (inThisBeat)` keeps whatever state the last visited beat left it in,
+  so a scrub or a parallel export shows stray things. `check.mjs` catches this as non-determinism.
 - **Frame 0 is the thumbnail**: the title is already readable (`TT.title = -0.6`).
 - **Every hold moves**: camera drift on every key, breathing shapes, title creep. Calm, but
   never frozen.
@@ -129,7 +132,7 @@ Open the contact sheet and the full-size stills you're unsure of, and actually l
 - Would a designer ship this frame?
 
 `check.mjs` flags errors (non-deterministic frames, a blank first frame, console errors) and
-warnings (frozen spans, jump-dominated motion, tiny text). It can't judge taste. Fix, re-render
+warnings (frozen spans, a film that is mostly frozen, tiny text). It can't judge taste. Fix, re-render
 the stills you changed, and look again. **Do at least two look-fix passes before exporting.** The first
 render always has problems.
 
@@ -147,7 +150,8 @@ below about −30 dB.
 ### 6. Export and check the file
 
 `node <skill>/scripts/export.mjs <film-dir> --out <film-dir>/film.mp4` (renders the score, encodes
-H.264 + AAC; `--fps 60` for the smoothest UI, `--gif` too if asked). Then pull a few stills from the MP4
+H.264 + AAC; `--fps 60` for the smoothest UI, `--gif` too if asked). DOM frames take ~0.05 s each; 3D frames
+~1–2 s each without a GPU, so a 34 s film with 18 s of 3D takes about 15 minutes. Run it in the background. Then pull a few stills from the MP4
 itself (`ffmpeg -ss 12 -i film.mp4 -frames:v 1 x.png`) and look. Report truthfully: what you made, its
 length and size, the look you chose, and anything you couldn't do.
 
