@@ -24,11 +24,40 @@ It can have perfect type and still fail. This skill exists to prevent that.
 
 1. `references/upstream/motion.md`: the original craft rules and the numbers that review taught.
    Read all of it. Skip what's specific to its private player (Artifact, `kit.module`, check.ts).
-2. `examples/launch/film.js` + `film.css`: a complete 34 s launch film (title → app → question →
-   chart → push into a 3D city → comment → replay with the fix → end card, with score). It's the
-   reference for structure and finish. **Copy its techniques, never its look, story or words.**
+2. **The two reference films.** Copy their techniques, never their look, story or words.
+   - `examples/launch/`: a 34 s product launch (title → app → question → chart → push into a 3D city →
+     comment → replay with the fix → end card, with score).
+   - `examples/journey/`: a 22 s **abstract story** (how a message crosses the world) told with one
+     physical subject, a camera that goes from finger scale to map scale and back, and almost no words.
+     Read it for any brief that's an idea rather than a product.
+   Each has a `BEATS.md`: read the sheet, then the code.
 3. `references/intake.md` (the opening questions), `references/recipes.md` (the specific moves you'll use),
    `references/kit-api.md` (the API) and, if a preset is picked, `references/styles.md`.
+
+## The deck trap
+
+Strong models rarely make frozen slideshows any more. They make **animated decks**: every beat is a
+label ("02 / CONTEXT"), a headline in the same place, and a diagram or card centred on an empty
+ground. Something small moves inside it, then it dissolves into the next one. Each frame looks
+designed, but the whole reads as a presentation. The signals:
+
+- **The same composition beat after beat**: headline top-left or top-centre, a centred block below,
+  60% of the frame empty.
+- **Headlines that explain** what the picture should be showing ("Every word shifts the rest.").
+- **Frame furniture**: header bars, chapter numbers ("03 / 07"), timecodes, progress bars, footers and
+  disclaimers on every frame. A concept label belongs once, on the end card.
+- **A camera that never changes scale**: everything stays at 1×, and motion stays local to one widget.
+- **Cross-dissolves, iris wipes and "next card" transitions** between ideas.
+- **A silent export.**
+
+The fix is the method above, not more animation: **one world** the camera travels through, **one
+subject** that carries from beat to beat, **framing that changes** (wide, working, close-up, full-bleed),
+**words that arrive and leave** instead of a headline per beat, and transitions made by the subject
+moving. `scripts/review.mjs` measures the deck signals on any MP4, so use it on your own export.
+
+For an abstract story (an idea, a process, "what it's like to be…"), the same rules apply. Turn the
+idea into one physical subject in one world, the way `examples/journey/` turns a message into an
+object that travels. Then let the camera follow it. Don't turn each idea into a titled panel.
 
 ## Workflow
 
@@ -73,11 +102,12 @@ Whatever look you end up with:
 
 This is where films are won. Write it as a table and keep it in `BEATS.md` beside the film:
 
-| t | subject | action (a verb that changes it) | camera | carries into next by | sound |
-|---|---|---|---|---|---|
-| 0–2.4 | the question | words rise, creep | still, wide | the line shrinks into the app's field | pad, one mallet note |
-| 2.4–5 | composer | cursor arrives, clicks Ask | 1.6× on the field, drifting | answer streams where the eye is | click; groove starts on the bar |
-| … | | | | | |
+| t | subject | action (a verb that changes it) | framing (scale, where it sits) | words on screen | carries into next by | sound |
+|---|---|---|---|---|---|---|
+| 0–2.4 | the question | words rise, creep | wide, centred line | "Where do the bikes go at 8 a.m.?" | the line shrinks into the app's field | pad, one mallet note |
+| 2.4–5 | composer | cursor arrives, clicks Ask | 1.6× on the field, lower third | (UI only) | answer streams where the eye is | click; groove starts on the bar |
+| 7–11 | Harbor's line | still drawing as we arrive; dips | 2.3× close-up, line fills the frame | "Harbor is empty by 8:40" | we push through the dip | ding on the circle |
+| … | | | | | | |
 
 Rules for the sheet:
 
@@ -94,6 +124,12 @@ Rules for the sheet:
   The data changes, then the consequence is visible. The viewer should be able to retell it.
 - **At least three shot scales** in 30 s: wide/establishing, working (1.3–1.7×), and a close-up
   (2–3×) that arrives while something is still building.
+- **The picture carries the meaning, not the words.** Cover the words column: can you still follow
+  the film? If not, find the image or action that says it. Budget: about **one short line on screen at a
+  time** and **~40 words of film copy per 30 s** (UI content and the end card aside). No beat has a
+  heading. Lines arrive, do their job, and leave.
+- **Framing changes.** No two neighbouring beats share the same framing, and something fills the frame
+  at least once every ~8 s (a close-up, a full-bleed world).
 - **Count it:** ~4–6 beats per 20 s, a meaningful change every 2–4 s, open calm (title ~2.5 s, at most
   one measured push early), end card held ≥ 3 s.
 
@@ -139,6 +175,9 @@ node <skill>/scripts/frames.mjs <film-dir> --at 0,<every beat start>,<every beat
 node <skill>/scripts/check.mjs <film-dir>
 ```
 
+After export, `node <skill>/scripts/review.mjs <film.mp4> --sheet sheet.jpg` runs the same smells on the
+encoded file (sound, loudness, frozen time, the animated-deck signals) and works on any video.
+
 Open the contact sheet and the full-size stills you're unsure of, and actually look. For each frame ask:
 
 - Is there one clear subject, and is it big enough to read on a phone (640 px wide)?
@@ -155,7 +194,8 @@ render always has problems.
 
 ### 5. Sound
 
-Sound is half the film, unless they asked for silence. Write `score(S, kit)` from the same `TT`
+Sound is half the film. **A film with no `score()` is unfinished**: never deliver a silent export unless
+they asked for silence, and if you do, say so in your reply. Write `score(S, kit)` from the same `TT`
 (`upstream/sound.md` has the method): pick a tempo so bar lines land on the big moments. Start with a
 near-silent pad under the title, bring the groove in when the action starts, put foley on the exact
 frames of visible events (clicks, keystrokes via `S.ticks(kit.typing.times)`, pops when things land,
