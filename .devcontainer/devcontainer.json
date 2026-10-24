@@ -1,0 +1,14 @@
+{
+  "name": "Claude Motion - Full Capability Studio",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+  "postCreateCommand": "bash .devcontainer/bootstrap.sh",
+  "forwardPorts": [4173],
+  "portsAttributes": {
+    "4173": { "label": "Claude Motion preview", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode.vscode-typescript-next"]
+    }
+  }
+}
