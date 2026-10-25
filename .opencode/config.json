@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/schema.json",
+  "name": "claude-motion",
+  "description": "Deterministic 60 FPS 2D/3D motion graphics runtime, kinetic typography, and physics engine for coding agents and browser animation.",
+  "skills": [
+    {
+      "name": "claude-motion",
+      "path": "./SKILL.md",
+      "description": "Make polished, continuously moving short films in code and export frame-exact MP4 with an original score."
+    }
+  ]
+}
