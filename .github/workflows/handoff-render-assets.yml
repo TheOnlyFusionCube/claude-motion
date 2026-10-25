@@ -1,0 +1,25 @@
+name: Temporary rendered video handoff
+on:
+  push:
+    branches:
+      - showcase-video-handoff
+    paths:
+      - .github/workflows/handoff-render-assets.yml
+permissions:
+  contents: read
+jobs:
+  package-video:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify available renders
+        run: |
+          ls -lh showcase-output/*.mp4
+      - name: Upload rendered footage
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-motion-rendered-footage
+          path: showcase-output/*.mp4
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
