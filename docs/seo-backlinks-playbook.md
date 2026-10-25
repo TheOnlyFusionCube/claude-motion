@@ -70,6 +70,7 @@ GitHub has a Domain Authority of 96. Getting listed in popular curated lists pro
 
 #### Target D: `awesome-opencode` (`awesome-opencode/awesome-opencode`)
 - **Repo**: [https://github.com/awesome-opencode/awesome-opencode](https://github.com/awesome-opencode/awesome-opencode)
+- **Active PR**: [PR #937](https://github.com/awesome-opencode/awesome-opencode/pull/937) (Status: Open)
 - **Target Section**: `<div id="projects"></div>` under `🛠 PROJECTS`
 - **HTML/Markdown Snippet**:
   ```html
@@ -86,18 +87,20 @@ GitHub has a Domain Authority of 96. Getting listed in popular curated lists pro
 
 #### Target E: `awesome-codex-skills` (`composio-community/awesome-codex-skills` - 17,000+ stars)
 - **Repo**: [https://github.com/composio-community/awesome-codex-skills](https://github.com/composio-community/awesome-codex-skills)
+- **Active PR**: [PR #377](https://github.com/composio-community/awesome-codex-skills/pull/377) (Status: Open)
 - **Target Section**: `### Development & Code Tools`
 - **Markdown Snippet**:
   ```markdown
-  - [claude-motion](https://github.com/TheOnlyFusionCube/claude-motion) - Launch-quality 2D/3D motion graphics, kinetic typography, and deterministic physics engine for coding agents and browser animation. Export frame-exact 60 FPS MP4 video.
+  - [claude-motion](https://github.com/TheOnlyFusionCube/claude-motion) - Launch-quality 2D/3D motion graphics, kinetic typography, and deterministic physics engine for coding agents and browser animation with frame-exact 60 FPS MP4 video export. Install: `python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo TheOnlyFusionCube/claude-motion --name claude-motion`
   ```
-- **PR Title**: `Add claude-motion to Development & Code Tools skills`
+- **PR Title**: `Add claude-motion skill to Development & Code Tools`
 
 #### Target F: `awesome-codex-subagents` (`VoltAgent/awesome-codex-subagents` - 6,300+ stars)
 - **Repo**: [https://github.com/VoltAgent/awesome-codex-subagents](https://github.com/VoltAgent/awesome-codex-subagents)
+- **Active PR**: [PR #51](https://github.com/VoltAgent/awesome-codex-subagents/pull/51) (Status: Open)
 - **Target Section**: `categories/07-specialized-domains`
-- **New File**: `categories/07-specialized-domains/motion-director.toml` (copy directly from `.codex/agents/motion-director.toml`)
-- **PR Title**: `Add motion-director subagent for 2D/3D motion graphics & video export`
+- **New File**: `categories/07-specialized-domains/motion-director.toml` (copied directly from `.codex/agents/motion-director.toml`)
+- **PR Title**: `feat(subagents): add motion-director subagent`
 
 ---
 
