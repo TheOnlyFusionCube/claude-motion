@@ -2,7 +2,27 @@
   "name": "claude-motion",
   "version": "2.5.0",
   "private": true,
-  "description": "Launch-quality motion films in code for coding agents: deterministic DOM + Three.js film runtime, direction method, render/score/export tools",
+  "description": "High-performance 2D/3D motion graphics runtime, kinetic typography, and physics engine for deterministic 60 FPS video rendering.",
+  "homepage": "https://theonlyfusioncube.github.io/claude-motion/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheOnlyFusionCube/claude-motion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TheOnlyFusionCube/claude-motion/issues"
+  },
+  "author": "Jesse Pan",
+  "license": "MIT",
+  "keywords": [
+    "motion-graphics",
+    "threejs",
+    "creative-coding",
+    "video-rendering",
+    "physics-engine",
+    "kinetic-typography",
+    "playwright",
+    "claude-code"
+  ],
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": {
