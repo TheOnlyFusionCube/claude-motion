@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://theonlyfusioncube.github.io/claude-motion/sitemap.xml
