@@ -41,66 +41,33 @@ If asked to verify ownership:
 ## Part 2: High-Authority Backlink Acquisition (Domain Authority 85–96)
 
 ### 1. GitHub "Awesome" Lists (DA 96)
-GitHub has a Domain Authority of 96. Getting listed in popular curated lists provides permanent, authoritative backlinks and targeted developer traffic.
+GitHub has a Domain Authority of 96. Getting listed in popular curated lists provides permanent, authoritative backlinks and targeted developer traffic. All pull requests below have been verified against the respective repository's `CONTRIBUTING.md` guidelines (alphabetical sorting, schema validation, punctuation, and star requirements).
 
-#### Target A: `awesome-creative-coding` (`terkelg/awesome-creative-coding`)
-- **Repo**: [https://github.com/terkelg/awesome-creative-coding](https://github.com/terkelg/awesome-creative-coding)
-- **Target Section**: `### Web / JavaScript` or `### Physics`
-- **Markdown Snippet**:
-  ```markdown
-  - [claude-motion](https://github.com/TheOnlyFusionCube/claude-motion) - High-performance 2D/3D motion graphics and deterministic physics engine for browser animation and video rendering.
-  ```
-- **PR Title**: `Add claude-motion to JavaScript motion/physics section`
+#### Filed Community Pull Requests (12 Repositories, 90,000+ ⭐ Total Reach)
 
-#### Target B: `awesome-canvas` (`ericdrowell/awesome-canvas`)
-- **Repo**: [https://github.com/ericdrowell/awesome-canvas](https://github.com/ericdrowell/awesome-canvas)
-- **Target Section**: `## Libraries / Animation`
-- **Markdown Snippet**:
-  ```markdown
-  - [claude-motion](https://github.com/TheOnlyFusionCube/claude-motion) - Deterministic 60 FPS Canvas and WebGL motion graphics runtime with headless video export.
-  ```
-- **PR Title**: `Add claude-motion to Animation libraries`
+| # | Target Repository | Category / Section | Stars | Live Pull Request |
+|---|---|---|---|---|
+| 1 | **awesome-opencode/awesome-opencode** | `data/projects/claude-motion.yaml` (Schema validated) | 10,700 ⭐ | [PR #937](https://github.com/awesome-opencode/awesome-opencode/pull/937) |
+| 2 | **composio-community/awesome-codex-skills** | `Development & Code Tools` | 17,200 ⭐ | [PR #377](https://github.com/composio-community/awesome-codex-skills/pull/377) |
+| 3 | **VoltAgent/awesome-codex-subagents** | `categories/07-specialized-domains/motion-director.toml` | 6,300 ⭐ | [PR #51](https://github.com/VoltAgent/awesome-codex-subagents/pull/51) |
+| 4 | **VoltAgent/awesome-claude-code-subagents** | `categories/07-specialized-domains/motion-director.md` | 26,000 ⭐ | [PR #335](https://github.com/VoltAgent/awesome-claude-code-subagents/pull/335) |
+| 5 | **terkelg/awesome-creative-coding** | `Web Programming • Libraries` (Alphabetical) | 15,400 ⭐ | [PR #294](https://github.com/terkelg/awesome-creative-coding/pull/294) |
+| 6 | **raphamorim/awesome-canvas** | `To draw using canvas` (Alphabetical) | 1,800 ⭐ | [PR #62](https://github.com/raphamorim/awesome-canvas/pull/62) |
+| 7 | **AxiomeCG/awesome-threejs** | `Animation` | 1,000 ⭐ | [PR #71](https://github.com/AxiomeCG/awesome-threejs/pull/71) |
+| 8 | **sergey-pimenov/awesome-web-animation** | `## React` (Remotion / R3F ecosystem) | 1,600 ⭐ | [PR #39](https://github.com/sergey-pimenov/awesome-web-animation/pull/39) |
+| 9 | **steven2358/awesome-generative-ai** | `DISCOVERIES.md` > `Video` > `Animation` | 12,800 ⭐ | [PR #1843](https://github.com/steven2358/awesome-generative-ai/pull/1843) |
+| 10 | **e2b-dev/awesome-sdks-for-ai-agents** | Open-source Agent SDKs (Alphabetical) | 1,200 ⭐ | [PR #419](https://github.com/e2b-dev/awesome-sdks-for-ai-agents/pull/419) |
+| 11 | **sjfricke/awesome-webgl** | `Libraries` > `Others` (Alphabetical) | 1,500 ⭐ | [PR #51](https://github.com/sjfricke/awesome-webgl/pull/51) |
+| 12 | **willianjusten/awesome-svg** | `topics/Libraries.md` (Alphabetical) | 4,700 ⭐ | [PR #261](https://github.com/willianjusten/awesome-svg/pull/261) |
 
-#### Target C: `awesome-claude` / `awesome-claude-prompts`
-- **Target Section**: `## Skills & Extensions` or `## Tools`
-- **Markdown Snippet**:
-  ```markdown
-  - [claude-motion](https://github.com/TheOnlyFusionCube/claude-motion) - Claude Code agent skill for generating deterministic 60 FPS motion graphics, Three.js scenes, and video exports.
-  ```
+---
 
-#### Target D: `awesome-opencode` (`awesome-opencode/awesome-opencode`)
-- **Repo**: [https://github.com/awesome-opencode/awesome-opencode](https://github.com/awesome-opencode/awesome-opencode)
-- **Active PR**: [PR #937](https://github.com/awesome-opencode/awesome-opencode/pull/937) (Status: Open)
-- **Target Section**: `<div id="projects"></div>` under `🛠 PROJECTS`
-- **HTML/Markdown Snippet**:
-  ```html
-  <details>
-    <summary><b>claude-motion</b> <img src="https://badgen.net/github/stars/TheOnlyFusionCube/claude-motion" height="14"/> - <i>Deterministic 60 FPS 2D/3D motion graphics runtime and video renderer</i></summary>
-    <blockquote>
-      Launch-quality motion films and physics simulations in code. Combines deterministic DOM + Three.js film runtime with headless Playwright frame capture and FFmpeg hardware-accelerated video export for coding agents.
-      <br><br>
-      <a href="https://github.com/TheOnlyFusionCube/claude-motion">🔗 <b>View Repository</b></a>
-    </blockquote>
-  </details>
-  ```
-- **PR Title**: `Add claude-motion to Projects section`
-
-#### Target E: `awesome-codex-skills` (`composio-community/awesome-codex-skills` - 17,000+ stars)
-- **Repo**: [https://github.com/composio-community/awesome-codex-skills](https://github.com/composio-community/awesome-codex-skills)
-- **Active PR**: [PR #377](https://github.com/composio-community/awesome-codex-skills/pull/377) (Status: Open)
-- **Target Section**: `### Development & Code Tools`
-- **Markdown Snippet**:
-  ```markdown
-  - [claude-motion](https://github.com/TheOnlyFusionCube/claude-motion) - Launch-quality 2D/3D motion graphics, kinetic typography, and deterministic physics engine for coding agents and browser animation with frame-exact 60 FPS MP4 video export. Install: `python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo TheOnlyFusionCube/claude-motion --name claude-motion`
-  ```
-- **PR Title**: `Add claude-motion skill to Development & Code Tools`
-
-#### Target F: `awesome-codex-subagents` (`VoltAgent/awesome-codex-subagents` - 6,300+ stars)
-- **Repo**: [https://github.com/VoltAgent/awesome-codex-subagents](https://github.com/VoltAgent/awesome-codex-subagents)
-- **Active PR**: [PR #51](https://github.com/VoltAgent/awesome-codex-subagents/pull/51) (Status: Open)
-- **Target Section**: `categories/07-specialized-domains`
-- **New File**: `categories/07-specialized-domains/motion-director.toml` (copied directly from `.codex/agents/motion-director.toml`)
-- **PR Title**: `feat(subagents): add motion-director subagent`
+#### Reserve Queue: Pending Star Thresholds
+- **`travisvn/awesome-claude-skills` (15,500 ⭐)**:
+  - *Requirement*: `CONTRIBUTING.md` specifies automated closure if the repository has under 10 stars.
+  - *Status*: Fork prepared at `TheOnlyFusionCube/awesome-claude-skills-1`, branch `add-claude-motion`. Once `claude-motion` reaches 10 stars via incoming traffic, submit immediately.
+- **`ComposioHQ/awesome-claude-skills` & `hesreallyhim/awesome-claude-code`**:
+  - *Status*: GitHub Interaction Limits active (restricts API PR creation to repository contributors). Can be submitted via Web UI or after initial star growth.
 
 ---
 
