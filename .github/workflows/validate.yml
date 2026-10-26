@@ -40,3 +40,71 @@ jobs:
         run: |
           node scripts/export.mjs templates/starter --draft --out /tmp/starter.mp4
           node scripts/review.mjs /tmp/starter.mp4
+
+  webgl-poster-draft:
+    name: Draft WebGL MP4 export (poster / software)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MOTION_GL: software
+      DRAFT: '1'
+      FORCE: '1'
+      CHECKS: '0'
+      STILLS: '0'
+      SHOWCASE_FROM: '2.5'
+      SHOWCASE_TO: '3.5'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium, FFmpeg, Xvfb, and software GL
+        run: |
+          npm i --no-save playwright
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg xvfb libgl1 libegl1 libgl1-mesa-dri mesa-utils
+      - name: Export bounded poster clip with software WebGL
+        run: |
+          set -euo pipefail
+          mkdir -p showcase-output
+          bash scripts/codespaces-showcase.sh poster 2>&1 | tee showcase-output/poster-smoke.log
+          grep -Ei 'WebGL \(3D scenes\).*(swiftshader|llvmpipe|software)' showcase-output/poster-smoke.log
+      - name: Probe and decode the exported MP4
+        run: |
+          set -euo pipefail
+          test -s showcase-output/poster.mp4
+          ffprobe -v error -count_frames -select_streams v:0 \
+            -show_entries stream=codec_name,width,height,avg_frame_rate,nb_read_frames:format=duration \
+            -of json showcase-output/poster.mp4 > showcase-output/poster-ffprobe.json
+          python3 - <<'PY'
+          import json
+          from fractions import Fraction
+          with open("showcase-output/poster-ffprobe.json", encoding="utf-8") as source:
+              metadata = json.load(source)
+          stream, = metadata["streams"]
+          assert stream["codec_name"] == "h264", stream
+          assert (stream["width"], stream["height"]) == (960, 540), stream
+          assert Fraction(stream["avg_frame_rate"]) == 24, stream
+          assert int(stream["nb_read_frames"]) == 24, stream
+          duration = float(metadata["format"]["duration"])
+          assert 0.9 <= duration <= 1.15, duration
+          print(f"Validated H.264 960x540/24fps, 24 decoded frames, {duration:.2f}s")
+          PY
+          ffmpeg -hide_banner -v error -xerror -i showcase-output/poster.mp4 -map 0:v:0 -f null -
+          ffmpeg -y -hide_banner -v error -ss 0.5 -i showcase-output/poster.mp4 \
+            -frames:v 1 showcase-output/poster-frame.jpg
+      - name: Upload draft video and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: poster-software-webgl-draft
+          path: |
+            showcase-output/poster.mp4
+            showcase-output/poster-export.log
+            showcase-output/poster-smoke.log
+            showcase-output/poster-ffprobe.json
+            showcase-output/poster-frame.jpg
+            /tmp/claude-motion-xvfb.log
+          if-no-files-found: warn
+          retention-days: 7
