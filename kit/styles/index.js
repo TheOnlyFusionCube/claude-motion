@@ -1,5 +1,5 @@
 // Style presets: six ready-made looks that share one vocabulary of classes, so a film can switch
-// look by changing one word. Ported from the original Motion built-in styles (references/upstream/styles.md).
+// look by changing one word. See references/styles.md for the local preset API.
 //
 //   import { useStyle, STYLES } from 'motion/styles/index.js';
 //   const st = await useStyle(kit, 'editorial', { palette: 'cobalt', values: { stress: 'underline' }, root });

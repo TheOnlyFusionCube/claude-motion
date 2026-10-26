@@ -2,7 +2,7 @@
 
 Style, colours and length decide more of the result than anything else, and they are the things
 people most regret not specifying. So for a **new film**, ask them **once, together, before the beat
-sheet**. Adapted from the original Motion intake (`upstream/questions.md`).
+sheet**. This is the standalone skill's own intake procedure.
 
 ## When
 
@@ -127,4 +127,4 @@ any came from defaults.
 
 Every look, typeface, palette and name you offer or choose must be clean, professional, and fine to show a
 diverse audience of every age, race, faith, gender and sexual orientation. Beyond what the subject needs, nothing
-that could read as political, religious or propaganda imagery (`upstream/motion.md` §1 has the full list).
+that could read as political, religious or propaganda imagery without a reason grounded in the brief.

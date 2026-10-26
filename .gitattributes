@@ -6,4 +6,3 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.sh text eol=lf
-references/upstream/*.md text eol=lf

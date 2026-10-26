@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-Scope: This MIT grant excludes the verbatim third-party documents under
-`references/upstream/`. This file is not a representation that the original
-rights holder has licensed those documents. See NOTICE.md and SOURCE.md.
+Scope: This MIT grant covers material authored for this project, except separately
+licensed dependencies and any third-party content. The historical mirrored Motion
+documents are not included in the current source tree. No license to that source text
+is asserted here; prior Git history may still contain it. See NOTICE.md and SOURCE.md.

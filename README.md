@@ -289,7 +289,7 @@ examples/tabletop/       11 s 3D tabletop: UI plates on a desk, a walking box ch
 examples/app-promo/      12.6 s app promo: icon → store page → prompt → home screen → glossy pills
 examples/brand-promo/    14 s brand promo: 3D coins, rays, icons in sentences, tilted dashboard, claims
 examples/styles/         One scene per style preset
-references/              intake · styles · kit-api · recipes · upstream/ (the original Motion docs, verbatim)
+references/              production-guide · intake · styles · kit-api · recipes (local workflow and API)
 ```
 
 ---
@@ -313,10 +313,14 @@ Any agent capable of executing Node.js and loading Agent Skills (Claude Code, Co
 
 ---
 
-## Notes & Upstream Verification
+## Provenance and portable distribution
 
-An independent open-source project. Not affiliated with, sponsored by, or endorsed by Anthropic. The original reference documentation in `references/upstream/` is preserved verbatim; see [NOTICE.md](NOTICE.md) and [SOURCE.md](SOURCE.md). Verification of upstream document hashes can be performed at any time:
+Claude Motion is an independent open-source project, not affiliated with or endorsed by Anthropic. Its local production instructions, API reference, templates and examples work without bundled original Motion artifact-type documents. For the public mirror's pinned revision, historical file hashes and the unresolved redistribution question, see [SOURCE.md](SOURCE.md) and [NOTICE.md](NOTICE.md). Removal from the current tree does not remove files from earlier Git history.
+
+Run the offline portability guard and the full test suite:
 ```bash
-npm run verify-upstream
+npm run verify-portable
+npm run check
 ```
+The legacy `scripts/sync-upstream.mjs` accepts `--list` for historical metadata and `--verify` for local portability checks; it no longer downloads or repairs third-party documents.
 Bundled typography is licensed under SIL OFL 1.1 (`kit/fonts/LICENSE.md`); Three.js is licensed under MIT. Full version history is detailed in [CHANGELOG.md](CHANGELOG.md).
