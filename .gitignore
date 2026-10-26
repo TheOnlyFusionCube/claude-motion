@@ -16,3 +16,4 @@ dist/
 __pycache__/
 .agents/
 ORIGINAL_REQUEST.md
+references/upstream/

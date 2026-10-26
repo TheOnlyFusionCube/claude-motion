@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Verbatim-source integrity verifier and optional pinned-source repair.
- * Uses only Node built-ins, pins the git commit and checks every original git blob SHA-1.
- * Never executes the downloaded text. Does not modify SKILL.md or any user film.
+ * Historical entry point, now a read-only portability audit.
+ * No network access, synchronization, downloading, or source repair is performed.
+ * The metadata below is an audit trail, not a grant of redistribution rights.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -10,7 +10,6 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 export const commit = '4ec8ef41a1e0ef32e6f0e9d20b0c18f7e028dc83';
-const root = 'Anthropic/artifact-types/motion/';
 export const originals = Object.freeze([
   { local: 'original-skill.md', bytes: 16064, remote: 'SKILL.md', sha: 'b3ddb733dcda89d071ccf3a914f62e01fda06a4f' },
   { local: 'motion.md', bytes: 16106, remote: 'artifact-type/reference/motion.md', sha: '7dd751cb8d54347a5ef8a34d7539d98d0942d784' },
@@ -26,51 +25,113 @@ export const originals = Object.freeze([
   { local: 'walkthrough.md', bytes: 4653, remote: 'artifact-type/reference/walkthrough.md', sha: '6499048be0e2ed73c8de6d35a69c13d3b8f95e23' },
 ]);
 
-export function gitBlobSha(buffer) {
-  return crypto.createHash('sha1').update(`blob ${buffer.byteLength}\0`).update(buffer).digest('hex');
+// These files make a usable installed skill, without any third-party reference text.
+export const requiredPortableFiles = Object.freeze([
+  'SKILL.md', 'references/production-guide.md', 'references/intake.md',
+  'references/kit-api.md', 'references/recipes.md', 'references/styles.md',
+  'templates/starter/film.js', 'kit/motion-kit.js',
+  'scripts/check.mjs', 'scripts/score.mjs', 'scripts/export.mjs',
+  'SOURCE.md', 'NOTICE.md',
+]);
+
+// Check published instructions and executable entry points for broken source-document links.
+export const operationalFiles = Object.freeze([
+  'SKILL.md', 'README.md', 'CONTRIBUTING.md',
+  'references/production-guide.md', 'references/intake.md',
+  'references/kit-api.md', 'references/recipes.md', 'references/styles.md',
+  'kit/motion-kit.js', 'kit/styles/index.js',
+  'templates/starter/film.js', 'templates/preset/film.js',
+  'package.json', '.github/workflows/validate.yml',
+]);
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const ignoredDirectories = new Set(['.git', 'node_modules', 'dist', 'frames', '.agents', '.next']);
+const knownSourceHashes = new Map(originals.map(o => [o.sha, o.local]));
+const staleLink = /(?:references\/)?upstream\/[\w.-]+\.md/gi;
+
+export function gitBlobSha(bytes) {
+  return crypto.createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
+}
+
+async function markdownFiles(dir, relative = '') {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    if (entry.isSymbolicLink()) continue;
+    const rel = path.posix.join(relative, entry.name);
+    const absolute = path.join(dir, entry.name);
+    if (entry.isDirectory() && !ignoredDirectories.has(entry.name)) {
+      files.push(...await markdownFiles(absolute, rel));
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      files.push({ rel, absolute });
+    }
+  }
+  return files;
+}
+
+export async function auditPortable(repoRoot = root, { sourceHashes = knownSourceHashes } = {}) {
+  const issues = [];
+  for (const rel of requiredPortableFiles) {
+    try {
+      if (!(await fs.stat(path.join(repoRoot, rel))).isFile()) issues.push(`Not a file: ${rel}`);
+    } catch (err) {
+      if (err.code === 'ENOENT') issues.push(`Missing portable skill dependency: ${rel}`);
+      else throw err;
+    }
+  }
+
+  const oldDirectory = path.join(repoRoot, 'references/upstream');
+  try {
+    const files = await fs.readdir(oldDirectory);
+    if (files.length) issues.push(`Bundled upstream directory is not portable: references/upstream/ (${files.length} entries)`);
+  } catch (err) { if (err.code !== 'ENOENT') throw err; }
+
+  for (const rel of operationalFiles) {
+    let source;
+    try { source = await fs.readFile(path.join(repoRoot, rel), 'utf8'); }
+    catch (err) { if (err.code === 'ENOENT') continue; throw err; }
+    for (const match of source.matchAll(staleLink)) {
+      const line = source.slice(0, match.index).split('\n').length;
+      issues.push(`Obsolete upstream document link in ${rel}:${line}: ${match[0]}`);
+    }
+  }
+
+  // Catch renamed exact copies, not merely copies kept at the former path.
+  for (const { rel, absolute } of await markdownFiles(repoRoot)) {
+    const hash = gitBlobSha(await fs.readFile(absolute));
+    if (sourceHashes.has(hash)) {
+      issues.push(`Verbatim mirrored document at ${rel} (historical ${sourceHashes.get(hash)} blob)`);
+    }
+  }
+  return issues;
 }
 
 async function main(argv) {
-  const modes = new Set(argv);
-  if (modes.has('--help') || modes.has('-h')) {
-    console.log('Usage: node scripts/sync-upstream.mjs [--list | --verify | --all] [--force]');
-    console.log('Without options, download only missing original refs; --all downloads missing docs too and verifies existing ones.');
+  if (!argv.length || argv.includes('--help') || argv.includes('-h')) {
+    console.log('Usage: node scripts/sync-upstream.mjs --verify | --list');
+    console.log('Legacy filename retained for compatibility. This command never downloads or restores source documents.');
     return;
   }
-  if (argv.some(a => !['--list', '--verify', '--all', '--force'].includes(a))) throw new Error('Unknown argument. Use --help.');
-  const target = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../references/upstream');
-  if (modes.has('--list')) {
-    for (const o of originals) console.log(`${o.local.padEnd(20)} ${o.sha} ${o.remote}`);
+  if (argv.length !== 1) throw new Error('Choose exactly one option: --verify or --list.');
+  if (argv[0] === '--list') {
+    console.log(`Historical source manifest (metadata only), pinned to ${commit}:`);
+    for (const o of originals) console.log(`${o.local.padEnd(20)} ${o.bytes} bytes ${o.sha} ${o.remote}`);
     return;
   }
-  await fs.mkdir(target, {recursive: true});
-  let verified = 0, downloaded = 0, missing = 0;
-  for (const o of originals) {
-    const dest = path.join(target, o.local);
-    let bytes = null;
-    try { bytes = await fs.readFile(dest); } catch (error) { if (error.code !== 'ENOENT') throw error; }
-    if (bytes && gitBlobSha(bytes) === o.sha) { verified++; console.log(`VERIFIED ${o.local}`); continue; }
-    if (bytes && !modes.has('--force')) {
-      throw new Error(`Local file differs from upstream blob: ${dest}. It was not overwritten (use --force to replace).`);
+  if (argv[0] === '--verify') {
+    const issues = await auditPortable();
+    if (issues.length) {
+      for (const issue of issues) console.error(`FAIL ${issue}`);
+      process.exitCode = 1;
+    } else {
+      console.log('Portable skill verified: local instructions and runtime present; no known verbatim upstream copies or operational source-document links.');
     }
-    if (modes.has('--verify')) { missing++; console.log(`MISSING ${o.local}`); continue; }
-    const url = `https://raw.githubusercontent.com/asgeirtj/system_prompts_leaks/${commit}/${root}${o.remote}`;
-    let response;
-    try { response = await fetch(url, {signal: AbortSignal.timeout(30000)}); }
-    catch (error) { throw new Error(`Could not fetch ${o.remote}: ${error.message}. Offline use is supported with bundled refs.`); }
-    if (!response.ok) throw new Error(`GET ${url} → HTTP ${response.status}`);
-    bytes = Buffer.from(await response.arrayBuffer());
-    const actual = gitBlobSha(bytes);
-    if (actual !== o.sha) throw new Error(`${o.remote}: expected git blob ${o.sha}, got ${actual}. Refusing altered bytes.`);
-    await fs.writeFile(dest, bytes);
-    console.log(`DOWNLOADED ${o.local} (${bytes.length} bytes)`);
-    downloaded++;
+    return;
   }
-  console.log(`Original references: ${verified} verified, ${downloaded} downloaded, ${missing} missing. Pinned commit ${commit}.`);
-  if (modes.has('--verify') && missing) {
-    console.error('Source verification failed: bundled original references are missing. Run --all while online to restore exact pinned source files.');
-    process.exitCode = 1;
+  if (argv[0] === '--all' || argv[0] === '--force') {
+    throw new Error('Upstream downloading and repair are disabled. See SOURCE.md and NOTICE.md; this skill does not require mirrored documents.');
   }
+  throw new Error(`Unknown argument: ${argv[0]}. Use --help.`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

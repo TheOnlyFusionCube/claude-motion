@@ -1,18 +1,16 @@
-# Original Motion source, integrity and portability
+# Source provenance and standalone distribution
 
-`claude-motion` is an **unofficial** standalone Agent Skill adapted from the Motion artifact-type instructions in the public mirror:
+Claude Motion is an **unofficial**, independently maintained coding-agent skill and browser renderer informed by the Motion artifact-type materials made public in the mirror:
 
 https://github.com/asgeirtj/system_prompts_leaks/tree/main/Anthropic/artifact-types/motion
 
-It is not an official Anthropic product or a copy of Anthropic's private player, Artifact store, stylesheet bundle, runtime synthesizer, or live design interface. The mirror labels its repository CC0-1.0; that label does not establish a license from the original rights holder. Review provenance and applicable permissions before redistributing source text.
+**Pinned historical source revision:** `4ec8ef41a1e0ef32e6f0e9d20b0c18f7e028dc83`. The mirror marks its repository CC0-1.0, but that repository-level label does **not** establish redistribution permission from the original rights holder. Permission is unresolved; neither authorization nor infringement is asserted here.
 
-**Pinned source revision:** `4ec8ef41a1e0ef32e6f0e9d20b0c18f7e028dc83`.
+## Historical inventory (metadata, not bundled contents)
 
-## Exact contents: 100% verbatim source documentation
+Earlier repository commits included the following 12 unmodified Markdown files (159,065 bytes) in `references/upstream/`. This table preserves their paths, sizes and Git blob hashes for identification and attribution. **The files listed below are no longer part of the current source tree.** The former root `SKILL.md` had been renamed to `original-skill.md` to avoid conflicting with this project's entrypoint.
 
-All original files are **included offline**, unmodified, and checked against the Git blob SHA-1 hashes that identify their exact upstream content. The source root `SKILL.md` has only been **renamed** to `references/upstream/original-skill.md` to keep the portable skill's root `SKILL.md` as the sole entrypoint; its byte contents are unchanged.
-
-| Local `references/upstream/` file | Original Git path suffix | Bytes | Git blob SHA-1 |
+| Previously bundled under `references/upstream/` | Original Git path suffix | Bytes | Git blob SHA-1 |
 | --- | --- | ---: | --- |
 | `original-skill.md` | `SKILL.md` | 16,064 | `b3ddb733dcda89d071ccf3a914f62e01fda06a4f` |
 | `motion.md` | `artifact-type/reference/motion.md` | 16,106 | `7dd751cb8d54347a5ef8a34d7539d98d0942d784` |
@@ -28,19 +26,12 @@ All original files are **included offline**, unmodified, and checked against the
 | `walkthrough.md` | `artifact-type/reference/walkthrough.md` | 4,653 | `6499048be0e2ed73c8de6d35a69c13d3b8f95e23` |
 | **Total** | **12 original documents** | **159,065** | **12 verified Git blobs** |
 
-Verify with Node built-ins only:
+## Standalone operation
 
-```sh
-node scripts/sync-upstream.mjs --verify   # fails nonzero for a missing or changed original
-```
+The current `SKILL.md` uses `references/production-guide.md`, `references/kit-api.md`, `references/recipes.md`, `references/intake.md` and `references/styles.md`, plus local runnable starter and example films. Those are the installation's working instructions. The renderer in `kit/` and export scripts are this project's independent implementation, **not** the private Motion player; matching the private product or acquiring its source is not required.
 
-`node scripts/sync-upstream.mjs --all` re-fetches the originals at the pinned revision (optional, needs network).
+Use `npm run verify-portable` or `node scripts/sync-upstream.mjs --verify` to check required local files, stale document links and known exact-copy Git hashes. The retained `sync-upstream.mjs` filename is historical: `--list` displays this metadata; `--all` and `--force` no longer fetch, restore or modify external text. Verification needs no network.
 
-## How the skill uses them
+## Distribution boundaries
 
-`SKILL.md`, `kit/`, `scripts/`, `templates/` and `examples/` are new code written for this project. The runtime
-re-implements the *documented* `kit` API (`film-api.md`) as an ordinary browser script, so the craft rules and
-code fragments in the originals apply to films made here. It is not the original player, and neither its
-pixels nor its sound are claimed to match. The originals' private-product commands (Artifact, ArtifactData,
-`kit.module`, `frames.ts`/`check.ts`, the Export button) do not exist here; `references/kit-api.md` lists the
-local equivalents.
+This change removes the verbatim reference files from the current checkout, package and new Git archives built from this revision. It **does not erase earlier commits, tags, forks or downloaded archives** that may contain them; historical Git objects remain reachable unless separately addressed. The change also does not establish a legal opinion on the authorship or licensing of any earlier adaptations. Keep attribution, obtain permission where needed, and review rights before independently redistributing the original documents. See `NOTICE.md`.

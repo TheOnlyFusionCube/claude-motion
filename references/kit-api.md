@@ -1,7 +1,7 @@
 # Kit API
 
-The runtime is `kit/motion-kit.js` (a global `kit`) plus `kit/player.html`. It mirrors the
-original Motion `kit` (`upstream/film-api.md`), so the craft docs' code applies almost as is.
+The runtime is `kit/motion-kit.js` (a global `kit`) plus `kit/player.html`. This reference
+covers the functions implemented in this repository, without requiring any external source document.
 Everything is pure in `t`: no timers, no CSS transitions (the stage disables them), no
 accumulation between frames. `Math.random` and `Date.now` are seeded/frozen per frame anyway.
 

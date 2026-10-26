@@ -3,8 +3,8 @@
  * Everything on screen is a pure function of t (seconds). The player calls
  * CUT.render(t, kit) for any t, in any order, and expects the identical picture.
  *
- * API mirrors the original Motion `kit` (references/upstream/film-api.md) so the
- * craft docs apply directly. Classic script: defines window.kit before film.js runs.
+ * The supported runtime API is documented in references/kit-api.md.
+ * Classic script: defines window.kit before film.js runs.
  */
 (function () {
   'use strict';

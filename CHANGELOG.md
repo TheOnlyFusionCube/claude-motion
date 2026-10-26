@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased: portable standalone documentation
+
+- Remove the twelve mirrored Motion artifact-type documents from the current tree; preserve their historical paths, commit and hashes in `SOURCE.md` for attribution and review.
+- Add a self-contained production guide for the local player, and remove mandatory upstream-document reading and stale links in instructions, presets and kit comments.
+- Replace automatic source downloads with an offline portability audit and regression tests; renderer, starter and examples remain unchanged.
+- The legal status of redistribution from the public mirror remains unresolved; this change makes no finding of infringement or permission.
+
 ## 2.5.0: every genre
 
 Asked for: four more kinds of film, a crypto-style brand promo, a 3D tabletop with a walking mascot, an

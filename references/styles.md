@@ -1,6 +1,6 @@
 # Style presets
 
-Six ready-made looks, ported from the original Motion built-in styles (`upstream/styles.md`). A preset
+Six ready-made looks implemented in `kit/styles/index.js`. A preset
 gives you the ground, typefaces, surfaces, the emphasis animation and named palettes. **It doesn't make
 the film.** The beat sheet, the camera, the actions and the transitions are still yours, and every rule in
 SKILL.md holds. A preset with five fading cards is still a slideshow.

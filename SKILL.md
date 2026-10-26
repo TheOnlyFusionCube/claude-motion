@@ -22,8 +22,8 @@ It can have perfect type and still fail. This skill exists to prevent that.
 
 ## Read before your first film
 
-1. `references/upstream/motion.md`: the original craft rules and the numbers that review taught.
-   Read all of it. Skip what's specific to its private player (Artifact, `kit.module`, check.ts).
+1. `references/production-guide.md`: the standalone production workflow, written for this project's
+   runtime, templates, examples and CLI. It requires no third-party source documents.
 2. **The reference film for this genre.** Copy its techniques, never its look, story or words. Each has a
    `BEATS.md`: read the sheet, then the code. Pick by the brief:
 
@@ -205,7 +205,7 @@ showing the grammar). Add `--style <preset> [--palette <id>]` to start on a pres
   overshoot (`eob` 1.6–1.9) or spring. Product UI only eases and never bounces. Things travel on arcs.
   Type enters word by word from ONE direction (~110 ms stagger, 24–34 px), and exits quicker the other way.
 - **Product UI** (theirs): read the real components/CSS and match exact values
-  (`upstream/recreate-ui.md`). Use fictional names and data. Label anything speculative ("Concept film ·
+  (see `references/production-guide.md` for the local UI-matching workflow). Use fictional names and data. Label anything speculative ("Concept film ·
   fictional data") on the end card.
 - **3D**, when depth carries the idea (a city of data, a product object, a space to fly through):
   the clay-and-light recipe in `recipes.md` §11. Project DOM labels from 3D anchors. Drive geometry
@@ -239,7 +239,7 @@ render always has problems.
 
 Sound is half the film. **A film with no `score()` is unfinished**: never deliver a silent export unless
 they asked for silence, and if you do, say so in your reply. Write `score(S, kit)` from the same `TT`
-(`upstream/sound.md` has the method): pick a tempo so bar lines land on the big moments. Start with a
+(see `references/production-guide.md` and `references/kit-api.md` for the local score API): pick a tempo so bar lines land on the big moments. Start with a
 near-silent pad under the title, bring the groove in when the action starts, put foley on the exact
 frames of visible events (clicks, keystrokes via `S.ticks(kit.typing.times)`, pops when things land,
 a whoosh under a whip), drop to a pad for a transform, build into the end card, then hit on it and let
@@ -280,6 +280,5 @@ they ask for a redesign. If you think a bigger change would help, do what they a
 `examples/` (launch, journey, reel, poster, tabletop, app-promo, brand-promo, styles) · `kit/three-kit.js` (3D) ·
 `kit/ui/devices.js` (phone, icons, store page, input, browser, pills) ·
 `references/intake.md`, `references/styles.md` (+ `kit/styles/`, `examples/styles/`), `references/kit-api.md`,
-`references/recipes.md`, `scripts/palette.mjs` · `references/upstream/` (the original Motion
-reference set, verbatim and read-only; its private-player commands don't exist here. Use this kit's
-equivalents in `kit-api.md`).
+`references/recipes.md`, `references/production-guide.md`, `scripts/palette.mjs` · `SOURCE.md` and
+`NOTICE.md` (historical provenance and rights context; neither is needed to render).
