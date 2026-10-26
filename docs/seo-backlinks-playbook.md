@@ -54,7 +54,7 @@ GitHub has a Domain Authority of 96. Getting listed in popular curated lists pro
 | 5 | **terkelg/awesome-creative-coding** | `Web Programming • Libraries` (Alphabetical) | 15,400 ⭐ | [PR #294](https://github.com/terkelg/awesome-creative-coding/pull/294) |
 | 6 | **raphamorim/awesome-canvas** | `To draw using canvas` (Alphabetical) | 1,800 ⭐ | [PR #62](https://github.com/raphamorim/awesome-canvas/pull/62) |
 | 7 | **AxiomeCG/awesome-threejs** | `Animation` | 1,000 ⭐ | [PR #71](https://github.com/AxiomeCG/awesome-threejs/pull/71) |
-| 8 | **sergey-pimenov/awesome-web-animation** | `## React` (Remotion / R3F ecosystem) | 1,600 ⭐ | [PR #39](https://github.com/sergey-pimenov/awesome-web-animation/pull/39) |
+| 8 | **sergey-pimenov/awesome-web-animation** | `## Common` (standalone DOM/SVG + Three.js renderer) | 1,600 ⭐ | [PR #39](https://github.com/sergey-pimenov/awesome-web-animation/pull/39) |
 | 9 | **steven2358/awesome-generative-ai** | `DISCOVERIES.md` > `Video` > `Animation` | 12,800 ⭐ | [PR #1843](https://github.com/steven2358/awesome-generative-ai/pull/1843) |
 | 10 | **e2b-dev/awesome-sdks-for-ai-agents** | Open-source Agent SDKs (Alphabetical) | 1,200 ⭐ | [PR #419](https://github.com/e2b-dev/awesome-sdks-for-ai-agents/pull/419) |
 | 11 | **sjfricke/awesome-webgl** | `Libraries` > `Others` (Alphabetical) | 1,500 ⭐ | [PR #51](https://github.com/sjfricke/awesome-webgl/pull/51) |
