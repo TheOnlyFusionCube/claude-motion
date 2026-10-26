@@ -42,3 +42,27 @@ Download `claude-motion-renders.zip` after running:
 ```bash
 zip -r claude-motion-renders.zip showcase-output/
 ```
+
+## Automated software-WebGL export smoke test
+
+The separate **Draft WebGL MP4 export (poster / software)** GitHub Actions job
+uses the actual Codespaces showcase script with `MOTION_GL=software`, `DRAFT=1`,
+one export worker and motion blur disabled. It renders **only 2.5–3.5 seconds**
+of the WebGL chrome-knot scene in `poster`, keeping CPU and artifact size bounded.
+The optional `SHOWCASE_FROM` and `SHOWCASE_TO` environment variables select a
+short clip; omit both to export entire films.
+
+The job requires a reported SwiftShader/llvmpipe software-WebGL renderer,
+uses FFmpeg to write an MP4, verifies H.264 at 960×540/24 fps with 24 decodable
+frames using ffprobe, and decodes the video again with FFmpeg. It uploads the
+draft MP4, a representative JPEG frame, probe metadata, and rendering logs
+as the `poster-software-webgl-draft` Actions artifact (retained seven days).
+A failed renderer, export, or validation step fails the job; logs remain
+available for diagnosis.
+
+**Passing GitHub Actions validates a software-WebGL export on the GitHub-hosted
+Ubuntu runner, not inside GitHub Codespaces.** It also does not establish that
+all eight full-length films, motion blur, or 1080p exports work. A Codespace
+must still be launched on the showcase branch and separately tested and
+inspected with the full `DRAFT=1 bash scripts/codespaces-showcase.sh poster`
+(or all-eight) command before claiming Codespaces validation.

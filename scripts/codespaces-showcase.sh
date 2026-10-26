@@ -23,6 +23,19 @@ else
   EXTRAS=(--jobs 1)
   echo "Full-quality mode: WebGL software rendering can be slow."
 fi
+# Optional short clip for bounded automated exports. Omit both for complete films.
+if [[ -n "${SHOWCASE_FROM:-}" || -n "${SHOWCASE_TO:-}" ]]; then
+  if [[ -z "${SHOWCASE_FROM:-}" || -z "${SHOWCASE_TO:-}" ]]; then
+    echo "Set SHOWCASE_FROM and SHOWCASE_TO together." >&2
+    exit 2
+  fi
+  if ! node -e 'const [from, to] = process.argv.slice(1).map(Number); process.exit(Number.isFinite(from) && from >= 0 && Number.isFinite(to) && to > from ? 0 : 1)' "$SHOWCASE_FROM" "$SHOWCASE_TO"; then
+    echo "Invalid clip range: require finite seconds with 0 <= SHOWCASE_FROM < SHOWCASE_TO." >&2
+    exit 2
+  fi
+  EXTRAS+=(--from "$SHOWCASE_FROM" --to "$SHOWCASE_TO")
+  echo "Clip mode: ${SHOWCASE_FROM}s to ${SHOWCASE_TO}s (not a full film)."
+fi
 if [ "$#" -gt 0 ]; then
   FILMS=("$@")
 else
